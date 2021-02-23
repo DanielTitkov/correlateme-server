@@ -1,12 +1,12 @@
 version: '3.7'
 
 services:
-  detector_db:
+  correlateme_db:
     image: postgres
     restart: unless-stopped
     environment:
       POSTGRES_PASSWORD: pass
       POSTGRES_USER: test
-      POSTGRES_DB: detector
+      POSTGRES_DB: correlateme
     ports:
-      - "5439:5432"
+      - "5442:5432"
