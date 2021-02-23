@@ -1,0 +1,11 @@
+# configuration file template
+env: dev
+db:
+  uri: "host=localhost port=5435 user=test dbname=test password=pass sslmode=disable"
+  driver: postgres
+server:
+  port: 8000
+  host: "0.0.0.0"
+notification:
+  approveOnSend: false
+  schedule: "30 10 * * *"

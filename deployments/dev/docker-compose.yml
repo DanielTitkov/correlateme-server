@@ -1,0 +1,12 @@
+version: '3.7'
+
+services:
+  detector_db:
+    image: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: pass
+      POSTGRES_USER: test
+      POSTGRES_DB: detector
+    ports:
+      - "5439:5432"

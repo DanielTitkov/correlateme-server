@@ -1,0 +1,11 @@
+# this file is stored in repository for demo purposes only
+env: dev
+db:
+  uri: "host=localhost port=5439 user=test dbname=detector password=pass sslmode=disable"
+  driver: postgres
+server:
+  port: 8000
+  host: "0.0.0.0"
+notification:
+  approveOnSend: false
+  schedule: "*/10 * * * *"
