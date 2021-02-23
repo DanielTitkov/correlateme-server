@@ -9,45 +9,6 @@ import (
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent"
 )
 
-// The AnomalyFunc type is an adapter to allow the use of ordinary
-// function as Anomaly mutator.
-type AnomalyFunc func(context.Context, *ent.AnomalyMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f AnomalyFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.AnomalyMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.AnomalyMutation", m)
-	}
-	return f(ctx, mv)
-}
-
-// The DetectionJobFunc type is an adapter to allow the use of ordinary
-// function as DetectionJob mutator.
-type DetectionJobFunc func(context.Context, *ent.DetectionJobMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f DetectionJobFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.DetectionJobMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DetectionJobMutation", m)
-	}
-	return f(ctx, mv)
-}
-
-// The DetectionJobInstanceFunc type is an adapter to allow the use of ordinary
-// function as DetectionJobInstance mutator.
-type DetectionJobInstanceFunc func(context.Context, *ent.DetectionJobInstanceMutation) (ent.Value, error)
-
-// Mutate calls f(ctx, m).
-func (f DetectionJobInstanceFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.DetectionJobInstanceMutation)
-	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DetectionJobInstanceMutation", m)
-	}
-	return f(ctx, mv)
-}
-
 // The UserFunc type is an adapter to allow the use of ordinary
 // function as User mutator.
 type UserFunc func(context.Context, *ent.UserMutation) (ent.Value, error)

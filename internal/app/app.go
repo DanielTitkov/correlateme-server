@@ -21,17 +21,6 @@ type (
 		CreateUser(*domain.User) (*domain.User, error)
 		GetUserByUsername(username string) (*domain.User, error)
 		GetUserCount() (int, error)
-
-		// anomalies
-		CreateAnomaly(*domain.Anomaly) (*domain.Anomaly, error)
-		FilterAnomalies(*domain.FilterAnomaliesArgs) ([]*domain.Anomaly, error)
-		SetAnomalyStatus(anomalyID int, processed bool) error
-
-		// detection jobs
-		CreateDetectionJob(*domain.DetectionJob) (*domain.DetectionJob, error)
-		DeleteDetectionJobByID(int) error
-		FilterDetectionJobs(*domain.FilterDetectionJobsArgs) ([]*domain.DetectionJob, error)
-		CreateDetectionInstanceJob(*domain.DetectionJobInstance) (*domain.DetectionJobInstance, error)
 	}
 )
 

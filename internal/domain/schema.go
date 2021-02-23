@@ -12,51 +12,50 @@ type (
 		PasswordHash string
 		Email        string // TODO: add ent validation
 	}
-)
-
-type (
-	Anomaly struct {
-		ID                     int
-		DetectionJobID         int     // related job
-		DetectionJobInstanceID int     // related instance
-		Type                   string  // warning or alarm
-		Value                  float64 // outlier item value
-		Processed              bool    // if anomaly is accepted/approved
-		PeriodStart            time.Time
-		PeriodEnd              time.Time
-	}
-	DetectionJob struct {
+	// Indicator is a set of user-created data
+	Indicator struct {
 		ID          int
-		Schedule    string // cron string
-		Method      string // e.g, 3-sigmas
-		SiteID      string
-		Metric      string
-		Attribute   string
-		TimeAgo     string // e.g. 30d
-		TimeStep    string // e.g. 1d
+		Code        string // unique code for external systems
+		Slug        string
+		Title       string
 		Description string
+		Type        string
+		Active      bool
+		BuiltIn     bool // if Indicator is created by the service
+		External    bool // if Indicator is populated by the user or external system
+		Author      User
+		CreateTime  time.Time
+		UpdateTime  time.Time
 	}
-	DetectionJobInstance struct {
-		ID             int
-		DetectionJobID int // related job
-		StartedAt      time.Time
-		FinishedAt     time.Time
-	}
+	// Dataset is an intance of an Indicator populated by user data.
+	// Each User can have one Dataset for each Indicator
 	Dataset struct {
-		SiteID    string
-		Metric    string
-		Attribute string
-		StartDate time.Time
-		EndDate   time.Time
-		Data      []DataItem
+		ID           int
+		User         User
+		Indicator    Indicator
+		CreateTime   time.Time
+		UpdateTime   time.Time
+		Observations []*Observation
+		Source       string // user input or external system
+		Shared       bool   // if dataset can be shared between all users
 	}
-	DataItem struct {
-		Timestamp time.Time
-		Value     float64
+	// Observation is a data point for an indicator
+	Observation struct {
+		ID         int
+		Dataset    Dataset
+		CreateTime time.Time
+		Value      float64
 	}
-	Notification struct {
-		ChannelID string
-		Warnings  Anomaly
-		Alarms    Anomaly
+	// Correlation is a corr value of a pair of Datasets
+	Correlation struct {
+		ID         int
+		Left       Dataset
+		Right      Dataset
+		Coef       float64 // correlation coef
+		P          float64 // p-value
+		R2         float64 // determination coef
+		Type       string  // Pearson or whatever
+		CreateTime time.Time
+		UpdateTime time.Time
 	}
 )

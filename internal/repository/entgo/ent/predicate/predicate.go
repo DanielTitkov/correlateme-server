@@ -6,14 +6,5 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
-// Anomaly is the predicate function for anomaly builders.
-type Anomaly func(*sql.Selector)
-
-// DetectionJob is the predicate function for detectionjob builders.
-type DetectionJob func(*sql.Selector)
-
-// DetectionJobInstance is the predicate function for detectionjobinstance builders.
-type DetectionJobInstance func(*sql.Selector)
-
 // User is the predicate function for user builders.
 type User func(*sql.Selector)
