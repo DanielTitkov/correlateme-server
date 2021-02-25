@@ -4,6 +4,7 @@ package ent
 
 import (
 	"context"
+	"database/sql/driver"
 	"errors"
 	"fmt"
 	"math"
@@ -11,6 +12,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dataset"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/predicate"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/user"
 )
@@ -23,6 +26,9 @@ type UserQuery struct {
 	order      []OrderFunc
 	fields     []string
 	predicates []predicate.User
+	// eager-loading edges.
+	withIndicators *IndicatorQuery
+	withDatasets   *DatasetQuery
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -50,6 +56,50 @@ func (uq *UserQuery) Offset(offset int) *UserQuery {
 func (uq *UserQuery) Order(o ...OrderFunc) *UserQuery {
 	uq.order = append(uq.order, o...)
 	return uq
+}
+
+// QueryIndicators chains the current query on the "indicators" edge.
+func (uq *UserQuery) QueryIndicators() *IndicatorQuery {
+	query := &IndicatorQuery{config: uq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(indicator.Table, indicator.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.IndicatorsTable, user.IndicatorsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryDatasets chains the current query on the "datasets" edge.
+func (uq *UserQuery) QueryDatasets() *DatasetQuery {
+	query := &DatasetQuery{config: uq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := uq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := uq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(user.Table, user.FieldID, selector),
+			sqlgraph.To(dataset.Table, dataset.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, user.DatasetsTable, user.DatasetsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(uq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
 }
 
 // First returns the first User entity from the query.
@@ -228,15 +278,39 @@ func (uq *UserQuery) Clone() *UserQuery {
 		return nil
 	}
 	return &UserQuery{
-		config:     uq.config,
-		limit:      uq.limit,
-		offset:     uq.offset,
-		order:      append([]OrderFunc{}, uq.order...),
-		predicates: append([]predicate.User{}, uq.predicates...),
+		config:         uq.config,
+		limit:          uq.limit,
+		offset:         uq.offset,
+		order:          append([]OrderFunc{}, uq.order...),
+		predicates:     append([]predicate.User{}, uq.predicates...),
+		withIndicators: uq.withIndicators.Clone(),
+		withDatasets:   uq.withDatasets.Clone(),
 		// clone intermediate query.
 		sql:  uq.sql.Clone(),
 		path: uq.path,
 	}
+}
+
+// WithIndicators tells the query-builder to eager-load the nodes that are connected to
+// the "indicators" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithIndicators(opts ...func(*IndicatorQuery)) *UserQuery {
+	query := &IndicatorQuery{config: uq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withIndicators = query
+	return uq
+}
+
+// WithDatasets tells the query-builder to eager-load the nodes that are connected to
+// the "datasets" edge. The optional arguments are used to configure the query builder of the edge.
+func (uq *UserQuery) WithDatasets(opts ...func(*DatasetQuery)) *UserQuery {
+	query := &DatasetQuery{config: uq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	uq.withDatasets = query
+	return uq
 }
 
 // GroupBy is used to group vertices by one or more fields/columns.
@@ -302,8 +376,12 @@ func (uq *UserQuery) prepareQuery(ctx context.Context) error {
 
 func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 	var (
-		nodes = []*User{}
-		_spec = uq.querySpec()
+		nodes       = []*User{}
+		_spec       = uq.querySpec()
+		loadedTypes = [2]bool{
+			uq.withIndicators != nil,
+			uq.withDatasets != nil,
+		}
 	)
 	_spec.ScanValues = func(columns []string) ([]interface{}, error) {
 		node := &User{config: uq.config}
@@ -315,6 +393,7 @@ func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 			return fmt.Errorf("ent: Assign called without calling ScanValues")
 		}
 		node := nodes[len(nodes)-1]
+		node.Edges.loadedTypes = loadedTypes
 		return node.assignValues(columns, values)
 	}
 	if err := sqlgraph.QueryNodes(ctx, uq.driver, _spec); err != nil {
@@ -323,6 +402,65 @@ func (uq *UserQuery) sqlAll(ctx context.Context) ([]*User, error) {
 	if len(nodes) == 0 {
 		return nodes, nil
 	}
+
+	if query := uq.withIndicators; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		nodeids := make(map[int]*User)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+			nodes[i].Edges.Indicators = []*Indicator{}
+		}
+		query.withFKs = true
+		query.Where(predicate.Indicator(func(s *sql.Selector) {
+			s.Where(sql.InValues(user.IndicatorsColumn, fks...))
+		}))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			fk := n.user_indicators
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "user_indicators" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "user_indicators" returned %v for node %v`, *fk, n.ID)
+			}
+			node.Edges.Indicators = append(node.Edges.Indicators, n)
+		}
+	}
+
+	if query := uq.withDatasets; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		nodeids := make(map[int]*User)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+			nodes[i].Edges.Datasets = []*Dataset{}
+		}
+		query.withFKs = true
+		query.Where(predicate.Dataset(func(s *sql.Selector) {
+			s.Where(sql.InValues(user.DatasetsColumn, fks...))
+		}))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			fk := n.user_datasets
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "user_datasets" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "user_datasets" returned %v for node %v`, *fk, n.ID)
+			}
+			node.Edges.Datasets = append(node.Edges.Datasets, n)
+		}
+	}
+
 	return nodes, nil
 }
 

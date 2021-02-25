@@ -12,6 +12,16 @@ import (
 // Tx is a transactional client that is created by calling Client.Tx().
 type Tx struct {
 	config
+	// Correlation is the client for interacting with the Correlation builders.
+	Correlation *CorrelationClient
+	// Dataset is the client for interacting with the Dataset builders.
+	Dataset *DatasetClient
+	// Indicator is the client for interacting with the Indicator builders.
+	Indicator *IndicatorClient
+	// Observation is the client for interacting with the Observation builders.
+	Observation *ObservationClient
+	// Scale is the client for interacting with the Scale builders.
+	Scale *ScaleClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
 
@@ -149,6 +159,11 @@ func (tx *Tx) Client() *Client {
 }
 
 func (tx *Tx) init() {
+	tx.Correlation = NewCorrelationClient(tx.config)
+	tx.Dataset = NewDatasetClient(tx.config)
+	tx.Indicator = NewIndicatorClient(tx.config)
+	tx.Observation = NewObservationClient(tx.config)
+	tx.Scale = NewScaleClient(tx.config)
 	tx.User = NewUserClient(tx.config)
 }
 
@@ -159,7 +174,7 @@ func (tx *Tx) init() {
 // of them in order to commit or rollback the transaction.
 //
 // If a closed transaction is embedded in one of the generated entities, and the entity
-// applies a query, for example: User.QueryXXX(), the query will be executed
+// applies a query, for example: Correlation.QueryXXX(), the query will be executed
 // through the driver which created this transaction.
 //
 // Note that txDriver is not goroutine safe.

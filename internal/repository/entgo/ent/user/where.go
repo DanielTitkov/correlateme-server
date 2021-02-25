@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"entgo.io/ent/dialect/sql"
+	"entgo.io/ent/dialect/sql/sqlgraph"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/predicate"
 )
 
@@ -630,6 +631,62 @@ func ServiceEQ(v bool) predicate.User {
 func ServiceNEQ(v bool) predicate.User {
 	return predicate.User(func(s *sql.Selector) {
 		s.Where(sql.NEQ(s.C(FieldService), v))
+	})
+}
+
+// HasIndicators applies the HasEdge predicate on the "indicators" edge.
+func HasIndicators() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(IndicatorsTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, IndicatorsTable, IndicatorsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasIndicatorsWith applies the HasEdge predicate on the "indicators" edge with a given conditions (other predicates).
+func HasIndicatorsWith(preds ...predicate.Indicator) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(IndicatorsInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, IndicatorsTable, IndicatorsColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
+// HasDatasets applies the HasEdge predicate on the "datasets" edge.
+func HasDatasets() predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(DatasetsTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, DatasetsTable, DatasetsColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasDatasetsWith applies the HasEdge predicate on the "datasets" edge with a given conditions (other predicates).
+func HasDatasetsWith(preds ...predicate.Dataset) predicate.User {
+	return predicate.User(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(DatasetsInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, DatasetsTable, DatasetsColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
 	})
 }
 

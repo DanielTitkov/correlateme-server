@@ -28,6 +28,38 @@ type User struct {
 	PasswordHash string `json:"password_hash,omitempty"`
 	// Service holds the value of the "service" field.
 	Service bool `json:"service,omitempty"`
+	// Edges holds the relations/edges for other nodes in the graph.
+	// The values are being populated by the UserQuery when eager-loading is set.
+	Edges UserEdges `json:"edges"`
+}
+
+// UserEdges holds the relations/edges for other nodes in the graph.
+type UserEdges struct {
+	// Indicators holds the value of the indicators edge.
+	Indicators []*Indicator `json:"indicators,omitempty"`
+	// Datasets holds the value of the datasets edge.
+	Datasets []*Dataset `json:"datasets,omitempty"`
+	// loadedTypes holds the information for reporting if a
+	// type was loaded (or requested) in eager-loading or not.
+	loadedTypes [2]bool
+}
+
+// IndicatorsOrErr returns the Indicators value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) IndicatorsOrErr() ([]*Indicator, error) {
+	if e.loadedTypes[0] {
+		return e.Indicators, nil
+	}
+	return nil, &NotLoadedError{edge: "indicators"}
+}
+
+// DatasetsOrErr returns the Datasets value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) DatasetsOrErr() ([]*Dataset, error) {
+	if e.loadedTypes[1] {
+		return e.Datasets, nil
+	}
+	return nil, &NotLoadedError{edge: "datasets"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -103,6 +135,16 @@ func (u *User) assignValues(columns []string, values []interface{}) error {
 		}
 	}
 	return nil
+}
+
+// QueryIndicators queries the "indicators" edge of the User entity.
+func (u *User) QueryIndicators() *IndicatorQuery {
+	return (&UserClient{config: u.config}).QueryIndicators(u)
+}
+
+// QueryDatasets queries the "datasets" edge of the User entity.
+func (u *User) QueryDatasets() *DatasetQuery {
+	return (&UserClient{config: u.config}).QueryDatasets(u)
 }
 
 // Update returns a builder for updating this User.

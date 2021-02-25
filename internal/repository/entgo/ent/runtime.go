@@ -5,6 +5,11 @@ package ent
 import (
 	"time"
 
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/correlation"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dataset"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/observation"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/scale"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/schema"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/user"
 )
@@ -13,6 +18,108 @@ import (
 // (default values, validators, hooks and policies) and stitches it
 // to their package variables.
 func init() {
+	correlationMixin := schema.Correlation{}.Mixin()
+	correlationMixinFields0 := correlationMixin[0].Fields()
+	_ = correlationMixinFields0
+	correlationFields := schema.Correlation{}.Fields()
+	_ = correlationFields
+	// correlationDescCreateTime is the schema descriptor for create_time field.
+	correlationDescCreateTime := correlationMixinFields0[0].Descriptor()
+	// correlation.DefaultCreateTime holds the default value on creation for the create_time field.
+	correlation.DefaultCreateTime = correlationDescCreateTime.Default.(func() time.Time)
+	// correlationDescUpdateTime is the schema descriptor for update_time field.
+	correlationDescUpdateTime := correlationMixinFields0[1].Descriptor()
+	// correlation.DefaultUpdateTime holds the default value on creation for the update_time field.
+	correlation.DefaultUpdateTime = correlationDescUpdateTime.Default.(func() time.Time)
+	// correlation.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	correlation.UpdateDefaultUpdateTime = correlationDescUpdateTime.UpdateDefault.(func() time.Time)
+	// correlationDescType is the schema descriptor for type field.
+	correlationDescType := correlationFields[3].Descriptor()
+	// correlation.TypeValidator is a validator for the "type" field. It is called by the builders before save.
+	correlation.TypeValidator = correlationDescType.Validators[0].(func(string) error)
+	datasetMixin := schema.Dataset{}.Mixin()
+	datasetMixinFields0 := datasetMixin[0].Fields()
+	_ = datasetMixinFields0
+	datasetFields := schema.Dataset{}.Fields()
+	_ = datasetFields
+	// datasetDescCreateTime is the schema descriptor for create_time field.
+	datasetDescCreateTime := datasetMixinFields0[0].Descriptor()
+	// dataset.DefaultCreateTime holds the default value on creation for the create_time field.
+	dataset.DefaultCreateTime = datasetDescCreateTime.Default.(func() time.Time)
+	// datasetDescUpdateTime is the schema descriptor for update_time field.
+	datasetDescUpdateTime := datasetMixinFields0[1].Descriptor()
+	// dataset.DefaultUpdateTime holds the default value on creation for the update_time field.
+	dataset.DefaultUpdateTime = datasetDescUpdateTime.Default.(func() time.Time)
+	// dataset.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	dataset.UpdateDefaultUpdateTime = datasetDescUpdateTime.UpdateDefault.(func() time.Time)
+	// datasetDescShared is the schema descriptor for shared field.
+	datasetDescShared := datasetFields[0].Descriptor()
+	// dataset.DefaultShared holds the default value on creation for the shared field.
+	dataset.DefaultShared = datasetDescShared.Default.(bool)
+	indicatorMixin := schema.Indicator{}.Mixin()
+	indicatorMixinFields0 := indicatorMixin[0].Fields()
+	_ = indicatorMixinFields0
+	indicatorFields := schema.Indicator{}.Fields()
+	_ = indicatorFields
+	// indicatorDescCreateTime is the schema descriptor for create_time field.
+	indicatorDescCreateTime := indicatorMixinFields0[0].Descriptor()
+	// indicator.DefaultCreateTime holds the default value on creation for the create_time field.
+	indicator.DefaultCreateTime = indicatorDescCreateTime.Default.(func() time.Time)
+	// indicatorDescUpdateTime is the schema descriptor for update_time field.
+	indicatorDescUpdateTime := indicatorMixinFields0[1].Descriptor()
+	// indicator.DefaultUpdateTime holds the default value on creation for the update_time field.
+	indicator.DefaultUpdateTime = indicatorDescUpdateTime.Default.(func() time.Time)
+	// indicator.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	indicator.UpdateDefaultUpdateTime = indicatorDescUpdateTime.UpdateDefault.(func() time.Time)
+	// indicatorDescCode is the schema descriptor for code field.
+	indicatorDescCode := indicatorFields[0].Descriptor()
+	// indicator.CodeValidator is a validator for the "code" field. It is called by the builders before save.
+	indicator.CodeValidator = indicatorDescCode.Validators[0].(func(string) error)
+	// indicatorDescTitle is the schema descriptor for title field.
+	indicatorDescTitle := indicatorFields[1].Descriptor()
+	// indicator.TitleValidator is a validator for the "title" field. It is called by the builders before save.
+	indicator.TitleValidator = indicatorDescTitle.Validators[0].(func(string) error)
+	// indicatorDescActive is the schema descriptor for active field.
+	indicatorDescActive := indicatorFields[3].Descriptor()
+	// indicator.DefaultActive holds the default value on creation for the active field.
+	indicator.DefaultActive = indicatorDescActive.Default.(bool)
+	// indicatorDescBuiltIn is the schema descriptor for built_in field.
+	indicatorDescBuiltIn := indicatorFields[4].Descriptor()
+	// indicator.DefaultBuiltIn holds the default value on creation for the built_in field.
+	indicator.DefaultBuiltIn = indicatorDescBuiltIn.Default.(bool)
+	// indicatorDescExternal is the schema descriptor for external field.
+	indicatorDescExternal := indicatorFields[5].Descriptor()
+	// indicator.DefaultExternal holds the default value on creation for the external field.
+	indicator.DefaultExternal = indicatorDescExternal.Default.(bool)
+	observationMixin := schema.Observation{}.Mixin()
+	observationMixinFields0 := observationMixin[0].Fields()
+	_ = observationMixinFields0
+	observationFields := schema.Observation{}.Fields()
+	_ = observationFields
+	// observationDescCreateTime is the schema descriptor for create_time field.
+	observationDescCreateTime := observationMixinFields0[0].Descriptor()
+	// observation.DefaultCreateTime holds the default value on creation for the create_time field.
+	observation.DefaultCreateTime = observationDescCreateTime.Default.(func() time.Time)
+	// observationDescUpdateTime is the schema descriptor for update_time field.
+	observationDescUpdateTime := observationMixinFields0[1].Descriptor()
+	// observation.DefaultUpdateTime holds the default value on creation for the update_time field.
+	observation.DefaultUpdateTime = observationDescUpdateTime.Default.(func() time.Time)
+	// observation.UpdateDefaultUpdateTime holds the default value on update for the update_time field.
+	observation.UpdateDefaultUpdateTime = observationDescUpdateTime.UpdateDefault.(func() time.Time)
+	scaleFields := schema.Scale{}.Fields()
+	_ = scaleFields
+	// scaleDescType is the schema descriptor for type field.
+	scaleDescType := scaleFields[0].Descriptor()
+	// scale.TypeValidator is a validator for the "type" field. It is called by the builders before save.
+	scale.TypeValidator = scaleDescType.Validators[0].(func(string) error)
+	// scaleDescTitle is the schema descriptor for title field.
+	scaleDescTitle := scaleFields[1].Descriptor()
+	// scale.TitleValidator is a validator for the "title" field. It is called by the builders before save.
+	scale.TitleValidator = scaleDescTitle.Validators[0].(func(string) error)
+	// scaleDescDescription is the schema descriptor for description field.
+	scaleDescDescription := scaleFields[2].Descriptor()
+	// scale.DescriptionValidator is a validator for the "description" field. It is called by the builders before save.
+	scale.DescriptionValidator = scaleDescDescription.Validators[0].(func(string) error)
 	userMixin := schema.User{}.Mixin()
 	userMixinFields0 := userMixin[0].Fields()
 	_ = userMixinFields0

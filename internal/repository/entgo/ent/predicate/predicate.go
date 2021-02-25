@@ -6,5 +6,20 @@ import (
 	"entgo.io/ent/dialect/sql"
 )
 
+// Correlation is the predicate function for correlation builders.
+type Correlation func(*sql.Selector)
+
+// Dataset is the predicate function for dataset builders.
+type Dataset func(*sql.Selector)
+
+// Indicator is the predicate function for indicator builders.
+type Indicator func(*sql.Selector)
+
+// Observation is the predicate function for observation builders.
+type Observation func(*sql.Selector)
+
+// Scale is the predicate function for scale builders.
+type Scale func(*sql.Selector)
+
 // User is the predicate function for user builders.
 type User func(*sql.Selector)

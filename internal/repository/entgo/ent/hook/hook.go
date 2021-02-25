@@ -9,6 +9,71 @@ import (
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent"
 )
 
+// The CorrelationFunc type is an adapter to allow the use of ordinary
+// function as Correlation mutator.
+type CorrelationFunc func(context.Context, *ent.CorrelationMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f CorrelationFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.CorrelationMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.CorrelationMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The DatasetFunc type is an adapter to allow the use of ordinary
+// function as Dataset mutator.
+type DatasetFunc func(context.Context, *ent.DatasetMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f DatasetFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.DatasetMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DatasetMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The IndicatorFunc type is an adapter to allow the use of ordinary
+// function as Indicator mutator.
+type IndicatorFunc func(context.Context, *ent.IndicatorMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f IndicatorFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.IndicatorMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.IndicatorMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The ObservationFunc type is an adapter to allow the use of ordinary
+// function as Observation mutator.
+type ObservationFunc func(context.Context, *ent.ObservationMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ObservationFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.ObservationMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ObservationMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The ScaleFunc type is an adapter to allow the use of ordinary
+// function as Scale mutator.
+type ScaleFunc func(context.Context, *ent.ScaleMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f ScaleFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.ScaleMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.ScaleMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The UserFunc type is an adapter to allow the use of ordinary
 // function as User mutator.
 type UserFunc func(context.Context, *ent.UserMutation) (ent.Value, error)

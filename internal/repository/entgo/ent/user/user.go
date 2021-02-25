@@ -24,8 +24,27 @@ const (
 	// FieldService holds the string denoting the service field in the database.
 	FieldService = "service"
 
+	// EdgeIndicators holds the string denoting the indicators edge name in mutations.
+	EdgeIndicators = "indicators"
+	// EdgeDatasets holds the string denoting the datasets edge name in mutations.
+	EdgeDatasets = "datasets"
+
 	// Table holds the table name of the user in the database.
 	Table = "users"
+	// IndicatorsTable is the table the holds the indicators relation/edge.
+	IndicatorsTable = "indicators"
+	// IndicatorsInverseTable is the table name for the Indicator entity.
+	// It exists in this package in order to avoid circular dependency with the "indicator" package.
+	IndicatorsInverseTable = "indicators"
+	// IndicatorsColumn is the table column denoting the indicators relation/edge.
+	IndicatorsColumn = "user_indicators"
+	// DatasetsTable is the table the holds the datasets relation/edge.
+	DatasetsTable = "datasets"
+	// DatasetsInverseTable is the table name for the Dataset entity.
+	// It exists in this package in order to avoid circular dependency with the "dataset" package.
+	DatasetsInverseTable = "datasets"
+	// DatasetsColumn is the table column denoting the datasets relation/edge.
+	DatasetsColumn = "user_datasets"
 )
 
 // Columns holds all SQL columns for user fields.

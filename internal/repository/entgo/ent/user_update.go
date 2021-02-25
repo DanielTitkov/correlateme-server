@@ -9,6 +9,8 @@ import (
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dataset"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/predicate"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/user"
 )
@@ -58,9 +60,81 @@ func (uu *UserUpdate) SetNillableService(b *bool) *UserUpdate {
 	return uu
 }
 
+// AddIndicatorIDs adds the "indicators" edge to the Indicator entity by IDs.
+func (uu *UserUpdate) AddIndicatorIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddIndicatorIDs(ids...)
+	return uu
+}
+
+// AddIndicators adds the "indicators" edges to the Indicator entity.
+func (uu *UserUpdate) AddIndicators(i ...*Indicator) *UserUpdate {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return uu.AddIndicatorIDs(ids...)
+}
+
+// AddDatasetIDs adds the "datasets" edge to the Dataset entity by IDs.
+func (uu *UserUpdate) AddDatasetIDs(ids ...int) *UserUpdate {
+	uu.mutation.AddDatasetIDs(ids...)
+	return uu
+}
+
+// AddDatasets adds the "datasets" edges to the Dataset entity.
+func (uu *UserUpdate) AddDatasets(d ...*Dataset) *UserUpdate {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return uu.AddDatasetIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uu *UserUpdate) Mutation() *UserMutation {
 	return uu.mutation
+}
+
+// ClearIndicators clears all "indicators" edges to the Indicator entity.
+func (uu *UserUpdate) ClearIndicators() *UserUpdate {
+	uu.mutation.ClearIndicators()
+	return uu
+}
+
+// RemoveIndicatorIDs removes the "indicators" edge to Indicator entities by IDs.
+func (uu *UserUpdate) RemoveIndicatorIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveIndicatorIDs(ids...)
+	return uu
+}
+
+// RemoveIndicators removes "indicators" edges to Indicator entities.
+func (uu *UserUpdate) RemoveIndicators(i ...*Indicator) *UserUpdate {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return uu.RemoveIndicatorIDs(ids...)
+}
+
+// ClearDatasets clears all "datasets" edges to the Dataset entity.
+func (uu *UserUpdate) ClearDatasets() *UserUpdate {
+	uu.mutation.ClearDatasets()
+	return uu
+}
+
+// RemoveDatasetIDs removes the "datasets" edge to Dataset entities by IDs.
+func (uu *UserUpdate) RemoveDatasetIDs(ids ...int) *UserUpdate {
+	uu.mutation.RemoveDatasetIDs(ids...)
+	return uu
+}
+
+// RemoveDatasets removes "datasets" edges to Dataset entities.
+func (uu *UserUpdate) RemoveDatasets(d ...*Dataset) *UserUpdate {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return uu.RemoveDatasetIDs(ids...)
 }
 
 // Save executes the query and returns the number of nodes affected by the update operation.
@@ -197,6 +271,114 @@ func (uu *UserUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: user.FieldService,
 		})
 	}
+	if uu.mutation.IndicatorsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.IndicatorsTable,
+			Columns: []string{user.IndicatorsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: indicator.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedIndicatorsIDs(); len(nodes) > 0 && !uu.mutation.IndicatorsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.IndicatorsTable,
+			Columns: []string{user.IndicatorsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: indicator.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.IndicatorsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.IndicatorsTable,
+			Columns: []string{user.IndicatorsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: indicator.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uu.mutation.DatasetsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DatasetsTable,
+			Columns: []string{user.DatasetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: dataset.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.RemovedDatasetsIDs(); len(nodes) > 0 && !uu.mutation.DatasetsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DatasetsTable,
+			Columns: []string{user.DatasetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: dataset.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uu.mutation.DatasetsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DatasetsTable,
+			Columns: []string{user.DatasetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: dataset.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if n, err = sqlgraph.UpdateNodes(ctx, uu.driver, _spec); err != nil {
 		if _, ok := err.(*sqlgraph.NotFoundError); ok {
 			err = &NotFoundError{user.Label}
@@ -247,9 +429,81 @@ func (uuo *UserUpdateOne) SetNillableService(b *bool) *UserUpdateOne {
 	return uuo
 }
 
+// AddIndicatorIDs adds the "indicators" edge to the Indicator entity by IDs.
+func (uuo *UserUpdateOne) AddIndicatorIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddIndicatorIDs(ids...)
+	return uuo
+}
+
+// AddIndicators adds the "indicators" edges to the Indicator entity.
+func (uuo *UserUpdateOne) AddIndicators(i ...*Indicator) *UserUpdateOne {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return uuo.AddIndicatorIDs(ids...)
+}
+
+// AddDatasetIDs adds the "datasets" edge to the Dataset entity by IDs.
+func (uuo *UserUpdateOne) AddDatasetIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.AddDatasetIDs(ids...)
+	return uuo
+}
+
+// AddDatasets adds the "datasets" edges to the Dataset entity.
+func (uuo *UserUpdateOne) AddDatasets(d ...*Dataset) *UserUpdateOne {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return uuo.AddDatasetIDs(ids...)
+}
+
 // Mutation returns the UserMutation object of the builder.
 func (uuo *UserUpdateOne) Mutation() *UserMutation {
 	return uuo.mutation
+}
+
+// ClearIndicators clears all "indicators" edges to the Indicator entity.
+func (uuo *UserUpdateOne) ClearIndicators() *UserUpdateOne {
+	uuo.mutation.ClearIndicators()
+	return uuo
+}
+
+// RemoveIndicatorIDs removes the "indicators" edge to Indicator entities by IDs.
+func (uuo *UserUpdateOne) RemoveIndicatorIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveIndicatorIDs(ids...)
+	return uuo
+}
+
+// RemoveIndicators removes "indicators" edges to Indicator entities.
+func (uuo *UserUpdateOne) RemoveIndicators(i ...*Indicator) *UserUpdateOne {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return uuo.RemoveIndicatorIDs(ids...)
+}
+
+// ClearDatasets clears all "datasets" edges to the Dataset entity.
+func (uuo *UserUpdateOne) ClearDatasets() *UserUpdateOne {
+	uuo.mutation.ClearDatasets()
+	return uuo
+}
+
+// RemoveDatasetIDs removes the "datasets" edge to Dataset entities by IDs.
+func (uuo *UserUpdateOne) RemoveDatasetIDs(ids ...int) *UserUpdateOne {
+	uuo.mutation.RemoveDatasetIDs(ids...)
+	return uuo
+}
+
+// RemoveDatasets removes "datasets" edges to Dataset entities.
+func (uuo *UserUpdateOne) RemoveDatasets(d ...*Dataset) *UserUpdateOne {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return uuo.RemoveDatasetIDs(ids...)
 }
 
 // Save executes the query and returns the updated User entity.
@@ -390,6 +644,114 @@ func (uuo *UserUpdateOne) sqlSave(ctx context.Context) (_node *User, err error) 
 			Value:  value,
 			Column: user.FieldService,
 		})
+	}
+	if uuo.mutation.IndicatorsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.IndicatorsTable,
+			Columns: []string{user.IndicatorsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: indicator.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedIndicatorsIDs(); len(nodes) > 0 && !uuo.mutation.IndicatorsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.IndicatorsTable,
+			Columns: []string{user.IndicatorsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: indicator.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.IndicatorsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.IndicatorsTable,
+			Columns: []string{user.IndicatorsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: indicator.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if uuo.mutation.DatasetsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DatasetsTable,
+			Columns: []string{user.DatasetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: dataset.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.RemovedDatasetsIDs(); len(nodes) > 0 && !uuo.mutation.DatasetsCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DatasetsTable,
+			Columns: []string{user.DatasetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: dataset.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := uuo.mutation.DatasetsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DatasetsTable,
+			Columns: []string{user.DatasetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: dataset.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
 	_node = &User{config: uuo.config}
 	_spec.Assign = _node.assignValues

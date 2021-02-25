@@ -2,6 +2,7 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/mixin"
 )
@@ -24,7 +25,9 @@ func (User) Fields() []ent.Field {
 // Edges of the User.
 func (User) Edges() []ent.Edge {
 	return []ent.Edge{
-		// edge.To("tasks", Task.Type),
+		// has
+		edge.To("indicators", Indicator.Type),
+		edge.To("datasets", Dataset.Type),
 	}
 }
 

@@ -16,16 +16,22 @@ type (
 	Indicator struct {
 		ID          int
 		Code        string // unique code for external systems
-		Slug        string
 		Title       string
 		Description string
-		Type        string
 		Active      bool
 		BuiltIn     bool // if Indicator is created by the service
 		External    bool // if Indicator is populated by the user or external system
+		Scale       Scale
 		Author      User
 		CreateTime  time.Time
 		UpdateTime  time.Time
+	}
+	// Scale is a type of a scale for an Indicator
+	Scale struct {
+		ID          int
+		Type        string // numeric, ordinal or nomial
+		Title       string
+		Description string
 	}
 	// Dataset is an intance of an Indicator populated by user data.
 	// Each User can have one Dataset for each Indicator

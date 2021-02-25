@@ -10,6 +10,8 @@ import (
 
 	"entgo.io/ent/dialect/sql/sqlgraph"
 	"entgo.io/ent/schema/field"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dataset"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/user"
 )
 
@@ -78,6 +80,36 @@ func (uc *UserCreate) SetNillableService(b *bool) *UserCreate {
 		uc.SetService(*b)
 	}
 	return uc
+}
+
+// AddIndicatorIDs adds the "indicators" edge to the Indicator entity by IDs.
+func (uc *UserCreate) AddIndicatorIDs(ids ...int) *UserCreate {
+	uc.mutation.AddIndicatorIDs(ids...)
+	return uc
+}
+
+// AddIndicators adds the "indicators" edges to the Indicator entity.
+func (uc *UserCreate) AddIndicators(i ...*Indicator) *UserCreate {
+	ids := make([]int, len(i))
+	for j := range i {
+		ids[j] = i[j].ID
+	}
+	return uc.AddIndicatorIDs(ids...)
+}
+
+// AddDatasetIDs adds the "datasets" edge to the Dataset entity by IDs.
+func (uc *UserCreate) AddDatasetIDs(ids ...int) *UserCreate {
+	uc.mutation.AddDatasetIDs(ids...)
+	return uc
+}
+
+// AddDatasets adds the "datasets" edges to the Dataset entity.
+func (uc *UserCreate) AddDatasets(d ...*Dataset) *UserCreate {
+	ids := make([]int, len(d))
+	for i := range d {
+		ids[i] = d[i].ID
+	}
+	return uc.AddDatasetIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -250,6 +282,44 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 			Column: user.FieldService,
 		})
 		_node.Service = value
+	}
+	if nodes := uc.mutation.IndicatorsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.IndicatorsTable,
+			Columns: []string{user.IndicatorsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: indicator.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.DatasetsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.DatasetsTable,
+			Columns: []string{user.DatasetsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: dataset.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
 	}
 	return _node, _spec
 }
