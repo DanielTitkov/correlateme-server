@@ -48,7 +48,10 @@ func main() {
 
 	repo := entgo.NewEntgoRepository(db, logger)
 
-	app := app.NewApp(cfg, logger, repo)
+	app, err := app.NewApp(cfg, logger, repo)
+	if err != nil {
+		logger.Fatal("failed creating app", err)
+	}
 
 	server := prepare.NewServer(cfg, logger, app)
 	logger.Fatal("failed to start server", server.Start(cfg.Server.GetAddress()))

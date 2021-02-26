@@ -36,6 +36,7 @@ func (Indicator) Edges() []ent.Edge {
 }
 
 func (Indicator) Indexes() []ent.Index {
+	// TODO: unique title for user
 	return nil
 }
 

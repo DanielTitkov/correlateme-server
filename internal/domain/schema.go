@@ -21,8 +21,8 @@ type (
 		Active      bool
 		BuiltIn     bool // if Indicator is created by the service
 		External    bool // if Indicator is populated by the user or external system
-		Scale       Scale
-		Author      User
+		Scale       *Scale
+		Author      *User
 		CreateTime  time.Time
 		UpdateTime  time.Time
 	}

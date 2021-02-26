@@ -1,3 +1,12 @@
 package domain
 
-type ()
+type (
+	CreateIndicatorArgs struct {
+		Username    string
+		Title       string
+		Description string
+		ScaleType   string
+	}
+	FilterIndicatorsArgs struct {
+	}
+)
