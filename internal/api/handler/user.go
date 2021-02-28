@@ -51,6 +51,7 @@ func (h *Handler) GetUserHandler(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, model.GetUserResponse{
+		ID:       u.ID,
 		Username: u.Username,
 		Email:    u.Email,
 	})

@@ -4,6 +4,7 @@ import (
 	"context"
 
 	"github.com/DanielTitkov/correlateme-server/internal/domain"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/user"
 )
 
@@ -16,12 +17,7 @@ func (r *EntgoRepository) GetUserByUsername(username string) (*domain.User, erro
 		return nil, err
 	}
 
-	return &domain.User{
-		ID:           user.ID,
-		Username:     user.Username,
-		Email:        user.Email,
-		PasswordHash: user.PasswordHash,
-	}, nil
+	return entToDomainUser(user), nil
 }
 
 func (r *EntgoRepository) CreateUser(u *domain.User) (*domain.User, error) {
@@ -35,14 +31,18 @@ func (r *EntgoRepository) CreateUser(u *domain.User) (*domain.User, error) {
 		return nil, err
 	}
 
+	return entToDomainUser(user), nil
+}
+
+func (r *EntgoRepository) GetUserCount() (int, error) {
+	return r.client.User.Query().Count(context.Background())
+}
+
+func entToDomainUser(user *ent.User) *domain.User {
 	return &domain.User{
 		ID:           user.ID,
 		Username:     user.Username,
 		Email:        user.Email,
 		PasswordHash: user.PasswordHash,
-	}, nil
-}
-
-func (r *EntgoRepository) GetUserCount() (int, error) {
-	return r.client.User.Query().Count(context.Background())
+	}
 }

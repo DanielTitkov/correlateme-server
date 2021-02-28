@@ -5,12 +5,12 @@ import "time"
 type (
 	// User holds user data
 	User struct {
-		ID           int  // id is passed to domain model for simplicity
-		Service      bool // if user is a service // TODO: only service users create items
+		ID           int // id is passed to domain model for simplicity
 		Username     string
 		Password     string
 		PasswordHash string
 		Email        string // TODO: add ent validation
+		// Service      bool // if user is a service
 	}
 	// Indicator is a set of user-created data
 	Indicator struct {

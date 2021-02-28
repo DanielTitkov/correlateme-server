@@ -40,8 +40,8 @@ func (h *Handler) link(e *echo.Echo) {
 	v1Restricted.POST("/getUser", h.GetUserHandler)
 	// indicator
 	v1Restricted.POST("/createIndicator", h.CreateIndicator)
+	v1Restricted.POST("/getIndicators", h.GetIndicators)
 	// TODO
-	// v1Restricted.POST("/", h.GetIndicators)
 	// v1Restricted.POST("/", h.CreateObservation)
 	// v1Restricted.POST("/", h.GetDataset)
 	// v1Restricted.POST("/", h.GetCorrelation) // ?

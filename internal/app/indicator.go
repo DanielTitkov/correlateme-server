@@ -35,6 +35,16 @@ func (a *App) CreateIndicator(args domain.CreateIndicatorArgs) error {
 	return nil
 }
 
+func (a *App) FilterIndicators(filter domain.FilterIndicatorsArgs) ([]*domain.Indicator, error) {
+	// if user want to get built-in indicators author is obsolete
+	// otherwise user gets only indicators belonging to them
+	if filter.BuiltIn != nil && *filter.BuiltIn == true {
+		filter.AuthorUsername = nil
+	}
+
+	return a.repo.FilterIndicators(filter)
+}
+
 func makeIndicatorCode(username, scaleType, title string) string {
 	ts := strconv.FormatInt(time.Now().Unix(), 10)
 	reg, _ := regexp.Compile(`[^\d\w]+`)

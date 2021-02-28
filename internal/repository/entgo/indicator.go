@@ -5,6 +5,9 @@ import (
 
 	"github.com/DanielTitkov/correlateme-server/internal/domain"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/scale"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/user"
 )
 
 func (r *EntgoRepository) CreateIndicator(i *domain.Indicator) (*domain.Indicator, error) {
@@ -27,7 +30,58 @@ func (r *EntgoRepository) CreateIndicator(i *domain.Indicator) (*domain.Indicato
 }
 
 func (r *EntgoRepository) FilterIndicators(filter domain.FilterIndicatorsArgs) ([]*domain.Indicator, error) {
-	return []*domain.Indicator{}, nil
+	query := r.client.Indicator.Query().WithAuthor().WithScale()
+
+	if filter.ID != nil {
+		query.Where(indicator.IDIn(filter.ID...))
+	}
+
+	if filter.Code != nil {
+		query.Where(indicator.CodeIn(filter.Code...))
+	}
+
+	if filter.Title != nil {
+		query.Where(indicator.TitleIn(filter.Title...))
+	}
+
+	if filter.Active != nil {
+		query.Where(indicator.ActiveEQ(*filter.Active))
+	}
+
+	if filter.BuiltIn != nil {
+		query.Where(indicator.BuiltInEQ(*filter.BuiltIn))
+	}
+
+	if filter.External != nil {
+		query.Where(indicator.ExternalEQ(*filter.External))
+	}
+
+	if filter.AuthorUsername != nil {
+		query.Where(indicator.HasAuthorWith(user.UsernameEQ(*filter.AuthorUsername)))
+	}
+
+	if filter.ScaleType != nil {
+		query.Where(indicator.HasScaleWith(scale.TypeEQ(*filter.ScaleType)))
+	}
+
+	inds, err := query.All(context.TODO())
+	if err != nil {
+		return nil, err
+	}
+
+	var res []*domain.Indicator
+	for _, ind := range inds {
+		// this should be safe because scale is required
+		scale := ind.Edges.Scale
+		// must check because author is optional
+		var author *domain.User
+		if ind.Edges.Author != nil {
+			author = entToDomainUser(ind.Edges.Author)
+		}
+		res = append(res, entToDomainIndicator(ind, entToDomainScale(scale), author))
+	}
+
+	return res, nil
 }
 
 func entToDomainIndicator(ind *ent.Indicator, scale *domain.Scale, author *domain.User) *domain.Indicator {
