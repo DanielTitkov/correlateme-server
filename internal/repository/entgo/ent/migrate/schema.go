@@ -73,6 +73,13 @@ var (
 				OnDelete:   schema.SetNull,
 			},
 		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "dataset_user_datasets",
+				Unique:  true,
+				Columns: []*schema.Column{DatasetsColumns[6]},
+			},
+		},
 	}
 	// IndicatorsColumns holds the columns for the "indicators" table.
 	IndicatorsColumns = []*schema.Column{
@@ -107,6 +114,13 @@ var (
 
 				RefColumns: []*schema.Column{UsersColumns[0]},
 				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "indicator_title_user_indicators",
+				Unique:  true,
+				Columns: []*schema.Column{IndicatorsColumns[4], IndicatorsColumns[10]},
 			},
 		},
 	}

@@ -58,6 +58,7 @@ func (a *App) GetUserToken(u *domain.User) (string, error) {
 
 	token := jwt.New(jwt.SigningMethodHS256)
 	claims := token.Claims.(jwt.MapClaims)
+	claims["id"] = user.ID
 	claims["username"] = user.Username
 	claims["exp"] = time.Now().Add(time.Hour * time.Duration(a.cfg.Auth.Exp)).Unix()
 

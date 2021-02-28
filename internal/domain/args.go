@@ -2,7 +2,7 @@ package domain
 
 type (
 	CreateIndicatorArgs struct {
-		Username    string
+		Username    string // TODO: change to ID
 		Title       string
 		Description string
 		ScaleType   string
@@ -16,5 +16,10 @@ type (
 		AuthorUsername *string
 		ScaleType      *string
 		External       *bool // not accesible via API, only for intenal use
+	}
+	CreateObservationArgs struct {
+		UserID      int
+		IndicatorID int
+		Value       float64
 	}
 )

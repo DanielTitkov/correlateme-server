@@ -4,6 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 	"entgo.io/ent/schema/mixin"
 )
 
@@ -34,7 +35,10 @@ func (Dataset) Edges() []ent.Edge {
 }
 
 func (Dataset) Indexes() []ent.Index {
-	return nil
+	return []ent.Index{
+		// one dataset for one indicator for user
+		index.Edges("indicator").Edges("user").Unique(),
+	}
 }
 
 func (Dataset) Mixin() []ent.Mixin {

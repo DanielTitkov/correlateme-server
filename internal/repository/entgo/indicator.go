@@ -26,7 +26,21 @@ func (r *EntgoRepository) CreateIndicator(i *domain.Indicator) (*domain.Indicato
 		return nil, err
 	}
 
-	return entToDomainIndicator(ind, i.Scale, i.Author), nil
+	return entToDomainIndicator(ind), nil
+}
+
+func (r *EntgoRepository) GetIndicatorByID(id int) (*domain.Indicator, error) {
+	ind, err := r.client.Indicator.
+		Query().
+		WithAuthor().
+		WithScale().
+		Where(indicator.IDEQ(id)).
+		Only(context.TODO())
+	if err != nil {
+		return nil, err
+	}
+
+	return entToDomainIndicator(ind), nil
 }
 
 func (r *EntgoRepository) FilterIndicators(filter domain.FilterIndicatorsArgs) ([]*domain.Indicator, error) {
@@ -71,20 +85,23 @@ func (r *EntgoRepository) FilterIndicators(filter domain.FilterIndicatorsArgs) (
 
 	var res []*domain.Indicator
 	for _, ind := range inds {
-		// this should be safe because scale is required
-		scale := ind.Edges.Scale
-		// must check because author is optional
-		var author *domain.User
-		if ind.Edges.Author != nil {
-			author = entToDomainUser(ind.Edges.Author)
-		}
-		res = append(res, entToDomainIndicator(ind, entToDomainScale(scale), author))
+		res = append(res, entToDomainIndicator(ind))
 	}
 
 	return res, nil
 }
 
-func entToDomainIndicator(ind *ent.Indicator, scale *domain.Scale, author *domain.User) *domain.Indicator {
+func entToDomainIndicator(ind *ent.Indicator) *domain.Indicator {
+	var scale *domain.Scale
+	if ind.Edges.Scale != nil {
+		scale = entToDomainScale(ind.Edges.Scale)
+	}
+
+	var author *domain.User
+	if ind.Edges.Author != nil {
+		author = entToDomainUser(ind.Edges.Author)
+	}
+
 	return &domain.Indicator{
 		ID:          ind.ID,
 		Code:        ind.Code,

@@ -27,18 +27,6 @@ func (su *ScaleUpdate) Where(ps ...predicate.Scale) *ScaleUpdate {
 	return su
 }
 
-// SetType sets the "type" field.
-func (su *ScaleUpdate) SetType(s string) *ScaleUpdate {
-	su.mutation.SetType(s)
-	return su
-}
-
-// SetTitle sets the "title" field.
-func (su *ScaleUpdate) SetTitle(s string) *ScaleUpdate {
-	su.mutation.SetTitle(s)
-	return su
-}
-
 // SetDescription sets the "description" field.
 func (su *ScaleUpdate) SetDescription(s string) *ScaleUpdate {
 	su.mutation.SetDescription(s)
@@ -145,16 +133,6 @@ func (su *ScaleUpdate) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (su *ScaleUpdate) check() error {
-	if v, ok := su.mutation.GetType(); ok {
-		if err := scale.TypeValidator(v); err != nil {
-			return &ValidationError{Name: "type", err: fmt.Errorf("ent: validator failed for field \"type\": %w", err)}
-		}
-	}
-	if v, ok := su.mutation.Title(); ok {
-		if err := scale.TitleValidator(v); err != nil {
-			return &ValidationError{Name: "title", err: fmt.Errorf("ent: validator failed for field \"title\": %w", err)}
-		}
-	}
 	if v, ok := su.mutation.Description(); ok {
 		if err := scale.DescriptionValidator(v); err != nil {
 			return &ValidationError{Name: "description", err: fmt.Errorf("ent: validator failed for field \"description\": %w", err)}
@@ -180,20 +158,6 @@ func (su *ScaleUpdate) sqlSave(ctx context.Context) (n int, err error) {
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := su.mutation.GetType(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: scale.FieldType,
-		})
-	}
-	if value, ok := su.mutation.Title(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: scale.FieldTitle,
-		})
 	}
 	if value, ok := su.mutation.Description(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
@@ -272,18 +236,6 @@ type ScaleUpdateOne struct {
 	config
 	hooks    []Hook
 	mutation *ScaleMutation
-}
-
-// SetType sets the "type" field.
-func (suo *ScaleUpdateOne) SetType(s string) *ScaleUpdateOne {
-	suo.mutation.SetType(s)
-	return suo
-}
-
-// SetTitle sets the "title" field.
-func (suo *ScaleUpdateOne) SetTitle(s string) *ScaleUpdateOne {
-	suo.mutation.SetTitle(s)
-	return suo
 }
 
 // SetDescription sets the "description" field.
@@ -392,16 +344,6 @@ func (suo *ScaleUpdateOne) ExecX(ctx context.Context) {
 
 // check runs all checks and user-defined validators on the builder.
 func (suo *ScaleUpdateOne) check() error {
-	if v, ok := suo.mutation.GetType(); ok {
-		if err := scale.TypeValidator(v); err != nil {
-			return &ValidationError{Name: "type", err: fmt.Errorf("ent: validator failed for field \"type\": %w", err)}
-		}
-	}
-	if v, ok := suo.mutation.Title(); ok {
-		if err := scale.TitleValidator(v); err != nil {
-			return &ValidationError{Name: "title", err: fmt.Errorf("ent: validator failed for field \"title\": %w", err)}
-		}
-	}
 	if v, ok := suo.mutation.Description(); ok {
 		if err := scale.DescriptionValidator(v); err != nil {
 			return &ValidationError{Name: "description", err: fmt.Errorf("ent: validator failed for field \"description\": %w", err)}
@@ -432,20 +374,6 @@ func (suo *ScaleUpdateOne) sqlSave(ctx context.Context) (_node *Scale, err error
 				ps[i](selector)
 			}
 		}
-	}
-	if value, ok := suo.mutation.GetType(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: scale.FieldType,
-		})
-	}
-	if value, ok := suo.mutation.Title(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: scale.FieldTitle,
-		})
 	}
 	if value, ok := suo.mutation.Description(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{

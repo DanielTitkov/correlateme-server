@@ -37,8 +37,8 @@ type (
 	// Each User can have one Dataset for each Indicator
 	Dataset struct {
 		ID           int
-		User         User
-		Indicator    Indicator
+		User         *User
+		Indicator    *Indicator
 		CreateTime   time.Time
 		UpdateTime   time.Time
 		Observations []*Observation
@@ -48,15 +48,16 @@ type (
 	// Observation is a data point for an indicator
 	Observation struct {
 		ID         int
-		Dataset    Dataset
-		CreateTime time.Time
 		Value      float64
+		Dataset    *Dataset
+		CreateTime time.Time
+		UpdateTime time.Time
 	}
 	// Correlation is a corr value of a pair of Datasets
 	Correlation struct {
 		ID         int
-		Left       Dataset
-		Right      Dataset
+		Left       *Dataset
+		Right      *Dataset
 		Coef       float64 // correlation coef
 		P          float64 // p-value
 		R2         float64 // determination coef

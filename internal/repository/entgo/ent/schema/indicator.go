@@ -4,6 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 	"entgo.io/ent/schema/mixin"
 )
 
@@ -15,7 +16,7 @@ type Indicator struct {
 // Fields of the Indicator.
 func (Indicator) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("code").Unique().NotEmpty(),
+		field.String("code").Unique().NotEmpty().Immutable(),
 		field.String("title").NotEmpty(),
 		field.String("description").Optional(),
 		field.Bool("active").Default(true),
@@ -36,8 +37,10 @@ func (Indicator) Edges() []ent.Edge {
 }
 
 func (Indicator) Indexes() []ent.Index {
-	// TODO: unique title for user
-	return nil
+	return []ent.Index{
+		// unique title for user
+		index.Fields("title").Edges("author").Unique(),
+	}
 }
 
 func (Indicator) Mixin() []ent.Mixin {

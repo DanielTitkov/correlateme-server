@@ -26,15 +26,26 @@ type (
 	Repository interface {
 		// users
 		CreateUser(*domain.User) (*domain.User, error)
-		GetUserByUsername(username string) (*domain.User, error)
+		GetUserByUsername(string) (*domain.User, error)
+		GetUserByID(int) (*domain.User, error)
 		GetUserCount() (int, error)
 
 		// indicators
 		CreateIndicator(*domain.Indicator) (*domain.Indicator, error)
+		GetIndicatorByID(int) (*domain.Indicator, error)
 		FilterIndicators(domain.FilterIndicatorsArgs) ([]*domain.Indicator, error)
 
 		// scales
 		GetScales() ([]*domain.Scale, error)
+
+		// datasets
+		CreateDataset(*domain.Dataset) (*domain.Dataset, error)
+		GetDatasetByID(int) (*domain.Dataset, error)
+		GetUserIndicatorDataset(*domain.User, *domain.Indicator) (*domain.Dataset, error)
+		GetOrCreateUserIndicatorDataset(*domain.User, *domain.Indicator) (*domain.Dataset, error)
+
+		// observations
+		CreateObservation(*domain.Observation) (*domain.Observation, error)
 	}
 )
 

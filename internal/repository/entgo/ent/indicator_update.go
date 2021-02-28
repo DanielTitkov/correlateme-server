@@ -30,12 +30,6 @@ func (iu *IndicatorUpdate) Where(ps ...predicate.Indicator) *IndicatorUpdate {
 	return iu
 }
 
-// SetCode sets the "code" field.
-func (iu *IndicatorUpdate) SetCode(s string) *IndicatorUpdate {
-	iu.mutation.SetCode(s)
-	return iu
-}
-
 // SetTitle sets the "title" field.
 func (iu *IndicatorUpdate) SetTitle(s string) *IndicatorUpdate {
 	iu.mutation.SetTitle(s)
@@ -255,11 +249,6 @@ func (iu *IndicatorUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (iu *IndicatorUpdate) check() error {
-	if v, ok := iu.mutation.Code(); ok {
-		if err := indicator.CodeValidator(v); err != nil {
-			return &ValidationError{Name: "code", err: fmt.Errorf("ent: validator failed for field \"code\": %w", err)}
-		}
-	}
 	if v, ok := iu.mutation.Title(); ok {
 		if err := indicator.TitleValidator(v); err != nil {
 			return &ValidationError{Name: "title", err: fmt.Errorf("ent: validator failed for field \"title\": %w", err)}
@@ -294,13 +283,6 @@ func (iu *IndicatorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeTime,
 			Value:  value,
 			Column: indicator.FieldUpdateTime,
-		})
-	}
-	if value, ok := iu.mutation.Code(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: indicator.FieldCode,
 		})
 	}
 	if value, ok := iu.mutation.Title(); ok {
@@ -484,12 +466,6 @@ type IndicatorUpdateOne struct {
 	config
 	hooks    []Hook
 	mutation *IndicatorMutation
-}
-
-// SetCode sets the "code" field.
-func (iuo *IndicatorUpdateOne) SetCode(s string) *IndicatorUpdateOne {
-	iuo.mutation.SetCode(s)
-	return iuo
 }
 
 // SetTitle sets the "title" field.
@@ -711,11 +687,6 @@ func (iuo *IndicatorUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (iuo *IndicatorUpdateOne) check() error {
-	if v, ok := iuo.mutation.Code(); ok {
-		if err := indicator.CodeValidator(v); err != nil {
-			return &ValidationError{Name: "code", err: fmt.Errorf("ent: validator failed for field \"code\": %w", err)}
-		}
-	}
 	if v, ok := iuo.mutation.Title(); ok {
 		if err := indicator.TitleValidator(v); err != nil {
 			return &ValidationError{Name: "title", err: fmt.Errorf("ent: validator failed for field \"title\": %w", err)}
@@ -755,13 +726,6 @@ func (iuo *IndicatorUpdateOne) sqlSave(ctx context.Context) (_node *Indicator, e
 			Type:   field.TypeTime,
 			Value:  value,
 			Column: indicator.FieldUpdateTime,
-		})
-	}
-	if value, ok := iuo.mutation.Code(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeString,
-			Value:  value,
-			Column: indicator.FieldCode,
 		})
 	}
 	if value, ok := iuo.mutation.Title(); ok {

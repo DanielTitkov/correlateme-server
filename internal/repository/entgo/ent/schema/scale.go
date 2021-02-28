@@ -14,8 +14,8 @@ type Scale struct {
 // Fields of the Scale.
 func (Scale) Fields() []ent.Field {
 	return []ent.Field{
-		field.String("type").Unique().NotEmpty(),
-		field.String("title").Unique().NotEmpty(),
+		field.String("type").Unique().NotEmpty().Immutable(),
+		field.String("title").Unique().NotEmpty().Immutable(),
 		field.String("description").Unique().NotEmpty(),
 	}
 }

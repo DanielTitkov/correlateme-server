@@ -41,8 +41,9 @@ func (h *Handler) link(e *echo.Echo) {
 	// indicator
 	v1Restricted.POST("/createIndicator", h.CreateIndicator)
 	v1Restricted.POST("/getIndicators", h.GetIndicators)
+	// observation
+	v1Restricted.POST("/createObservation", h.CreateObservation)
 	// TODO
-	// v1Restricted.POST("/", h.CreateObservation)
 	// v1Restricted.POST("/", h.GetDataset)
 	// v1Restricted.POST("/", h.GetCorrelation) // ?
 	// v1Restricted.POST("/", h.GetCorrelations) // ?
