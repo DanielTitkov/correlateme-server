@@ -1,6 +1,7 @@
 package app
 
 import (
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -36,10 +37,11 @@ func (a *App) CreateIndicator(args domain.CreateIndicatorArgs) error {
 
 func makeIndicatorCode(username, scaleType, title string) string {
 	ts := strconv.FormatInt(time.Now().Unix(), 10)
+	reg, _ := regexp.Compile(`[^\d\w]+`)
 	code := strings.Join([]string{
 		strings.ToLower(username),
 		scaleType,
-		strings.ToLower(title), // TODO: strip non-letter
+		reg.ReplaceAllString(strings.ToLower(title), ""), // TODO: what about cyrillic?
 		ts,
 	}, "-")
 	return code
