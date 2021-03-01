@@ -2,6 +2,7 @@ package entgo
 
 import (
 	"context"
+	"errors"
 
 	"github.com/DanielTitkov/correlateme-server/internal/domain"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent"
@@ -71,6 +72,11 @@ func (r *EntgoRepository) GetOrCreateUserIndicatorDataset(u *domain.User, ind *d
 
 	if !ent.IsNotFound(err) {
 		return nil, err
+	}
+
+	// restrict creating obasevations for other users' indicators
+	if ind.Author != nil && ind.Author.ID != u.ID {
+		return nil, errors.New("forbidden: indicator doesn't belong to user and is not built-in")
 	}
 
 	dataset, err := r.client.Dataset.

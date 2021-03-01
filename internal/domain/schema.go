@@ -50,6 +50,7 @@ type (
 		ID         int
 		Value      float64
 		Dataset    *Dataset
+		Date       *time.Time
 		CreateTime time.Time
 		UpdateTime time.Time
 	}

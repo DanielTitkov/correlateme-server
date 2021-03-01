@@ -6,6 +6,6 @@ type (
 	CreateObservationRequest struct {
 		IndicatorID int
 		Value       float64
-		Timestamp   time.Time
+		Date        *time.Time
 	}
 )

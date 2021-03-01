@@ -6,6 +6,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"time"
 
 	"entgo.io/ent/dialect/sql"
 	"entgo.io/ent/dialect/sql/sqlgraph"
@@ -38,6 +39,12 @@ func (ou *ObservationUpdate) SetValue(f float64) *ObservationUpdate {
 // AddValue adds f to the "value" field.
 func (ou *ObservationUpdate) AddValue(f float64) *ObservationUpdate {
 	ou.mutation.AddValue(f)
+	return ou
+}
+
+// SetDate sets the "date" field.
+func (ou *ObservationUpdate) SetDate(t time.Time) *ObservationUpdate {
+	ou.mutation.SetDate(t)
 	return ou
 }
 
@@ -176,6 +183,13 @@ func (ou *ObservationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: observation.FieldValue,
 		})
 	}
+	if value, ok := ou.mutation.Date(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: observation.FieldDate,
+		})
+	}
 	if ou.mutation.DatasetCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -239,6 +253,12 @@ func (ouo *ObservationUpdateOne) SetValue(f float64) *ObservationUpdateOne {
 // AddValue adds f to the "value" field.
 func (ouo *ObservationUpdateOne) AddValue(f float64) *ObservationUpdateOne {
 	ouo.mutation.AddValue(f)
+	return ouo
+}
+
+// SetDate sets the "date" field.
+func (ouo *ObservationUpdateOne) SetDate(t time.Time) *ObservationUpdateOne {
+	ouo.mutation.SetDate(t)
 	return ouo
 }
 
@@ -380,6 +400,13 @@ func (ouo *ObservationUpdateOne) sqlSave(ctx context.Context) (_node *Observatio
 			Type:   field.TypeFloat64,
 			Value:  value,
 			Column: observation.FieldValue,
+		})
+	}
+	if value, ok := ouo.mutation.Date(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: observation.FieldDate,
 		})
 	}
 	if ouo.mutation.DatasetCleared() {

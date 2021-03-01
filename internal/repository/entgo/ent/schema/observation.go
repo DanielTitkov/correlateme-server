@@ -2,8 +2,10 @@ package schema
 
 import (
 	"entgo.io/ent"
+	"entgo.io/ent/dialect"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 	"entgo.io/ent/schema/mixin"
 )
 
@@ -16,6 +18,10 @@ type Observation struct {
 func (Observation) Fields() []ent.Field {
 	return []ent.Field{
 		field.Float("value"),
+		field.Time("date").SchemaType(map[string]string{
+			dialect.Postgres: "date",
+			dialect.MySQL:    "DATE",
+		}),
 	}
 }
 
@@ -30,7 +36,9 @@ func (Observation) Edges() []ent.Edge {
 }
 
 func (Observation) Indexes() []ent.Index {
-	return nil
+	return []ent.Index{
+		index.Fields("date").Edges("dataset").Unique(),
+	}
 }
 
 func (Observation) Mixin() []ent.Mixin {

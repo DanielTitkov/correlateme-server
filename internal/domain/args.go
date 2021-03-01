@@ -1,5 +1,7 @@
 package domain
 
+import "time"
+
 type (
 	CreateIndicatorArgs struct {
 		Username    string // TODO: change to ID
@@ -21,5 +23,6 @@ type (
 		UserID      int
 		IndicatorID int
 		Value       float64
+		Date        *time.Time
 	}
 )

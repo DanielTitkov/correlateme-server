@@ -55,6 +55,12 @@ func (oc *ObservationCreate) SetValue(f float64) *ObservationCreate {
 	return oc
 }
 
+// SetDate sets the "date" field.
+func (oc *ObservationCreate) SetDate(t time.Time) *ObservationCreate {
+	oc.mutation.SetDate(t)
+	return oc
+}
+
 // SetDatasetID sets the "dataset" edge to the Dataset entity by ID.
 func (oc *ObservationCreate) SetDatasetID(id int) *ObservationCreate {
 	oc.mutation.SetDatasetID(id)
@@ -139,6 +145,9 @@ func (oc *ObservationCreate) check() error {
 	if _, ok := oc.mutation.Value(); !ok {
 		return &ValidationError{Name: "value", err: errors.New("ent: missing required field \"value\"")}
 	}
+	if _, ok := oc.mutation.Date(); !ok {
+		return &ValidationError{Name: "date", err: errors.New("ent: missing required field \"date\"")}
+	}
 	if _, ok := oc.mutation.DatasetID(); !ok {
 		return &ValidationError{Name: "dataset", err: errors.New("ent: missing required edge \"dataset\"")}
 	}
@@ -192,6 +201,14 @@ func (oc *ObservationCreate) createSpec() (*Observation, *sqlgraph.CreateSpec) {
 			Column: observation.FieldValue,
 		})
 		_node.Value = value
+	}
+	if value, ok := oc.mutation.Date(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeTime,
+			Value:  value,
+			Column: observation.FieldDate,
+		})
+		_node.Date = value
 	}
 	if nodes := oc.mutation.DatasetIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

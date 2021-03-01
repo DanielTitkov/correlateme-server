@@ -17,6 +17,8 @@ const (
 	FieldUpdateTime = "update_time"
 	// FieldValue holds the string denoting the value field in the database.
 	FieldValue = "value"
+	// FieldDate holds the string denoting the date field in the database.
+	FieldDate = "date"
 
 	// EdgeDataset holds the string denoting the dataset edge name in mutations.
 	EdgeDataset = "dataset"
@@ -38,6 +40,7 @@ var Columns = []string{
 	FieldCreateTime,
 	FieldUpdateTime,
 	FieldValue,
+	FieldDate,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the Observation type.

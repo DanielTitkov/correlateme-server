@@ -27,6 +27,7 @@ func (h *Handler) CreateObservation(c echo.Context) error {
 		UserID:      userID,
 		IndicatorID: request.IndicatorID,
 		Value:       request.Value,
+		Date:        request.Date,
 	})
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, model.ErrorResponse{

@@ -2575,6 +2575,7 @@ type ObservationMutation struct {
 	update_time    *time.Time
 	value          *float64
 	addvalue       *float64
+	date           *time.Time
 	clearedFields  map[string]struct{}
 	dataset        *int
 	cleareddataset bool
@@ -2790,6 +2791,42 @@ func (m *ObservationMutation) ResetValue() {
 	m.addvalue = nil
 }
 
+// SetDate sets the "date" field.
+func (m *ObservationMutation) SetDate(t time.Time) {
+	m.date = &t
+}
+
+// Date returns the value of the "date" field in the mutation.
+func (m *ObservationMutation) Date() (r time.Time, exists bool) {
+	v := m.date
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDate returns the old "date" field's value of the Observation entity.
+// If the Observation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ObservationMutation) OldDate(ctx context.Context) (v time.Time, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldDate is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldDate requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDate: %w", err)
+	}
+	return oldValue.Date, nil
+}
+
+// ResetDate resets all changes to the "date" field.
+func (m *ObservationMutation) ResetDate() {
+	m.date = nil
+}
+
 // SetDatasetID sets the "dataset" edge to the Dataset entity by id.
 func (m *ObservationMutation) SetDatasetID(id int) {
 	m.dataset = &id
@@ -2843,7 +2880,7 @@ func (m *ObservationMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ObservationMutation) Fields() []string {
-	fields := make([]string, 0, 3)
+	fields := make([]string, 0, 4)
 	if m.create_time != nil {
 		fields = append(fields, observation.FieldCreateTime)
 	}
@@ -2852,6 +2889,9 @@ func (m *ObservationMutation) Fields() []string {
 	}
 	if m.value != nil {
 		fields = append(fields, observation.FieldValue)
+	}
+	if m.date != nil {
+		fields = append(fields, observation.FieldDate)
 	}
 	return fields
 }
@@ -2867,6 +2907,8 @@ func (m *ObservationMutation) Field(name string) (ent.Value, bool) {
 		return m.UpdateTime()
 	case observation.FieldValue:
 		return m.Value()
+	case observation.FieldDate:
+		return m.Date()
 	}
 	return nil, false
 }
@@ -2882,6 +2924,8 @@ func (m *ObservationMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldUpdateTime(ctx)
 	case observation.FieldValue:
 		return m.OldValue(ctx)
+	case observation.FieldDate:
+		return m.OldDate(ctx)
 	}
 	return nil, fmt.Errorf("unknown Observation field %s", name)
 }
@@ -2911,6 +2955,13 @@ func (m *ObservationMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetValue(v)
+		return nil
+	case observation.FieldDate:
+		v, ok := value.(time.Time)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDate(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Observation field %s", name)
@@ -2984,6 +3035,9 @@ func (m *ObservationMutation) ResetField(name string) error {
 		return nil
 	case observation.FieldValue:
 		m.ResetValue()
+		return nil
+	case observation.FieldDate:
+		m.ResetDate()
 		return nil
 	}
 	return fmt.Errorf("unknown Observation field %s", name)

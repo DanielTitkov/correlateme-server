@@ -75,9 +75,9 @@ var (
 		},
 		Indexes: []*schema.Index{
 			{
-				Name:    "dataset_user_datasets",
+				Name:    "dataset_user_datasets_indicator_datasets",
 				Unique:  true,
-				Columns: []*schema.Column{DatasetsColumns[6]},
+				Columns: []*schema.Column{DatasetsColumns[6], DatasetsColumns[5]},
 			},
 		},
 	}
@@ -130,6 +130,7 @@ var (
 		{Name: "create_time", Type: field.TypeTime},
 		{Name: "update_time", Type: field.TypeTime},
 		{Name: "value", Type: field.TypeFloat64},
+		{Name: "date", Type: field.TypeTime, SchemaType: map[string]string{"mysql": "DATE", "postgres": "date"}},
 		{Name: "dataset_observations", Type: field.TypeInt, Nullable: true},
 	}
 	// ObservationsTable holds the schema information for the "observations" table.
@@ -140,10 +141,17 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:  "observations_datasets_observations",
-				Columns: []*schema.Column{ObservationsColumns[4]},
+				Columns: []*schema.Column{ObservationsColumns[5]},
 
 				RefColumns: []*schema.Column{DatasetsColumns[0]},
 				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "observation_date_dataset_observations",
+				Unique:  true,
+				Columns: []*schema.Column{ObservationsColumns[4], ObservationsColumns[5]},
 			},
 		},
 	}

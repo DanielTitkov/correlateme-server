@@ -23,6 +23,8 @@ type Observation struct {
 	UpdateTime time.Time `json:"update_time,omitempty"`
 	// Value holds the value of the "value" field.
 	Value float64 `json:"value,omitempty"`
+	// Date holds the value of the "date" field.
+	Date time.Time `json:"date,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ObservationQuery when eager-loading is set.
 	Edges                ObservationEdges `json:"edges"`
@@ -61,7 +63,7 @@ func (*Observation) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = &sql.NullFloat64{}
 		case observation.FieldID:
 			values[i] = &sql.NullInt64{}
-		case observation.FieldCreateTime, observation.FieldUpdateTime:
+		case observation.FieldCreateTime, observation.FieldUpdateTime, observation.FieldDate:
 			values[i] = &sql.NullTime{}
 		case observation.ForeignKeys[0]: // dataset_observations
 			values[i] = &sql.NullInt64{}
@@ -103,6 +105,12 @@ func (o *Observation) assignValues(columns []string, values []interface{}) error
 				return fmt.Errorf("unexpected type %T for field value", values[i])
 			} else if value.Valid {
 				o.Value = value.Float64
+			}
+		case observation.FieldDate:
+			if value, ok := values[i].(*sql.NullTime); !ok {
+				return fmt.Errorf("unexpected type %T for field date", values[i])
+			} else if value.Valid {
+				o.Date = value.Time
 			}
 		case observation.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -150,6 +158,8 @@ func (o *Observation) String() string {
 	builder.WriteString(o.UpdateTime.Format(time.ANSIC))
 	builder.WriteString(", value=")
 	builder.WriteString(fmt.Sprintf("%v", o.Value))
+	builder.WriteString(", date=")
+	builder.WriteString(o.Date.Format(time.ANSIC))
 	builder.WriteByte(')')
 	return builder.String()
 }

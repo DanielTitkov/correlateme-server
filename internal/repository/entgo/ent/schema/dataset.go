@@ -29,7 +29,7 @@ func (Dataset) Edges() []ent.Edge {
 		edge.To("right", Correlation.Type),
 		edge.To("observations", Observation.Type),
 		// belongs to
-		edge.From("indicator", Indicator.Type).Ref("datasets").Required().Unique(),
+		edge.From("indicator", Indicator.Type).Ref("datasets").Unique().Required(),
 		edge.From("user", User.Type).Ref("datasets").Unique(),
 	}
 }
@@ -37,7 +37,7 @@ func (Dataset) Edges() []ent.Edge {
 func (Dataset) Indexes() []ent.Index {
 	return []ent.Index{
 		// one dataset for one indicator for user
-		index.Edges("indicator").Edges("user").Unique(),
+		index.Edges("user", "indicator").Unique(),
 	}
 }
 
