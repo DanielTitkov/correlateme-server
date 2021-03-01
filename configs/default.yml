@@ -9,3 +9,5 @@ server:
 auth:
   exp: 7200 # hours
   secret: secret-key
+indicator:
+  defaultObservationLimit: 200

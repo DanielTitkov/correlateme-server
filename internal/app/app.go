@@ -33,7 +33,7 @@ type (
 		// indicators
 		CreateIndicator(*domain.Indicator) (*domain.Indicator, error)
 		GetIndicatorByID(int) (*domain.Indicator, error)
-		FilterIndicators(domain.FilterIndicatorsArgs) ([]*domain.Indicator, error)
+		GetIndicators(domain.GetIndicatorsArgs) ([]*domain.Indicator, error)
 
 		// scales
 		GetScales() ([]*domain.Scale, error)

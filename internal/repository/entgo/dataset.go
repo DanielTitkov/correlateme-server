@@ -102,12 +102,19 @@ func entToDomainDataset(d *ent.Dataset) *domain.Dataset {
 		indicator = entToDomainIndicator(d.Edges.Indicator)
 	}
 
+	var observations []*domain.Observation
+	if d.Edges.Observations != nil {
+		for _, obs := range d.Edges.Observations {
+			observations = append(observations, entToDomainObservation(obs))
+		}
+	}
+
 	return &domain.Dataset{
 		ID:           d.ID,
 		Shared:       d.Shared,
 		User:         user,      // required
 		Indicator:    indicator, // required
-		Observations: nil,
+		Observations: observations,
 		CreateTime:   d.CreateTime,
 		UpdateTime:   d.UpdateTime,
 		// Source: *d.Source, // not used by now

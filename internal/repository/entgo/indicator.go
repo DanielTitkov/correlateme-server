@@ -5,7 +5,9 @@ import (
 
 	"github.com/DanielTitkov/correlateme-server/internal/domain"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dataset"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/observation"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/scale"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/user"
 )
@@ -43,39 +45,52 @@ func (r *EntgoRepository) GetIndicatorByID(id int) (*domain.Indicator, error) {
 	return entToDomainIndicator(ind), nil
 }
 
-func (r *EntgoRepository) FilterIndicators(filter domain.FilterIndicatorsArgs) ([]*domain.Indicator, error) {
+func (r *EntgoRepository) GetIndicators(args domain.GetIndicatorsArgs) ([]*domain.Indicator, error) {
 	query := r.client.Indicator.Query().WithAuthor().WithScale()
 
+	filter := args.Filter
 	if filter.ID != nil {
-		query.Where(indicator.IDIn(filter.ID...))
+		query = query.Where(indicator.IDIn(filter.ID...))
 	}
 
 	if filter.Code != nil {
-		query.Where(indicator.CodeIn(filter.Code...))
+		query = query.Where(indicator.CodeIn(filter.Code...))
 	}
 
 	if filter.Title != nil {
-		query.Where(indicator.TitleIn(filter.Title...))
+		query = query.Where(indicator.TitleIn(filter.Title...))
 	}
 
 	if filter.Active != nil {
-		query.Where(indicator.ActiveEQ(*filter.Active))
+		query = query.Where(indicator.ActiveEQ(*filter.Active))
 	}
 
 	if filter.BuiltIn != nil {
-		query.Where(indicator.BuiltInEQ(*filter.BuiltIn))
+		query = query.Where(indicator.BuiltInEQ(*filter.BuiltIn))
 	}
 
 	if filter.External != nil {
-		query.Where(indicator.ExternalEQ(*filter.External))
+		query = query.Where(indicator.ExternalEQ(*filter.External))
 	}
 
-	if filter.AuthorUsername != nil {
-		query.Where(indicator.HasAuthorWith(user.UsernameEQ(*filter.AuthorUsername)))
+	if filter.AuthorID != nil {
+		query = query.Where(indicator.HasAuthorWith(user.IDEQ(*filter.AuthorID)))
 	}
 
 	if filter.ScaleType != nil {
-		query.Where(indicator.HasScaleWith(scale.TypeEQ(*filter.ScaleType)))
+		query = query.Where(indicator.HasScaleWith(scale.TypeEQ(*filter.ScaleType)))
+	}
+
+	if args.WithDataset {
+		query = query.WithDatasets(func(q *ent.DatasetQuery) {
+			q.Where(dataset.HasUserWith(user.IDEQ(args.UserID)))
+			if args.WithObservations {
+				q.WithObservations(func(q *ent.ObservationQuery) {
+					q.Order(ent.Asc(observation.FieldDate))
+					q.Limit(int(args.ObservationLimit))
+				})
+			}
+		})
 	}
 
 	inds, err := query.All(context.TODO())
@@ -102,6 +117,11 @@ func entToDomainIndicator(ind *ent.Indicator) *domain.Indicator {
 		author = entToDomainUser(ind.Edges.Author)
 	}
 
+	var dataset *domain.Dataset
+	if ind.Edges.Datasets != nil && len(ind.Edges.Datasets) == 1 {
+		dataset = entToDomainDataset(ind.Edges.Datasets[0])
+	}
+
 	return &domain.Indicator{
 		ID:          ind.ID,
 		Code:        ind.Code,
@@ -112,6 +132,7 @@ func entToDomainIndicator(ind *ent.Indicator) *domain.Indicator {
 		Active:      ind.Active,
 		BuiltIn:     ind.BuiltIn,
 		External:    ind.External,
+		UserDataset: dataset,
 		CreateTime:  ind.CreateTime,
 		UpdateTime:  ind.UpdateTime,
 	}

@@ -23,6 +23,7 @@ type (
 		External    bool // if Indicator is populated by the user or external system
 		Scale       *Scale
 		Author      *User
+		UserDataset *Dataset // dataset for a specific user
 		CreateTime  time.Time
 		UpdateTime  time.Time
 	}

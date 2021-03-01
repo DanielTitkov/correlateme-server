@@ -52,7 +52,7 @@ func (h *Handler) GetIndicators(c echo.Context) error {
 		return err
 	}
 
-	username, err := util.UsernameFromToken(c)
+	userID, err := util.UserIDFromToken(c)
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, model.ErrorResponse{
 			Message: "token is invalid",
@@ -61,14 +61,19 @@ func (h *Handler) GetIndicators(c echo.Context) error {
 	}
 
 	filter := request.Filter
-	indicators, err := h.app.FilterIndicators(domain.FilterIndicatorsArgs{
-		AuthorUsername: &username,
-		ID:             filter.ID,
-		Code:           filter.Code,
-		Title:          filter.Title,
-		Active:         filter.Active,
-		BuiltIn:        filter.BuiltIn,
-		ScaleType:      filter.ScaleType,
+	indicators, err := h.app.GetIndicators(domain.GetIndicatorsArgs{
+		UserID:           userID,
+		WithDataset:      request.WithDataset,
+		WithObservations: request.WithObservations,
+		Filter: domain.GetIndicatorsArgsFilter{
+			AuthorID:  &userID,
+			ID:        filter.ID,
+			Code:      filter.Code,
+			Title:     filter.Title,
+			Active:    filter.Active,
+			BuiltIn:   filter.BuiltIn,
+			ScaleType: filter.ScaleType,
+		},
 	})
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, model.ErrorResponse{
@@ -83,6 +88,24 @@ func (h *Handler) GetIndicators(c echo.Context) error {
 		if i.Author != nil {
 			authorID = i.Author.ID
 		}
+		var dataset *model.GetIndicatorsResponseDataset
+		if i.UserDataset != nil {
+			var observations []model.GetIndicatorsResponseObservation
+			if i.UserDataset.Observations != nil && len(i.UserDataset.Observations) > 0 {
+				for _, obs := range i.UserDataset.Observations {
+					observations = append(observations, model.GetIndicatorsResponseObservation{
+						ID:    obs.ID,
+						Value: obs.Value,
+						Date:  obs.Date,
+					})
+				}
+			}
+			dataset = &model.GetIndicatorsResponseDataset{
+				ID:           i.UserDataset.ID,
+				Observations: observations,
+			}
+		}
+
 		response = append(response, model.GetIndicatorsResponseItem{
 			ID:          i.ID,
 			Code:        i.Code,
@@ -95,6 +118,7 @@ func (h *Handler) GetIndicators(c echo.Context) error {
 			AuthorID:    authorID,
 			CreateTime:  i.CreateTime,
 			UpdateTime:  i.UpdateTime,
+			Dataset:     dataset,
 		})
 	}
 

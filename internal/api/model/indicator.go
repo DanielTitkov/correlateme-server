@@ -9,7 +9,9 @@ type (
 		Description string `json:"description"`
 	}
 	GetIndicatorsRequest struct {
-		Filter GetIndicatorsRequestFilter `json:"filter"`
+		WithDataset      bool                       `json:"withDataset"`
+		WithObservations bool                       `json:"withObservations"`
+		Filter           GetIndicatorsRequestFilter `json:"filter"`
 	}
 	GetIndicatorsRequestFilter struct {
 		ID        []int    `json:"id"`
@@ -21,16 +23,28 @@ type (
 	}
 	GetIndicatorsResponse     []GetIndicatorsResponseItem
 	GetIndicatorsResponseItem struct {
-		ID          int       `json:"id"`
-		Code        string    `json:"code"`
-		Title       string    `json:"title"`
-		Description string    `json:"description"`
-		Active      bool      `json:"active"`
-		BuiltIn     bool      `json:"builtIn"`
-		External    bool      `json:"external"`
-		ScaleID     int       `json:"scaleID"`
-		AuthorID    int       `json:"authorID,omitempty"`
-		CreateTime  time.Time `json:"createTime"`
-		UpdateTime  time.Time `json:"updateTime"`
+		ID          int                           `json:"id"`
+		Code        string                        `json:"code"`
+		Title       string                        `json:"title"`
+		Description string                        `json:"description"`
+		Active      bool                          `json:"active"`
+		BuiltIn     bool                          `json:"builtIn"`
+		External    bool                          `json:"external"`
+		ScaleID     int                           `json:"scaleID"`
+		AuthorID    int                           `json:"authorID,omitempty"`
+		CreateTime  time.Time                     `json:"createTime"`
+		UpdateTime  time.Time                     `json:"updateTime"`
+		Dataset     *GetIndicatorsResponseDataset `json:"dataset,omitempty"`
+	}
+	GetIndicatorsResponseDataset struct {
+		ID           int                                `json:"id,omitempty"`
+		Source       string                             `json:"source,omitempty"`
+		Shared       bool                               `json:"shared,omitempty"`
+		Observations []GetIndicatorsResponseObservation `json:"observations,omitempty"`
+	}
+	GetIndicatorsResponseObservation struct {
+		ID    int        `json:"id"`
+		Value float64    `json:"value"`
+		Date  *time.Time `json:"date"`
 	}
 )

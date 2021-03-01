@@ -9,15 +9,22 @@ type (
 		Description string
 		ScaleType   string
 	}
-	FilterIndicatorsArgs struct {
-		ID             []int
-		Code           []string
-		Title          []string
-		Active         *bool
-		BuiltIn        *bool
-		AuthorUsername *string
-		ScaleType      *string
-		External       *bool // not accesible via API, only for intenal use
+	GetIndicatorsArgs struct {
+		UserID           int
+		WithDataset      bool
+		WithObservations bool
+		ObservationLimit int64
+		Filter           GetIndicatorsArgsFilter
+	}
+	GetIndicatorsArgsFilter struct {
+		ID        []int
+		Code      []string
+		Title     []string
+		Active    *bool
+		BuiltIn   *bool
+		AuthorID  *int
+		ScaleType *string
+		External  *bool // not accesible via API, only for intenal use
 	}
 	CreateObservationArgs struct {
 		UserID      int
