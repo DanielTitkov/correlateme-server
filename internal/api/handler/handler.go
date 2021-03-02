@@ -49,4 +49,10 @@ func (h *Handler) link(e *echo.Echo) {
 	// v1Restricted.POST("/", h.GetCorrelations) // ?
 	// v1Restricted.POST("/", h.)
 	// v1Restricted.POST("/", h.)
+
+	// dev endpoints for testing and debug
+	// not accessible on no-dev instances
+	if h.cfg.Env == "dev" {
+		v1.POST("/findUserCorrelations", h.FindUserCorrelations)
+	}
 }

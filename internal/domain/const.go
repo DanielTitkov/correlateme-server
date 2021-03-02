@@ -1,3 +1,9 @@
 package domain
 
-const ()
+const (
+	// Correlation
+
+	PearsonCorrelationType  = "pearson"
+	SpearmanCorrelationType = "spearman"
+	AutoCorrelationType     = "auto"
+)
