@@ -12,20 +12,24 @@ type (
 		Email        string // TODO: add ent validation
 		// Service      bool // if user is a service
 	}
+	// UserSettings holds user app/site preferences
+	UserSettings struct {
+	}
 	// Indicator is a set of user-created data
 	Indicator struct {
-		ID          int
-		Code        string // unique code for external systems
-		Title       string
-		Description string
-		Active      bool
-		BuiltIn     bool // if Indicator is created by the service
-		External    bool // if Indicator is populated by the user or external system
-		Scale       *Scale
-		Author      *User
-		UserDataset *Dataset // dataset for a specific user
-		CreateTime  time.Time
-		UpdateTime  time.Time
+		ID           int
+		Code         string // unique code for external systems
+		Title        string
+		Description  string
+		Active       bool
+		BuiltIn      bool // if Indicator is created by the service
+		External     bool // if Indicator is populated by the user or external system
+		Scale        *Scale
+		Author       *User
+		UserDataset  *Dataset           // dataset for a specific user
+		ValueMapping map[float64]string // aliases for nomial and ordinal scales
+		CreateTime   time.Time
+		UpdateTime   time.Time
 	}
 	// Scale is a type of a scale for an Indicator
 	Scale struct {
@@ -45,6 +49,10 @@ type (
 		Observations []*Observation
 		Source       string // user input or external system
 		Shared       bool   // if dataset can be shared between all users
+	}
+	// DatasetStyle holds dataset apperance params for site/app
+	DatasetStyle struct {
+		Color string
 	}
 	// Observation is a data point for an indicator
 	Observation struct {

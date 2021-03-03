@@ -15,6 +15,9 @@ type Dataset func(*sql.Selector)
 // Indicator is the predicate function for indicator builders.
 type Indicator func(*sql.Selector)
 
+// IndicatorValueAlias is the predicate function for indicatorvaluealias builders.
+type IndicatorValueAlias func(*sql.Selector)
+
 // Observation is the predicate function for observation builders.
 type Observation func(*sql.Selector)
 

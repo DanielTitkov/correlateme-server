@@ -18,6 +18,8 @@ type Tx struct {
 	Dataset *DatasetClient
 	// Indicator is the client for interacting with the Indicator builders.
 	Indicator *IndicatorClient
+	// IndicatorValueAlias is the client for interacting with the IndicatorValueAlias builders.
+	IndicatorValueAlias *IndicatorValueAliasClient
 	// Observation is the client for interacting with the Observation builders.
 	Observation *ObservationClient
 	// Scale is the client for interacting with the Scale builders.
@@ -162,6 +164,7 @@ func (tx *Tx) init() {
 	tx.Correlation = NewCorrelationClient(tx.config)
 	tx.Dataset = NewDatasetClient(tx.config)
 	tx.Indicator = NewIndicatorClient(tx.config)
+	tx.IndicatorValueAlias = NewIndicatorValueAliasClient(tx.config)
 	tx.Observation = NewObservationClient(tx.config)
 	tx.Scale = NewScaleClient(tx.config)
 	tx.User = NewUserClient(tx.config)

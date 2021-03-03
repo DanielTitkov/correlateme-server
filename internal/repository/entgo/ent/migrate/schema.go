@@ -124,6 +124,27 @@ var (
 			},
 		},
 	}
+	// IndicatorValueAliasColumns holds the columns for the "indicator_value_alias" table.
+	IndicatorValueAliasColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "value_mapping", Type: field.TypeJSON, Nullable: true},
+		{Name: "indicator_indicator_value_alias", Type: field.TypeInt, Unique: true, Nullable: true},
+	}
+	// IndicatorValueAliasTable holds the schema information for the "indicator_value_alias" table.
+	IndicatorValueAliasTable = &schema.Table{
+		Name:       "indicator_value_alias",
+		Columns:    IndicatorValueAliasColumns,
+		PrimaryKey: []*schema.Column{IndicatorValueAliasColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:  "indicator_value_alias_indicators_indicator_value_alias",
+				Columns: []*schema.Column{IndicatorValueAliasColumns[2]},
+
+				RefColumns: []*schema.Column{IndicatorsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// ObservationsColumns holds the columns for the "observations" table.
 	ObservationsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -191,6 +212,7 @@ var (
 		CorrelationsTable,
 		DatasetsTable,
 		IndicatorsTable,
+		IndicatorValueAliasTable,
 		ObservationsTable,
 		ScalesTable,
 		UsersTable,
@@ -204,5 +226,6 @@ func init() {
 	DatasetsTable.ForeignKeys[1].RefTable = UsersTable
 	IndicatorsTable.ForeignKeys[0].RefTable = ScalesTable
 	IndicatorsTable.ForeignKeys[1].RefTable = UsersTable
+	IndicatorValueAliasTable.ForeignKeys[0].RefTable = IndicatorsTable
 	ObservationsTable.ForeignKeys[0].RefTable = DatasetsTable
 }

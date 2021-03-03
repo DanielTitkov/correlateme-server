@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dataset"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicatorvaluealias"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/scale"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/user"
 )
@@ -132,6 +133,25 @@ func (ic *IndicatorCreate) AddDatasets(d ...*Dataset) *IndicatorCreate {
 		ids[i] = d[i].ID
 	}
 	return ic.AddDatasetIDs(ids...)
+}
+
+// SetIndicatorValueAliasID sets the "indicator_value_alias" edge to the IndicatorValueAlias entity by ID.
+func (ic *IndicatorCreate) SetIndicatorValueAliasID(id int) *IndicatorCreate {
+	ic.mutation.SetIndicatorValueAliasID(id)
+	return ic
+}
+
+// SetNillableIndicatorValueAliasID sets the "indicator_value_alias" edge to the IndicatorValueAlias entity by ID if the given value is not nil.
+func (ic *IndicatorCreate) SetNillableIndicatorValueAliasID(id *int) *IndicatorCreate {
+	if id != nil {
+		ic = ic.SetIndicatorValueAliasID(*id)
+	}
+	return ic
+}
+
+// SetIndicatorValueAlias sets the "indicator_value_alias" edge to the IndicatorValueAlias entity.
+func (ic *IndicatorCreate) SetIndicatorValueAlias(i *IndicatorValueAlias) *IndicatorCreate {
+	return ic.SetIndicatorValueAliasID(i.ID)
 }
 
 // SetAuthorID sets the "author" edge to the User entity by ID.
@@ -376,6 +396,25 @@ func (ic *IndicatorCreate) createSpec() (*Indicator, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: dataset.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := ic.mutation.IndicatorValueAliasIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   indicator.IndicatorValueAliasTable,
+			Columns: []string{indicator.IndicatorValueAliasColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: indicatorvaluealias.FieldID,
 				},
 			},
 		}

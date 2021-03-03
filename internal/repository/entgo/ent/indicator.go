@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicatorvaluealias"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/scale"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/user"
 )
@@ -45,13 +46,15 @@ type Indicator struct {
 type IndicatorEdges struct {
 	// Datasets holds the value of the datasets edge.
 	Datasets []*Dataset `json:"datasets,omitempty"`
+	// IndicatorValueAlias holds the value of the indicator_value_alias edge.
+	IndicatorValueAlias *IndicatorValueAlias `json:"indicator_value_alias,omitempty"`
 	// Author holds the value of the author edge.
 	Author *User `json:"author,omitempty"`
 	// Scale holds the value of the scale edge.
 	Scale *Scale `json:"scale,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [3]bool
+	loadedTypes [4]bool
 }
 
 // DatasetsOrErr returns the Datasets value or an error if the edge
@@ -63,10 +66,24 @@ func (e IndicatorEdges) DatasetsOrErr() ([]*Dataset, error) {
 	return nil, &NotLoadedError{edge: "datasets"}
 }
 
+// IndicatorValueAliasOrErr returns the IndicatorValueAlias value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e IndicatorEdges) IndicatorValueAliasOrErr() (*IndicatorValueAlias, error) {
+	if e.loadedTypes[1] {
+		if e.IndicatorValueAlias == nil {
+			// The edge indicator_value_alias was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: indicatorvaluealias.Label}
+		}
+		return e.IndicatorValueAlias, nil
+	}
+	return nil, &NotLoadedError{edge: "indicator_value_alias"}
+}
+
 // AuthorOrErr returns the Author value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e IndicatorEdges) AuthorOrErr() (*User, error) {
-	if e.loadedTypes[1] {
+	if e.loadedTypes[2] {
 		if e.Author == nil {
 			// The edge author was loaded in eager-loading,
 			// but was not found.
@@ -80,7 +97,7 @@ func (e IndicatorEdges) AuthorOrErr() (*User, error) {
 // ScaleOrErr returns the Scale value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e IndicatorEdges) ScaleOrErr() (*Scale, error) {
-	if e.loadedTypes[2] {
+	if e.loadedTypes[3] {
 		if e.Scale == nil {
 			// The edge scale was loaded in eager-loading,
 			// but was not found.
@@ -199,6 +216,11 @@ func (i *Indicator) assignValues(columns []string, values []interface{}) error {
 // QueryDatasets queries the "datasets" edge of the Indicator entity.
 func (i *Indicator) QueryDatasets() *DatasetQuery {
 	return (&IndicatorClient{config: i.config}).QueryDatasets(i)
+}
+
+// QueryIndicatorValueAlias queries the "indicator_value_alias" edge of the Indicator entity.
+func (i *Indicator) QueryIndicatorValueAlias() *IndicatorValueAliasQuery {
+	return (&IndicatorClient{config: i.config}).QueryIndicatorValueAlias(i)
 }
 
 // QueryAuthor queries the "author" edge of the Indicator entity.

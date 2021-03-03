@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dataset"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicatorvaluealias"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/predicate"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/scale"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/user"
@@ -113,6 +114,25 @@ func (iu *IndicatorUpdate) AddDatasets(d ...*Dataset) *IndicatorUpdate {
 	return iu.AddDatasetIDs(ids...)
 }
 
+// SetIndicatorValueAliasID sets the "indicator_value_alias" edge to the IndicatorValueAlias entity by ID.
+func (iu *IndicatorUpdate) SetIndicatorValueAliasID(id int) *IndicatorUpdate {
+	iu.mutation.SetIndicatorValueAliasID(id)
+	return iu
+}
+
+// SetNillableIndicatorValueAliasID sets the "indicator_value_alias" edge to the IndicatorValueAlias entity by ID if the given value is not nil.
+func (iu *IndicatorUpdate) SetNillableIndicatorValueAliasID(id *int) *IndicatorUpdate {
+	if id != nil {
+		iu = iu.SetIndicatorValueAliasID(*id)
+	}
+	return iu
+}
+
+// SetIndicatorValueAlias sets the "indicator_value_alias" edge to the IndicatorValueAlias entity.
+func (iu *IndicatorUpdate) SetIndicatorValueAlias(i *IndicatorValueAlias) *IndicatorUpdate {
+	return iu.SetIndicatorValueAliasID(i.ID)
+}
+
 // SetAuthorID sets the "author" edge to the User entity by ID.
 func (iu *IndicatorUpdate) SetAuthorID(id int) *IndicatorUpdate {
 	iu.mutation.SetAuthorID(id)
@@ -167,6 +187,12 @@ func (iu *IndicatorUpdate) RemoveDatasets(d ...*Dataset) *IndicatorUpdate {
 		ids[i] = d[i].ID
 	}
 	return iu.RemoveDatasetIDs(ids...)
+}
+
+// ClearIndicatorValueAlias clears the "indicator_value_alias" edge to the IndicatorValueAlias entity.
+func (iu *IndicatorUpdate) ClearIndicatorValueAlias() *IndicatorUpdate {
+	iu.mutation.ClearIndicatorValueAlias()
+	return iu
 }
 
 // ClearAuthor clears the "author" edge to the User entity.
@@ -380,6 +406,41 @@ func (iu *IndicatorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if iu.mutation.IndicatorValueAliasCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   indicator.IndicatorValueAliasTable,
+			Columns: []string{indicator.IndicatorValueAliasColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: indicatorvaluealias.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := iu.mutation.IndicatorValueAliasIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   indicator.IndicatorValueAliasTable,
+			Columns: []string{indicator.IndicatorValueAliasColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: indicatorvaluealias.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if iu.mutation.AuthorCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -551,6 +612,25 @@ func (iuo *IndicatorUpdateOne) AddDatasets(d ...*Dataset) *IndicatorUpdateOne {
 	return iuo.AddDatasetIDs(ids...)
 }
 
+// SetIndicatorValueAliasID sets the "indicator_value_alias" edge to the IndicatorValueAlias entity by ID.
+func (iuo *IndicatorUpdateOne) SetIndicatorValueAliasID(id int) *IndicatorUpdateOne {
+	iuo.mutation.SetIndicatorValueAliasID(id)
+	return iuo
+}
+
+// SetNillableIndicatorValueAliasID sets the "indicator_value_alias" edge to the IndicatorValueAlias entity by ID if the given value is not nil.
+func (iuo *IndicatorUpdateOne) SetNillableIndicatorValueAliasID(id *int) *IndicatorUpdateOne {
+	if id != nil {
+		iuo = iuo.SetIndicatorValueAliasID(*id)
+	}
+	return iuo
+}
+
+// SetIndicatorValueAlias sets the "indicator_value_alias" edge to the IndicatorValueAlias entity.
+func (iuo *IndicatorUpdateOne) SetIndicatorValueAlias(i *IndicatorValueAlias) *IndicatorUpdateOne {
+	return iuo.SetIndicatorValueAliasID(i.ID)
+}
+
 // SetAuthorID sets the "author" edge to the User entity by ID.
 func (iuo *IndicatorUpdateOne) SetAuthorID(id int) *IndicatorUpdateOne {
 	iuo.mutation.SetAuthorID(id)
@@ -605,6 +685,12 @@ func (iuo *IndicatorUpdateOne) RemoveDatasets(d ...*Dataset) *IndicatorUpdateOne
 		ids[i] = d[i].ID
 	}
 	return iuo.RemoveDatasetIDs(ids...)
+}
+
+// ClearIndicatorValueAlias clears the "indicator_value_alias" edge to the IndicatorValueAlias entity.
+func (iuo *IndicatorUpdateOne) ClearIndicatorValueAlias() *IndicatorUpdateOne {
+	iuo.mutation.ClearIndicatorValueAlias()
+	return iuo
 }
 
 // ClearAuthor clears the "author" edge to the User entity.
@@ -815,6 +901,41 @@ func (iuo *IndicatorUpdateOne) sqlSave(ctx context.Context) (_node *Indicator, e
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: dataset.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if iuo.mutation.IndicatorValueAliasCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   indicator.IndicatorValueAliasTable,
+			Columns: []string{indicator.IndicatorValueAliasColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: indicatorvaluealias.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := iuo.mutation.IndicatorValueAliasIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   indicator.IndicatorValueAliasTable,
+			Columns: []string{indicator.IndicatorValueAliasColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: indicatorvaluealias.FieldID,
 				},
 			},
 		}

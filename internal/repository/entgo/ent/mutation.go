@@ -11,6 +11,7 @@ import (
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/correlation"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dataset"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicatorvaluealias"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/observation"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/predicate"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/scale"
@@ -28,12 +29,13 @@ const (
 	OpUpdateOne = ent.OpUpdateOne
 
 	// Node types.
-	TypeCorrelation = "Correlation"
-	TypeDataset     = "Dataset"
-	TypeIndicator   = "Indicator"
-	TypeObservation = "Observation"
-	TypeScale       = "Scale"
-	TypeUser        = "User"
+	TypeCorrelation         = "Correlation"
+	TypeDataset             = "Dataset"
+	TypeIndicator           = "Indicator"
+	TypeIndicatorValueAlias = "IndicatorValueAlias"
+	TypeObservation         = "Observation"
+	TypeScale               = "Scale"
+	TypeUser                = "User"
 )
 
 // CorrelationMutation represents an operation that mutates the Correlation nodes in the graph.
@@ -1671,28 +1673,30 @@ func (m *DatasetMutation) ResetEdge(name string) error {
 // IndicatorMutation represents an operation that mutates the Indicator nodes in the graph.
 type IndicatorMutation struct {
 	config
-	op              Op
-	typ             string
-	id              *int
-	create_time     *time.Time
-	update_time     *time.Time
-	code            *string
-	title           *string
-	description     *string
-	active          *bool
-	built_in        *bool
-	external        *bool
-	clearedFields   map[string]struct{}
-	datasets        map[int]struct{}
-	removeddatasets map[int]struct{}
-	cleareddatasets bool
-	author          *int
-	clearedauthor   bool
-	scale           *int
-	clearedscale    bool
-	done            bool
-	oldValue        func(context.Context) (*Indicator, error)
-	predicates      []predicate.Indicator
+	op                           Op
+	typ                          string
+	id                           *int
+	create_time                  *time.Time
+	update_time                  *time.Time
+	code                         *string
+	title                        *string
+	description                  *string
+	active                       *bool
+	built_in                     *bool
+	external                     *bool
+	clearedFields                map[string]struct{}
+	datasets                     map[int]struct{}
+	removeddatasets              map[int]struct{}
+	cleareddatasets              bool
+	indicator_value_alias        *int
+	clearedindicator_value_alias bool
+	author                       *int
+	clearedauthor                bool
+	scale                        *int
+	clearedscale                 bool
+	done                         bool
+	oldValue                     func(context.Context) (*Indicator, error)
+	predicates                   []predicate.Indicator
 }
 
 var _ ent.Mutation = (*IndicatorMutation)(nil)
@@ -2128,6 +2132,45 @@ func (m *IndicatorMutation) ResetDatasets() {
 	m.removeddatasets = nil
 }
 
+// SetIndicatorValueAliasID sets the "indicator_value_alias" edge to the IndicatorValueAlias entity by id.
+func (m *IndicatorMutation) SetIndicatorValueAliasID(id int) {
+	m.indicator_value_alias = &id
+}
+
+// ClearIndicatorValueAlias clears the "indicator_value_alias" edge to the IndicatorValueAlias entity.
+func (m *IndicatorMutation) ClearIndicatorValueAlias() {
+	m.clearedindicator_value_alias = true
+}
+
+// IndicatorValueAliasCleared returns if the "indicator_value_alias" edge to the IndicatorValueAlias entity was cleared.
+func (m *IndicatorMutation) IndicatorValueAliasCleared() bool {
+	return m.clearedindicator_value_alias
+}
+
+// IndicatorValueAliasID returns the "indicator_value_alias" edge ID in the mutation.
+func (m *IndicatorMutation) IndicatorValueAliasID() (id int, exists bool) {
+	if m.indicator_value_alias != nil {
+		return *m.indicator_value_alias, true
+	}
+	return
+}
+
+// IndicatorValueAliasIDs returns the "indicator_value_alias" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// IndicatorValueAliasID instead. It exists only for internal usage by the builders.
+func (m *IndicatorMutation) IndicatorValueAliasIDs() (ids []int) {
+	if id := m.indicator_value_alias; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetIndicatorValueAlias resets all changes to the "indicator_value_alias" edge.
+func (m *IndicatorMutation) ResetIndicatorValueAlias() {
+	m.indicator_value_alias = nil
+	m.clearedindicator_value_alias = false
+}
+
 // SetAuthorID sets the "author" edge to the User entity by id.
 func (m *IndicatorMutation) SetAuthorID(id int) {
 	m.author = &id
@@ -2447,9 +2490,12 @@ func (m *IndicatorMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *IndicatorMutation) AddedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.datasets != nil {
 		edges = append(edges, indicator.EdgeDatasets)
+	}
+	if m.indicator_value_alias != nil {
+		edges = append(edges, indicator.EdgeIndicatorValueAlias)
 	}
 	if m.author != nil {
 		edges = append(edges, indicator.EdgeAuthor)
@@ -2470,6 +2516,10 @@ func (m *IndicatorMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case indicator.EdgeIndicatorValueAlias:
+		if id := m.indicator_value_alias; id != nil {
+			return []ent.Value{*id}
+		}
 	case indicator.EdgeAuthor:
 		if id := m.author; id != nil {
 			return []ent.Value{*id}
@@ -2484,7 +2534,7 @@ func (m *IndicatorMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *IndicatorMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.removeddatasets != nil {
 		edges = append(edges, indicator.EdgeDatasets)
 	}
@@ -2507,9 +2557,12 @@ func (m *IndicatorMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *IndicatorMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 3)
+	edges := make([]string, 0, 4)
 	if m.cleareddatasets {
 		edges = append(edges, indicator.EdgeDatasets)
+	}
+	if m.clearedindicator_value_alias {
+		edges = append(edges, indicator.EdgeIndicatorValueAlias)
 	}
 	if m.clearedauthor {
 		edges = append(edges, indicator.EdgeAuthor)
@@ -2526,6 +2579,8 @@ func (m *IndicatorMutation) EdgeCleared(name string) bool {
 	switch name {
 	case indicator.EdgeDatasets:
 		return m.cleareddatasets
+	case indicator.EdgeIndicatorValueAlias:
+		return m.clearedindicator_value_alias
 	case indicator.EdgeAuthor:
 		return m.clearedauthor
 	case indicator.EdgeScale:
@@ -2538,6 +2593,9 @@ func (m *IndicatorMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *IndicatorMutation) ClearEdge(name string) error {
 	switch name {
+	case indicator.EdgeIndicatorValueAlias:
+		m.ClearIndicatorValueAlias()
+		return nil
 	case indicator.EdgeAuthor:
 		m.ClearAuthor()
 		return nil
@@ -2555,6 +2613,9 @@ func (m *IndicatorMutation) ResetEdge(name string) error {
 	case indicator.EdgeDatasets:
 		m.ResetDatasets()
 		return nil
+	case indicator.EdgeIndicatorValueAlias:
+		m.ResetIndicatorValueAlias()
+		return nil
 	case indicator.EdgeAuthor:
 		m.ResetAuthor()
 		return nil
@@ -2563,6 +2624,384 @@ func (m *IndicatorMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Indicator edge %s", name)
+}
+
+// IndicatorValueAliasMutation represents an operation that mutates the IndicatorValueAlias nodes in the graph.
+type IndicatorValueAliasMutation struct {
+	config
+	op               Op
+	typ              string
+	id               *int
+	value_mapping    *map[float64]string
+	clearedFields    map[string]struct{}
+	indicator        *int
+	clearedindicator bool
+	done             bool
+	oldValue         func(context.Context) (*IndicatorValueAlias, error)
+	predicates       []predicate.IndicatorValueAlias
+}
+
+var _ ent.Mutation = (*IndicatorValueAliasMutation)(nil)
+
+// indicatorvaluealiasOption allows management of the mutation configuration using functional options.
+type indicatorvaluealiasOption func(*IndicatorValueAliasMutation)
+
+// newIndicatorValueAliasMutation creates new mutation for the IndicatorValueAlias entity.
+func newIndicatorValueAliasMutation(c config, op Op, opts ...indicatorvaluealiasOption) *IndicatorValueAliasMutation {
+	m := &IndicatorValueAliasMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeIndicatorValueAlias,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withIndicatorValueAliasID sets the ID field of the mutation.
+func withIndicatorValueAliasID(id int) indicatorvaluealiasOption {
+	return func(m *IndicatorValueAliasMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *IndicatorValueAlias
+		)
+		m.oldValue = func(ctx context.Context) (*IndicatorValueAlias, error) {
+			once.Do(func() {
+				if m.done {
+					err = fmt.Errorf("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().IndicatorValueAlias.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withIndicatorValueAlias sets the old IndicatorValueAlias of the mutation.
+func withIndicatorValueAlias(node *IndicatorValueAlias) indicatorvaluealiasOption {
+	return func(m *IndicatorValueAliasMutation) {
+		m.oldValue = func(context.Context) (*IndicatorValueAlias, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m IndicatorValueAliasMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m IndicatorValueAliasMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID
+// is only available if it was provided to the builder.
+func (m *IndicatorValueAliasMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// SetValueMapping sets the "value_mapping" field.
+func (m *IndicatorValueAliasMutation) SetValueMapping(value map[float64]string) {
+	m.value_mapping = &value
+}
+
+// ValueMapping returns the value of the "value_mapping" field in the mutation.
+func (m *IndicatorValueAliasMutation) ValueMapping() (r map[float64]string, exists bool) {
+	v := m.value_mapping
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldValueMapping returns the old "value_mapping" field's value of the IndicatorValueAlias entity.
+// If the IndicatorValueAlias object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *IndicatorValueAliasMutation) OldValueMapping(ctx context.Context) (v map[float64]string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldValueMapping is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldValueMapping requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldValueMapping: %w", err)
+	}
+	return oldValue.ValueMapping, nil
+}
+
+// ClearValueMapping clears the value of the "value_mapping" field.
+func (m *IndicatorValueAliasMutation) ClearValueMapping() {
+	m.value_mapping = nil
+	m.clearedFields[indicatorvaluealias.FieldValueMapping] = struct{}{}
+}
+
+// ValueMappingCleared returns if the "value_mapping" field was cleared in this mutation.
+func (m *IndicatorValueAliasMutation) ValueMappingCleared() bool {
+	_, ok := m.clearedFields[indicatorvaluealias.FieldValueMapping]
+	return ok
+}
+
+// ResetValueMapping resets all changes to the "value_mapping" field.
+func (m *IndicatorValueAliasMutation) ResetValueMapping() {
+	m.value_mapping = nil
+	delete(m.clearedFields, indicatorvaluealias.FieldValueMapping)
+}
+
+// SetIndicatorID sets the "indicator" edge to the Indicator entity by id.
+func (m *IndicatorValueAliasMutation) SetIndicatorID(id int) {
+	m.indicator = &id
+}
+
+// ClearIndicator clears the "indicator" edge to the Indicator entity.
+func (m *IndicatorValueAliasMutation) ClearIndicator() {
+	m.clearedindicator = true
+}
+
+// IndicatorCleared returns if the "indicator" edge to the Indicator entity was cleared.
+func (m *IndicatorValueAliasMutation) IndicatorCleared() bool {
+	return m.clearedindicator
+}
+
+// IndicatorID returns the "indicator" edge ID in the mutation.
+func (m *IndicatorValueAliasMutation) IndicatorID() (id int, exists bool) {
+	if m.indicator != nil {
+		return *m.indicator, true
+	}
+	return
+}
+
+// IndicatorIDs returns the "indicator" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// IndicatorID instead. It exists only for internal usage by the builders.
+func (m *IndicatorValueAliasMutation) IndicatorIDs() (ids []int) {
+	if id := m.indicator; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetIndicator resets all changes to the "indicator" edge.
+func (m *IndicatorValueAliasMutation) ResetIndicator() {
+	m.indicator = nil
+	m.clearedindicator = false
+}
+
+// Op returns the operation name.
+func (m *IndicatorValueAliasMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (IndicatorValueAlias).
+func (m *IndicatorValueAliasMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *IndicatorValueAliasMutation) Fields() []string {
+	fields := make([]string, 0, 1)
+	if m.value_mapping != nil {
+		fields = append(fields, indicatorvaluealias.FieldValueMapping)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *IndicatorValueAliasMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case indicatorvaluealias.FieldValueMapping:
+		return m.ValueMapping()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *IndicatorValueAliasMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case indicatorvaluealias.FieldValueMapping:
+		return m.OldValueMapping(ctx)
+	}
+	return nil, fmt.Errorf("unknown IndicatorValueAlias field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *IndicatorValueAliasMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case indicatorvaluealias.FieldValueMapping:
+		v, ok := value.(map[float64]string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetValueMapping(v)
+		return nil
+	}
+	return fmt.Errorf("unknown IndicatorValueAlias field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *IndicatorValueAliasMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *IndicatorValueAliasMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *IndicatorValueAliasMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown IndicatorValueAlias numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *IndicatorValueAliasMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(indicatorvaluealias.FieldValueMapping) {
+		fields = append(fields, indicatorvaluealias.FieldValueMapping)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *IndicatorValueAliasMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *IndicatorValueAliasMutation) ClearField(name string) error {
+	switch name {
+	case indicatorvaluealias.FieldValueMapping:
+		m.ClearValueMapping()
+		return nil
+	}
+	return fmt.Errorf("unknown IndicatorValueAlias nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *IndicatorValueAliasMutation) ResetField(name string) error {
+	switch name {
+	case indicatorvaluealias.FieldValueMapping:
+		m.ResetValueMapping()
+		return nil
+	}
+	return fmt.Errorf("unknown IndicatorValueAlias field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *IndicatorValueAliasMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.indicator != nil {
+		edges = append(edges, indicatorvaluealias.EdgeIndicator)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *IndicatorValueAliasMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case indicatorvaluealias.EdgeIndicator:
+		if id := m.indicator; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *IndicatorValueAliasMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *IndicatorValueAliasMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *IndicatorValueAliasMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedindicator {
+		edges = append(edges, indicatorvaluealias.EdgeIndicator)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *IndicatorValueAliasMutation) EdgeCleared(name string) bool {
+	switch name {
+	case indicatorvaluealias.EdgeIndicator:
+		return m.clearedindicator
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *IndicatorValueAliasMutation) ClearEdge(name string) error {
+	switch name {
+	case indicatorvaluealias.EdgeIndicator:
+		m.ClearIndicator()
+		return nil
+	}
+	return fmt.Errorf("unknown IndicatorValueAlias unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *IndicatorValueAliasMutation) ResetEdge(name string) error {
+	switch name {
+	case indicatorvaluealias.EdgeIndicator:
+		m.ResetIndicator()
+		return nil
+	}
+	return fmt.Errorf("unknown IndicatorValueAlias edge %s", name)
 }
 
 // ObservationMutation represents an operation that mutates the Observation nodes in the graph.

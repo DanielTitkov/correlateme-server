@@ -30,6 +30,7 @@ func (Indicator) Edges() []ent.Edge {
 	return []ent.Edge{
 		// has
 		edge.To("datasets", Dataset.Type),
+		edge.To("indicator_value_alias", IndicatorValueAlias.Type).Unique(),
 		// belongs to
 		edge.From("author", User.Type).Ref("indicators").Unique(),
 		edge.From("scale", Scale.Type).Ref("indicators").Unique().Required(),

@@ -718,6 +718,34 @@ func HasDatasetsWith(preds ...predicate.Dataset) predicate.Indicator {
 	})
 }
 
+// HasIndicatorValueAlias applies the HasEdge predicate on the "indicator_value_alias" edge.
+func HasIndicatorValueAlias() predicate.Indicator {
+	return predicate.Indicator(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(IndicatorValueAliasTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, IndicatorValueAliasTable, IndicatorValueAliasColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasIndicatorValueAliasWith applies the HasEdge predicate on the "indicator_value_alias" edge with a given conditions (other predicates).
+func HasIndicatorValueAliasWith(preds ...predicate.IndicatorValueAlias) predicate.Indicator {
+	return predicate.Indicator(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(IndicatorValueAliasInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, IndicatorValueAliasTable, IndicatorValueAliasColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasAuthor applies the HasEdge predicate on the "author" edge.
 func HasAuthor() predicate.Indicator {
 	return predicate.Indicator(func(s *sql.Selector) {

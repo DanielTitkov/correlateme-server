@@ -12,6 +12,7 @@ import (
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/correlation"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dataset"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicatorvaluealias"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/observation"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/scale"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/user"
@@ -32,6 +33,8 @@ type Client struct {
 	Dataset *DatasetClient
 	// Indicator is the client for interacting with the Indicator builders.
 	Indicator *IndicatorClient
+	// IndicatorValueAlias is the client for interacting with the IndicatorValueAlias builders.
+	IndicatorValueAlias *IndicatorValueAliasClient
 	// Observation is the client for interacting with the Observation builders.
 	Observation *ObservationClient
 	// Scale is the client for interacting with the Scale builders.
@@ -54,6 +57,7 @@ func (c *Client) init() {
 	c.Correlation = NewCorrelationClient(c.config)
 	c.Dataset = NewDatasetClient(c.config)
 	c.Indicator = NewIndicatorClient(c.config)
+	c.IndicatorValueAlias = NewIndicatorValueAliasClient(c.config)
 	c.Observation = NewObservationClient(c.config)
 	c.Scale = NewScaleClient(c.config)
 	c.User = NewUserClient(c.config)
@@ -88,14 +92,15 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:         ctx,
-		config:      cfg,
-		Correlation: NewCorrelationClient(cfg),
-		Dataset:     NewDatasetClient(cfg),
-		Indicator:   NewIndicatorClient(cfg),
-		Observation: NewObservationClient(cfg),
-		Scale:       NewScaleClient(cfg),
-		User:        NewUserClient(cfg),
+		ctx:                 ctx,
+		config:              cfg,
+		Correlation:         NewCorrelationClient(cfg),
+		Dataset:             NewDatasetClient(cfg),
+		Indicator:           NewIndicatorClient(cfg),
+		IndicatorValueAlias: NewIndicatorValueAliasClient(cfg),
+		Observation:         NewObservationClient(cfg),
+		Scale:               NewScaleClient(cfg),
+		User:                NewUserClient(cfg),
 	}, nil
 }
 
@@ -113,13 +118,14 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		config:      cfg,
-		Correlation: NewCorrelationClient(cfg),
-		Dataset:     NewDatasetClient(cfg),
-		Indicator:   NewIndicatorClient(cfg),
-		Observation: NewObservationClient(cfg),
-		Scale:       NewScaleClient(cfg),
-		User:        NewUserClient(cfg),
+		config:              cfg,
+		Correlation:         NewCorrelationClient(cfg),
+		Dataset:             NewDatasetClient(cfg),
+		Indicator:           NewIndicatorClient(cfg),
+		IndicatorValueAlias: NewIndicatorValueAliasClient(cfg),
+		Observation:         NewObservationClient(cfg),
+		Scale:               NewScaleClient(cfg),
+		User:                NewUserClient(cfg),
 	}, nil
 }
 
@@ -152,6 +158,7 @@ func (c *Client) Use(hooks ...Hook) {
 	c.Correlation.Use(hooks...)
 	c.Dataset.Use(hooks...)
 	c.Indicator.Use(hooks...)
+	c.IndicatorValueAlias.Use(hooks...)
 	c.Observation.Use(hooks...)
 	c.Scale.Use(hooks...)
 	c.User.Use(hooks...)
@@ -544,6 +551,22 @@ func (c *IndicatorClient) QueryDatasets(i *Indicator) *DatasetQuery {
 	return query
 }
 
+// QueryIndicatorValueAlias queries the indicator_value_alias edge of a Indicator.
+func (c *IndicatorClient) QueryIndicatorValueAlias(i *Indicator) *IndicatorValueAliasQuery {
+	query := &IndicatorValueAliasQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := i.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(indicator.Table, indicator.FieldID, id),
+			sqlgraph.To(indicatorvaluealias.Table, indicatorvaluealias.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, indicator.IndicatorValueAliasTable, indicator.IndicatorValueAliasColumn),
+		)
+		fromV = sqlgraph.Neighbors(i.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
 // QueryAuthor queries the author edge of a Indicator.
 func (c *IndicatorClient) QueryAuthor(i *Indicator) *UserQuery {
 	query := &UserQuery{config: c.config}
@@ -579,6 +602,110 @@ func (c *IndicatorClient) QueryScale(i *Indicator) *ScaleQuery {
 // Hooks returns the client hooks.
 func (c *IndicatorClient) Hooks() []Hook {
 	return c.hooks.Indicator
+}
+
+// IndicatorValueAliasClient is a client for the IndicatorValueAlias schema.
+type IndicatorValueAliasClient struct {
+	config
+}
+
+// NewIndicatorValueAliasClient returns a client for the IndicatorValueAlias from the given config.
+func NewIndicatorValueAliasClient(c config) *IndicatorValueAliasClient {
+	return &IndicatorValueAliasClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `indicatorvaluealias.Hooks(f(g(h())))`.
+func (c *IndicatorValueAliasClient) Use(hooks ...Hook) {
+	c.hooks.IndicatorValueAlias = append(c.hooks.IndicatorValueAlias, hooks...)
+}
+
+// Create returns a create builder for IndicatorValueAlias.
+func (c *IndicatorValueAliasClient) Create() *IndicatorValueAliasCreate {
+	mutation := newIndicatorValueAliasMutation(c.config, OpCreate)
+	return &IndicatorValueAliasCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of IndicatorValueAlias entities.
+func (c *IndicatorValueAliasClient) CreateBulk(builders ...*IndicatorValueAliasCreate) *IndicatorValueAliasCreateBulk {
+	return &IndicatorValueAliasCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for IndicatorValueAlias.
+func (c *IndicatorValueAliasClient) Update() *IndicatorValueAliasUpdate {
+	mutation := newIndicatorValueAliasMutation(c.config, OpUpdate)
+	return &IndicatorValueAliasUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *IndicatorValueAliasClient) UpdateOne(iva *IndicatorValueAlias) *IndicatorValueAliasUpdateOne {
+	mutation := newIndicatorValueAliasMutation(c.config, OpUpdateOne, withIndicatorValueAlias(iva))
+	return &IndicatorValueAliasUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *IndicatorValueAliasClient) UpdateOneID(id int) *IndicatorValueAliasUpdateOne {
+	mutation := newIndicatorValueAliasMutation(c.config, OpUpdateOne, withIndicatorValueAliasID(id))
+	return &IndicatorValueAliasUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for IndicatorValueAlias.
+func (c *IndicatorValueAliasClient) Delete() *IndicatorValueAliasDelete {
+	mutation := newIndicatorValueAliasMutation(c.config, OpDelete)
+	return &IndicatorValueAliasDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *IndicatorValueAliasClient) DeleteOne(iva *IndicatorValueAlias) *IndicatorValueAliasDeleteOne {
+	return c.DeleteOneID(iva.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *IndicatorValueAliasClient) DeleteOneID(id int) *IndicatorValueAliasDeleteOne {
+	builder := c.Delete().Where(indicatorvaluealias.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &IndicatorValueAliasDeleteOne{builder}
+}
+
+// Query returns a query builder for IndicatorValueAlias.
+func (c *IndicatorValueAliasClient) Query() *IndicatorValueAliasQuery {
+	return &IndicatorValueAliasQuery{config: c.config}
+}
+
+// Get returns a IndicatorValueAlias entity by its id.
+func (c *IndicatorValueAliasClient) Get(ctx context.Context, id int) (*IndicatorValueAlias, error) {
+	return c.Query().Where(indicatorvaluealias.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *IndicatorValueAliasClient) GetX(ctx context.Context, id int) *IndicatorValueAlias {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryIndicator queries the indicator edge of a IndicatorValueAlias.
+func (c *IndicatorValueAliasClient) QueryIndicator(iva *IndicatorValueAlias) *IndicatorQuery {
+	query := &IndicatorQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := iva.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(indicatorvaluealias.Table, indicatorvaluealias.FieldID, id),
+			sqlgraph.To(indicator.Table, indicator.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, true, indicatorvaluealias.IndicatorTable, indicatorvaluealias.IndicatorColumn),
+		)
+		fromV = sqlgraph.Neighbors(iva.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *IndicatorValueAliasClient) Hooks() []Hook {
+	return c.hooks.IndicatorValueAlias
 }
 
 // ObservationClient is a client for the Observation schema.
