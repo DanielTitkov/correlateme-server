@@ -41,6 +41,18 @@ var (
 				OnDelete:   schema.SetNull,
 			},
 		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "correlation_dataset_left_dataset_right",
+				Unique:  true,
+				Columns: []*schema.Column{CorrelationsColumns[7], CorrelationsColumns[8]},
+			},
+			{
+				Name:    "correlation_dataset_right_dataset_left",
+				Unique:  true,
+				Columns: []*schema.Column{CorrelationsColumns[8], CorrelationsColumns[7]},
+			},
+		},
 	}
 	// DatasetsColumns holds the columns for the "datasets" table.
 	DatasetsColumns = []*schema.Column{

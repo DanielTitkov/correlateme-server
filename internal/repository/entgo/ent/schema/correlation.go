@@ -4,6 +4,7 @@ import (
 	"entgo.io/ent"
 	"entgo.io/ent/schema/edge"
 	"entgo.io/ent/schema/field"
+	"entgo.io/ent/schema/index"
 	"entgo.io/ent/schema/mixin"
 )
 
@@ -33,7 +34,10 @@ func (Correlation) Edges() []ent.Edge {
 }
 
 func (Correlation) Indexes() []ent.Index {
-	return nil
+	return []ent.Index{
+		index.Edges("left", "right").Unique(),
+		index.Edges("right", "left").Unique(),
+	}
 }
 
 func (Correlation) Mixin() []ent.Mixin {

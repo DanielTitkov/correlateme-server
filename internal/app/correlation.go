@@ -55,6 +55,9 @@ func (a *App) FindCorrelations(args domain.FindCorrelationsArgs) error {
 		fmt.Println("DATA", leftData, rightData) // FIXME
 		// find coef and p
 		coef, p := onlinestats.Spearman(leftData, rightData)
+		if math.IsNaN(coef) {
+			continue
+		}
 		correlation := domain.Correlation{
 			Left:  left,
 			Right: right,
@@ -65,6 +68,10 @@ func (a *App) FindCorrelations(args domain.FindCorrelationsArgs) error {
 		}
 		fmt.Println("CORRELATION", correlation) // FIXME
 		// save correlations to db
+		_, err = a.repo.CreateOrUpdateCorrelation(&correlation)
+		if err != nil { // TODO: maybe save error, not exit right away
+			return err
+		}
 	}
 
 	return nil

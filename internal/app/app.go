@@ -49,6 +49,9 @@ type (
 		// observations
 		CreateObservation(*domain.Observation) (*domain.Observation, error)
 		// UpdateObservation
+
+		// correlations
+		CreateOrUpdateCorrelation(*domain.Correlation) (*domain.Correlation, error)
 	}
 )
 
