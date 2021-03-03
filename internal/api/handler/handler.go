@@ -43,6 +43,9 @@ func (h *Handler) link(e *echo.Echo) {
 	v1Restricted.POST("/getIndicators", h.GetIndicators)
 	// observation
 	v1Restricted.POST("/createObservation", h.CreateObservation)
+	// correlation
+	v1Restricted.POST("/getCorrelationMatrix", h.GetCorrelationMatrix)
+
 	// TODO
 	// v1Restricted.POST("/", h.GetDataset)
 	// v1Restricted.POST("/", h.GetCorrelation) // ?
@@ -51,7 +54,7 @@ func (h *Handler) link(e *echo.Echo) {
 	// v1Restricted.POST("/", h.)
 
 	// dev endpoints for testing and debug
-	// not accessible on no-dev instances
+	// not accessible on not-dev instances
 	if h.cfg.Env == "dev" {
 		v1.POST("/findUserCorrelations", h.FindUserCorrelations)
 	}

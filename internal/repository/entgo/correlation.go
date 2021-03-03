@@ -7,6 +7,7 @@ import (
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/correlation"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dataset"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/user"
 )
 
 func (r *EntgoRepository) CreateOrUpdateCorrelation(c *domain.Correlation) (*domain.Correlation, error) {
@@ -56,6 +57,32 @@ func (r *EntgoRepository) CreateOrUpdateCorrelation(c *domain.Correlation) (*dom
 	}
 
 	return entToDomainCorrelation(corr), nil
+}
+
+func (r *EntgoRepository) GetUserCorrelations(userID int) ([]*domain.Correlation, error) {
+	corrs, err := r.client.Correlation.
+		Query().
+		Where(correlation.Or( // TODO: maybe And?
+			correlation.HasLeftWith(dataset.HasUserWith(user.IDEQ(userID))),
+			correlation.HasRightWith(dataset.HasUserWith(user.IDEQ(userID))),
+		)).
+		WithLeft(func(q *ent.DatasetQuery) {
+			q.WithIndicator()
+		}).
+		WithRight(func(q *ent.DatasetQuery) {
+			q.WithIndicator()
+		}).
+		All(context.TODO())
+	if err != nil {
+		return nil, err
+	}
+
+	var res []*domain.Correlation
+	for _, corr := range corrs {
+		res = append(res, entToDomainCorrelation(corr))
+	}
+
+	return res, nil
 }
 
 func entToDomainCorrelation(corr *ent.Correlation) *domain.Correlation {

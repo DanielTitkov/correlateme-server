@@ -3,6 +3,8 @@ package app
 import (
 	"fmt"
 	"math"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/DanielTitkov/correlateme-server/internal/domain"
@@ -10,17 +12,63 @@ import (
 	combinations "github.com/mxschmitt/golang-combinations"
 )
 
-func (a *App) FindCorrelations(args domain.FindCorrelationsArgs) error {
-	fmt.Println("ARGS", args) // FIXME
+func (a *App) GetCorrelationMatrix(args domain.GetCorrelationMatrixArgs) (*domain.CorrelationMatrix, error) {
+	datasets, err := a.repo.GetUserDatasets(args.UserID, false, args.WithShared)
+	if err != nil {
+		return nil, err
+	}
 
+	correlations, err := a.repo.GetUserCorrelations(args.UserID)
+	if err != nil {
+		return nil, err
+	}
+
+	// map correlations
+	corrMap := mapCorrelation(correlations)
+
+	// make matrix
+	var matrix [][]domain.CorrelationMatrixBodyItem
+	for _, iDataset := range datasets {
+		var matrixRow []domain.CorrelationMatrixBodyItem
+		for _, jDataset := range datasets {
+			if iDataset.ID == jDataset.ID {
+				matrixRow = append(matrixRow, makeSelfCorrelationMatrixItem())
+				continue
+			}
+			corr, ok := corrMap[pairOfIDsToString(iDataset.ID, jDataset.ID)]
+			if !ok {
+				matrixRow = append(matrixRow, makeZeroCorrelationMatrixItem())
+				continue
+			}
+			matrixRow = append(matrixRow, makeCorrelationMatrixItem(corr))
+		}
+		matrix = append(matrix, matrixRow)
+	}
+
+	var header []domain.CorrelationMatrixHeaderItem
+	for _, dataset := range datasets {
+		header = append(header, domain.CorrelationMatrixHeaderItem{
+			IndicatorID:    dataset.Indicator.ID,
+			DatasetID:      dataset.ID,
+			IndicatorTitle: dataset.Indicator.Title,
+			DatasetShared:  dataset.Shared,
+		})
+	}
+
+	return &domain.CorrelationMatrix{
+		Header: header,
+		Body:   matrix,
+	}, nil
+}
+
+func (a *App) FindCorrelations(args domain.FindCorrelationsArgs) error {
 	datasets, err := a.repo.GetUserDatasets(args.UserID, true, args.WithShared)
 	if err != nil {
 		return err
 	}
 
 	// map datasets
-	// TODO: create combination method for ints to remove conversion
-	datasetMap := mapDatasets(datasets)
+	datasetMap := mapDatasets(datasets) // TODO: create combination method for ints to remove conversion
 
 	// get dataset ids
 	var datasetIDs []string
@@ -30,7 +78,6 @@ func (a *App) FindCorrelations(args domain.FindCorrelationsArgs) error {
 
 	// make combinations
 	subsets := combinations.Combinations(datasetIDs, 2)
-	fmt.Println("SUBSETS", subsets) // FIXME
 
 	// make data slices
 	for _, subset := range subsets {
@@ -52,7 +99,6 @@ func (a *App) FindCorrelations(args domain.FindCorrelationsArgs) error {
 			continue
 		}
 
-		fmt.Println("DATA", leftData, rightData) // FIXME
 		// find coef and p
 		coef, p := onlinestats.Spearman(leftData, rightData)
 		if math.IsNaN(coef) {
@@ -66,7 +112,7 @@ func (a *App) FindCorrelations(args domain.FindCorrelationsArgs) error {
 			Type:  domain.SpearmanCorrelationType,
 			R2:    math.Pow(coef, 2),
 		}
-		fmt.Println("CORRELATION", correlation) // FIXME
+
 		// save correlations to db
 		_, err = a.repo.CreateOrUpdateCorrelation(&correlation)
 		if err != nil { // TODO: maybe save error, not exit right away
@@ -94,4 +140,51 @@ func mapDatasets(datasets []*domain.Dataset) map[string]*domain.Dataset {
 		datasetMap[fmt.Sprintf("%d", dataset.ID)] = dataset
 	}
 	return datasetMap
+}
+
+func mapCorrelation(corrs []*domain.Correlation) map[string]*domain.Correlation {
+	corrMap := make(map[string]*domain.Correlation)
+	for _, corr := range corrs {
+		// this way map size is doubled but it provides results for every order
+		corrMap[pairOfIDsToString(corr.Left.ID, corr.Right.ID)] = corr
+		corrMap[pairOfIDsToString(corr.Right.ID, corr.Left.ID)] = corr
+	}
+	return corrMap
+}
+
+func pairOfIDsToString(left, right int) string {
+	return strings.Join([]string{
+		strconv.Itoa(left),
+		strconv.Itoa(right),
+	}, "_") // separator is for readability
+}
+
+func makeSelfCorrelationMatrixItem() domain.CorrelationMatrixBodyItem {
+	return domain.CorrelationMatrixBodyItem{
+		CorrelationID: 0,
+		Coef:          1,
+		P:             0,
+		R2:            0,
+		Type:          "-",
+	}
+}
+
+func makeZeroCorrelationMatrixItem() domain.CorrelationMatrixBodyItem {
+	return domain.CorrelationMatrixBodyItem{
+		CorrelationID: 0,
+		Coef:          0,
+		P:             0,
+		R2:            0,
+		Type:          "-",
+	}
+}
+
+func makeCorrelationMatrixItem(corr *domain.Correlation) domain.CorrelationMatrixBodyItem {
+	return domain.CorrelationMatrixBodyItem{
+		CorrelationID: corr.ID,
+		Coef:          corr.Coef,
+		P:             corr.P,
+		R2:            corr.R2,
+		Type:          corr.Type,
+	}
 }

@@ -21,7 +21,7 @@ type (
 		Code         string // unique code for external systems
 		Title        string
 		Description  string
-		Active       bool
+		Active       bool // FIXME move to dataset?
 		BuiltIn      bool // if Indicator is created by the service
 		External     bool // if Indicator is populated by the user or external system
 		Scale        *Scale
@@ -74,5 +74,25 @@ type (
 		Type       string  // Pearson or whatever
 		CreateTime time.Time
 		UpdateTime time.Time
+	}
+	// CorrelationMatrix holds correlations of user datasets to be shown in the app.
+	CorrelationMatrix struct {
+		Header []CorrelationMatrixHeaderItem
+		Body   [][]CorrelationMatrixBodyItem
+	}
+	// CorrelationMatrixHeaderItem holds a matrix subject description
+	CorrelationMatrixHeaderItem struct {
+		IndicatorID    int
+		DatasetID      int
+		IndicatorTitle string
+		DatasetShared  bool
+	}
+	// CorrelationMatrixBodyItem holds a correlation on the matrix
+	CorrelationMatrixBodyItem struct {
+		CorrelationID int
+		Coef          float64 // correlation coef
+		P             float64 // p-value
+		R2            float64 // determination coef
+		Type          string  // Pearson or whatever
 	}
 )

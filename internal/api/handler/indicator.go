@@ -107,18 +107,20 @@ func (h *Handler) GetIndicators(c echo.Context) error {
 		}
 
 		response = append(response, model.GetIndicatorsResponseItem{
-			ID:          i.ID,
-			Code:        i.Code,
-			Title:       i.Title,
-			Description: i.Description,
-			Active:      i.Active,
-			BuiltIn:     i.BuiltIn,
-			External:    i.External,
-			ScaleID:     i.Scale.ID,
-			AuthorID:    authorID,
-			CreateTime:  i.CreateTime,
-			UpdateTime:  i.UpdateTime,
-			Dataset:     dataset,
+			Indicator: model.Indicator{
+				ID:          i.ID,
+				Code:        i.Code,
+				Title:       i.Title,
+				Description: i.Description,
+				Active:      i.Active,
+				BuiltIn:     i.BuiltIn,
+				External:    i.External,
+				ScaleID:     i.Scale.ID,
+				AuthorID:    authorID,
+				CreateTime:  i.CreateTime,
+				UpdateTime:  i.UpdateTime,
+				Dataset:     dataset,
+			},
 		})
 	}
 

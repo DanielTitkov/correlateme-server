@@ -58,4 +58,9 @@ type (
 		WithShared bool
 		Method     string // pearson, spearman or auto
 	}
+
+	GetCorrelationMatrixArgs struct {
+		UserID     int
+		WithShared bool
+	}
 )
