@@ -1,7 +1,6 @@
 package handler
 
 import (
-	"fmt"
 	"net/http"
 
 	"github.com/DanielTitkov/correlateme-server/internal/api/model"
@@ -28,10 +27,44 @@ func (h *Handler) GetCorrelationMatrix(c echo.Context) error {
 		UserID:     userID,
 		WithShared: request.WithShared,
 	})
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, model.ErrorResponse{
+			Message: "failed to get correlation matrix",
+			Error:   err.Error(),
+		})
+	}
 
-	fmt.Println("MATRIX\n", matrix)
+	var header []model.GetCorrelationMatrixResponseHeaderItem
+	var body [][]model.GetCorrelationMatrixResponseBodyItem
 
-	return c.JSON(http.StatusOK, "")
+	for _, hi := range matrix.Header {
+		header = append(header, model.GetCorrelationMatrixResponseHeaderItem{
+			IndicatorID:    hi.IndicatorID,
+			DatasetID:      hi.DatasetID,
+			IndicatorTitle: hi.IndicatorTitle,
+			DatasetShared:  hi.DatasetShared,
+		})
+	}
+
+	for _, br := range matrix.Body {
+		var bodyRow []model.GetCorrelationMatrixResponseBodyItem
+		for _, bi := range br {
+			bodyRow = append(bodyRow, model.GetCorrelationMatrixResponseBodyItem{
+				CorrelationID: bi.CorrelationID,
+				Coef:          bi.Coef,
+				P:             bi.P,
+				R2:            bi.R2,
+				Type:          bi.Type,
+				UpdateTime:    bi.UpdateTime,
+			})
+		}
+		body = append(body, bodyRow)
+	}
+
+	return c.JSON(http.StatusOK, model.GetCorrelationMatrixResponse{
+		Header: header,
+		Body:   body,
+	})
 }
 
 // FindUserCorrelations method is only for debug on dev

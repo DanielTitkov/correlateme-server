@@ -43,8 +43,8 @@ type (
 		GetDatasetByID(int) (*domain.Dataset, error)
 		GetUserIndicatorDataset(*domain.User, *domain.Indicator) (*domain.Dataset, error)
 		GetOrCreateUserIndicatorDataset(*domain.User, *domain.Indicator) (*domain.Dataset, error)
-		GetUserDatasets(userID int, withObservations, withShared bool) ([]*domain.Dataset, error) // for correlations
-		// FilterDatasets // for more complex models
+		GetUserDatasets(userID int, withObservations, withShared bool) ([]*domain.Dataset, error) // to be deprecated
+		GetDatasets(domain.GetDatasetsArgs) ([]*domain.Dataset, error)
 
 		// observations
 		CreateObservation(*domain.Observation) (*domain.Observation, error)

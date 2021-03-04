@@ -41,14 +41,17 @@ type (
 	// Dataset
 
 	GetDatasetsArgs struct {
+		// IndicatorID      *int
 		UserID           int
+		WithIndicator    bool
+		WithUser         bool
 		WithObservations bool
 		ObservationLimit int64
 		Filter           GetDatasetsArgsFilter
 	}
 	GetDatasetsArgsFilter struct {
-		ID     []int
-		Shared *bool
+		ID         []int
+		WithShared bool
 	}
 
 	// Correlation

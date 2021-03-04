@@ -13,7 +13,14 @@ import (
 )
 
 func (a *App) GetCorrelationMatrix(args domain.GetCorrelationMatrixArgs) (*domain.CorrelationMatrix, error) {
-	datasets, err := a.repo.GetUserDatasets(args.UserID, false, args.WithShared)
+	datasets, err := a.repo.GetDatasets(domain.GetDatasetsArgs{
+		UserID:           args.UserID,
+		WithIndicator:    true,
+		WithObservations: false,
+		Filter: domain.GetDatasetsArgsFilter{
+			WithShared: args.WithShared,
+		},
+	})
 	if err != nil {
 		return nil, err
 	}
@@ -166,6 +173,7 @@ func makeSelfCorrelationMatrixItem() domain.CorrelationMatrixBodyItem {
 		P:             0,
 		R2:            0,
 		Type:          "-",
+		UpdateTime:    time.Now(),
 	}
 }
 
@@ -176,6 +184,7 @@ func makeZeroCorrelationMatrixItem() domain.CorrelationMatrixBodyItem {
 		P:             0,
 		R2:            0,
 		Type:          "-",
+		UpdateTime:    time.Now(),
 	}
 }
 
@@ -186,5 +195,6 @@ func makeCorrelationMatrixItem(corr *domain.Correlation) domain.CorrelationMatri
 		P:             corr.P,
 		R2:            corr.R2,
 		Type:          corr.Type,
+		UpdateTime:    corr.UpdateTime,
 	}
 }

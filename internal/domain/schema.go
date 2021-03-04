@@ -94,5 +94,6 @@ type (
 		P             float64 // p-value
 		R2            float64 // determination coef
 		Type          string  // Pearson or whatever
+		UpdateTime    time.Time
 	}
 )

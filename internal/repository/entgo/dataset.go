@@ -76,6 +76,49 @@ func (r *EntgoRepository) GetUserDatasets(userID int, withObservations, withShar
 	return datasets, nil
 }
 
+func (r *EntgoRepository) GetDatasets(args domain.GetDatasetsArgs) ([]*domain.Dataset, error) {
+	query := r.client.Dataset.Query()
+
+	// edges
+	if args.WithObservations {
+		query.WithObservations()
+		// TODO: maybe set limit for observations
+	}
+
+	if args.WithIndicator {
+		query.WithIndicator()
+	}
+
+	if args.WithUser {
+		query.WithUser()
+	}
+
+	// ownership
+	// TODO: indicator?
+
+	// filter
+	if args.Filter.WithShared {
+		query.Where(dataset.Or(
+			dataset.HasUserWith(user.IDEQ(args.UserID)),
+			dataset.SharedEQ(true),
+		))
+	} else {
+		query.Where(dataset.HasUserWith(user.IDEQ(args.UserID)))
+	}
+
+	dss, err := query.All(context.TODO())
+	if err != nil {
+		return nil, err
+	}
+
+	var datasets []*domain.Dataset
+	for _, ds := range dss {
+		datasets = append(datasets, entToDomainDataset(ds))
+	}
+
+	return datasets, nil
+}
+
 func (r *EntgoRepository) GetUserIndicatorDataset(u *domain.User, ind *domain.Indicator) (*domain.Dataset, error) {
 	ds, err := r.client.Dataset.
 		Query().
