@@ -44,6 +44,7 @@ func (r *EntgoRepository) CreateOrUpdateCorrelation(c *domain.Correlation) (*dom
 		if err != nil {
 			return nil, err
 		}
+		return entToDomainCorrelation(corr), nil
 	}
 
 	// update correlation

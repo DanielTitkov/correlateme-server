@@ -4,9 +4,9 @@ import (
 	"github.com/DanielTitkov/correlateme-server/internal/domain"
 )
 
-// CreateObservation checks if there is a dataset for user/indicator.
+// CreateOrUpdateObservation checks if there is a dataset for user/indicator.
 // If none, creates one and adds observation to it, otherwise adds to existing dataset.
-func (a *App) CreateObservation(args domain.CreateObservationArgs) error {
+func (a *App) CreateOrUpdateObservation(args domain.CreateOrUpdateObservationArgs) error {
 	user, err := a.repo.GetUserByID(args.UserID)
 	if err != nil {
 		return err
@@ -22,7 +22,7 @@ func (a *App) CreateObservation(args domain.CreateObservationArgs) error {
 		return err
 	}
 
-	_, err = a.repo.CreateObservation(&domain.Observation{
+	_, err = a.repo.CreateOrUpdateObservation(&domain.Observation{
 		Value:   args.Value,
 		Dataset: dataset,
 		Date:    args.Date,

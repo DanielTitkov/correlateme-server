@@ -31,7 +31,7 @@ type (
 
 	// Observation
 
-	CreateObservationArgs struct {
+	CreateOrUpdateObservationArgs struct {
 		UserID      int
 		IndicatorID int
 		Value       float64

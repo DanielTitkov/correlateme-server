@@ -42,7 +42,7 @@ func (h *Handler) link(e *echo.Echo) {
 	v1Restricted.POST("/createIndicator", h.CreateIndicator)
 	v1Restricted.POST("/getIndicators", h.GetIndicators)
 	// observation
-	v1Restricted.POST("/createObservation", h.CreateObservation)
+	v1Restricted.POST("/createOrUpdateObservation", h.CreateOrUpdateObservation)
 	// correlation
 	v1Restricted.POST("/getCorrelationMatrix", h.GetCorrelationMatrix)
 

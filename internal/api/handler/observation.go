@@ -9,8 +9,8 @@ import (
 	"github.com/labstack/echo"
 )
 
-func (h *Handler) CreateObservation(c echo.Context) error {
-	request := new(model.CreateObservationRequest)
+func (h *Handler) CreateOrUpdateObservation(c echo.Context) error {
+	request := new(model.CreateOrUpdateObservationRequest)
 	if err := c.Bind(request); err != nil {
 		return err
 	}
@@ -23,7 +23,7 @@ func (h *Handler) CreateObservation(c echo.Context) error {
 		})
 	}
 
-	err = h.app.CreateObservation(domain.CreateObservationArgs{
+	err = h.app.CreateOrUpdateObservation(domain.CreateOrUpdateObservationArgs{
 		UserID:      userID,
 		IndicatorID: request.IndicatorID,
 		Value:       request.Value,
@@ -31,13 +31,13 @@ func (h *Handler) CreateObservation(c echo.Context) error {
 	})
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, model.ErrorResponse{
-			Message: "failed to create observation",
+			Message: "failed to create/update observation",
 			Error:   err.Error(),
 		})
 	}
 
 	return c.JSON(http.StatusOK, model.OKResponse{
 		Status:  "ok",
-		Message: "observation created",
+		Message: "observation created/updated",
 	})
 }
