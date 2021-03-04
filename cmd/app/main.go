@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"net/http"
 	"os"
 
 	"github.com/DanielTitkov/correlateme-server/cmd/app/prepare"
@@ -12,6 +13,7 @@ import (
 	"github.com/DanielTitkov/correlateme-server/internal/logger"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 
 	_ "github.com/lib/pq"
 )
@@ -55,6 +57,12 @@ func main() {
 	}
 	j := job.New(cfg, logger, app)
 	go j.ListenUpdateUserCorrelationsChannel()
+
+	// prometheus
+	go func() {
+		http.Handle("/metrics", promhttp.Handler())
+		http.ListenAndServe(":2112", nil)
+	}()
 
 	server := prepare.NewServer(cfg, logger, app)
 	logger.Fatal("failed to start server", server.Start(cfg.Server.GetAddress()))

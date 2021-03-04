@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/DanielTitkov/correlateme-server/internal/domain"
+	"github.com/DanielTitkov/correlateme-server/internal/service/metrics"
 )
 
 // CreateOrUpdateObservation checks if there is a dataset for user/indicator.
@@ -33,6 +34,7 @@ func (a *App) CreateOrUpdateObservation(args domain.CreateOrUpdateObservationArg
 
 	go func() {
 		// TODO: add timeout
+		metrics.UnprocessedUpdateCorrelationsRequests.Add(1)
 		a.Channels.UpdateUserCorrelationsChan <- domain.UpdateCorrelationsArgs{
 			UserID:     args.UserID,
 			WithShared: true,
