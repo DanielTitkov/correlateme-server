@@ -68,7 +68,7 @@ func (a *App) GetCorrelationMatrix(args domain.GetCorrelationMatrixArgs) (*domai
 	}, nil
 }
 
-func (a *App) FindCorrelations(args domain.FindCorrelationsArgs) error {
+func (a *App) UpdateCorrelations(args domain.UpdateCorrelationsArgs) error {
 	datasets, err := a.repo.GetUserDatasets(args.UserID, true, args.WithShared)
 	if err != nil {
 		return err

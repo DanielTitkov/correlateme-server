@@ -8,6 +8,7 @@ import (
 	"github.com/DanielTitkov/correlateme-server/cmd/app/prepare"
 	"github.com/DanielTitkov/correlateme-server/internal/app"
 	"github.com/DanielTitkov/correlateme-server/internal/configs"
+	"github.com/DanielTitkov/correlateme-server/internal/job"
 	"github.com/DanielTitkov/correlateme-server/internal/logger"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent"
@@ -52,6 +53,8 @@ func main() {
 	if err != nil {
 		logger.Fatal("failed creating app", err)
 	}
+	j := job.New(cfg, logger, app)
+	go j.ListenUpdateUserCorrelationsChannel()
 
 	server := prepare.NewServer(cfg, logger, app)
 	logger.Fatal("failed to start server", server.Start(cfg.Server.GetAddress()))

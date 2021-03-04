@@ -81,7 +81,7 @@ func (h *Handler) FindUserCorrelations(c echo.Context) error {
 		})
 	}
 
-	err := h.app.FindCorrelations(domain.FindCorrelationsArgs{
+	err := h.app.UpdateCorrelations(domain.UpdateCorrelationsArgs{
 		UserID:     request.UserID,
 		WithShared: request.WithShared,
 	})

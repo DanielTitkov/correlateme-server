@@ -97,12 +97,13 @@ func entToDomainCorrelation(corr *ent.Correlation) *domain.Correlation {
 	}
 
 	return &domain.Correlation{
-		ID:    corr.ID,
-		Left:  left,
-		Right: right,
-		Coef:  corr.Coef,
-		P:     corr.P,
-		R2:    corr.R2,
-		Type:  corr.Type,
+		ID:         corr.ID,
+		Left:       left,
+		Right:      right,
+		Coef:       corr.Coef,
+		P:          corr.P,
+		R2:         corr.R2,
+		Type:       corr.Type,
+		UpdateTime: corr.UpdateTime,
 	}
 }

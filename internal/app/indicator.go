@@ -42,7 +42,7 @@ func (a *App) GetIndicators(args domain.GetIndicatorsArgs) ([]*domain.Indicator,
 		args.Filter.AuthorID = nil
 	}
 
-	args.ObservationLimit = a.cfg.Indicator.DefaultObservationLimit
+	args.ObservationLimit = a.cfg.App.DefaultObservationLimit
 
 	return a.repo.GetIndicators(args)
 }

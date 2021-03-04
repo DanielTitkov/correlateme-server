@@ -9,5 +9,7 @@ server:
 auth:
   exp: 7200 # hours
   secret: secret-key
-indicator:
+app:
   defaultObservationLimit: 200
+  maxCorrelationObservations: 500
+  minCorrelationObservations: 10

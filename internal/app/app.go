@@ -12,15 +12,20 @@ import (
 type (
 	// App combines services and holds business logic
 	App struct {
-		cfg    configs.Config
-		logger *logger.Logger
-		repo   Repository
-		cron   *cron.Cron
-		cache  *Cache
+		cfg      configs.Config
+		logger   *logger.Logger
+		repo     Repository
+		cron     *cron.Cron
+		cache    *Cache
+		Channels *Channels
 	}
 	// Cache stores data loaded on app start
 	Cache struct {
 		scales map[string]*domain.Scale
+	}
+	// Channels holds app channels for async jobs
+	Channels struct {
+		UpdateUserCorrelationsChan chan domain.UpdateCorrelationsArgs
 	}
 	// Repository stores data
 	Repository interface {
@@ -78,6 +83,12 @@ func NewApp(
 	}
 	app.cache = cache
 
+	channels, err := app.buildChannels()
+	if err != nil {
+		return nil, err
+	}
+	app.Channels = channels
+
 	return &app, nil
 }
 
@@ -100,4 +111,11 @@ func (a *App) buildCache() (*Cache, error) {
 
 	a.logger.Info("created cache", fmt.Sprintf("%+v", cache))
 	return &cache, nil
+}
+
+func (a *App) buildChannels() (*Channels, error) {
+	updateCorrelationsChan := make(chan domain.UpdateCorrelationsArgs, a.cfg.App.UpdateCorrelationsBuffer)
+	return &Channels{
+		UpdateUserCorrelationsChan: updateCorrelationsChan,
+	}, nil
 }

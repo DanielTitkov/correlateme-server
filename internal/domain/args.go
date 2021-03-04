@@ -56,7 +56,7 @@ type (
 
 	// Correlation
 
-	FindCorrelationsArgs struct {
+	UpdateCorrelationsArgs struct {
 		UserID     int
 		WithShared bool
 		Method     string // pearson, spearman or auto

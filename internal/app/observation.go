@@ -31,5 +31,14 @@ func (a *App) CreateOrUpdateObservation(args domain.CreateOrUpdateObservationArg
 		return err
 	}
 
+	go func() {
+		// TODO: add timeout
+		a.Channels.UpdateUserCorrelationsChan <- domain.UpdateCorrelationsArgs{
+			UserID:     args.UserID,
+			WithShared: true,
+			Method:     "auto",
+		}
+	}()
+
 	return nil
 }
