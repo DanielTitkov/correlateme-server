@@ -86,6 +86,34 @@ func (r *EntgoRepository) GetUserCorrelations(userID int) ([]*domain.Correlation
 	return res, nil
 }
 
+func (r *EntgoRepository) GetCorrelation(args domain.GetCorrelationArgs) (*domain.Correlation, error) {
+	query := r.client.Correlation.
+		Query().
+		Where(correlation.And(
+			correlation.IDEQ(args.ID),
+			correlation.HasLeftWith(dataset.HasUserWith(user.IDEQ(args.UserID))),
+			correlation.HasRightWith(dataset.HasUserWith(user.IDEQ(args.UserID))),
+		))
+
+	if args.WithDatasets {
+		var dsQuery func(q *ent.DatasetQuery)
+		if args.WithObservations {
+			dsQuery = func(q *ent.DatasetQuery) {
+				q.WithObservations()
+			}
+		}
+		query.WithLeft(dsQuery)
+		query.WithRight(dsQuery)
+	}
+
+	corr, err := query.Only(context.TODO())
+	if err != nil {
+		return nil, err
+	}
+
+	return entToDomainCorrelation(corr), nil
+}
+
 func entToDomainCorrelation(corr *ent.Correlation) *domain.Correlation {
 	var left, right *domain.Dataset
 	if corr.Edges.Left != nil {

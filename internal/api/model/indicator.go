@@ -5,18 +5,18 @@ import "time"
 type (
 	// Indicator is a common model to use in various methods
 	Indicator struct {
-		ID          int                           `json:"id"`
-		Code        string                        `json:"code"`
-		Title       string                        `json:"title"`
-		Description string                        `json:"description"`
-		Active      bool                          `json:"active"`
-		BuiltIn     bool                          `json:"builtIn"`
-		External    bool                          `json:"external"`
-		ScaleID     int                           `json:"scaleID"`
-		AuthorID    int                           `json:"authorID,omitempty"`
-		CreateTime  time.Time                     `json:"createTime"`
-		UpdateTime  time.Time                     `json:"updateTime"`
-		Dataset     *GetIndicatorsResponseDataset `json:"dataset,omitempty"`
+		ID          int       `json:"id"`
+		Code        string    `json:"code"`
+		Title       string    `json:"title"`
+		Description string    `json:"description"`
+		Active      bool      `json:"active"`
+		BuiltIn     bool      `json:"builtIn"`
+		External    bool      `json:"external"`
+		ScaleID     int       `json:"scaleID"`
+		AuthorID    int       `json:"authorID,omitempty"`
+		CreateTime  time.Time `json:"createTime"`
+		UpdateTime  time.Time `json:"updateTime"`
+		Dataset     *Dataset  `json:"dataset,omitempty"`
 	}
 )
 
@@ -42,16 +42,5 @@ type (
 	GetIndicatorsResponse     []GetIndicatorsResponseItem
 	GetIndicatorsResponseItem struct {
 		Indicator
-	}
-	GetIndicatorsResponseDataset struct {
-		ID           int                                `json:"id,omitempty"`
-		Source       string                             `json:"source,omitempty"`
-		Shared       bool                               `json:"shared,omitempty"`
-		Observations []GetIndicatorsResponseObservation `json:"observations,omitempty"`
-	}
-	GetIndicatorsResponseObservation struct {
-		ID    int        `json:"id"`
-		Value float64    `json:"value"`
-		Date  *time.Time `json:"date"`
 	}
 )

@@ -66,4 +66,11 @@ type (
 		UserID     int
 		WithShared bool
 	}
+
+	GetCorrelationArgs struct {
+		ID               int
+		UserID           int
+		WithDatasets     bool
+		WithObservations bool
+	}
 )

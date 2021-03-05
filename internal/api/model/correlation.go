@@ -3,6 +3,20 @@ package model
 import "time"
 
 type (
+	// Correlation is a common model to use in various methods
+	Correlation struct {
+		ID         int       `json:"correlationID"`
+		Coef       float64   `json:"coef"`
+		P          float64   `json:"p"`
+		R2         float64   `json:"r2"`
+		Type       string    `json:"type"`
+		UpdateTime time.Time `json:"updateTime"`
+		Left       *Dataset  `json:"left,omitempty"`
+		Right      *Dataset  `json:"right,omitempty"`
+	}
+)
+
+type (
 	FindUserCorrelationsRequest struct {
 		UserID     int  `json:"userID"`
 		WithShared bool `json:"withShared"`
@@ -27,5 +41,11 @@ type (
 		R2            float64   `json:"r2"`
 		Type          string    `json:"type"`
 		UpdateTime    time.Time `json:"updateTime"`
+	}
+	GetCorrelationRequest struct {
+		ID int `json:"id"`
+	}
+	GetCorrelationResponse struct {
+		Correlation
 	}
 )

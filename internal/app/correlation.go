@@ -12,6 +12,15 @@ import (
 	combinations "github.com/mxschmitt/golang-combinations"
 )
 
+func (a *App) GetCorrelation(args domain.GetCorrelationArgs) (*domain.Correlation, error) {
+	corr, err := a.repo.GetCorrelation(args)
+	if err != nil {
+		return nil, err
+	}
+
+	return corr, nil
+}
+
 func (a *App) GetCorrelationMatrix(args domain.GetCorrelationMatrixArgs) (*domain.CorrelationMatrix, error) {
 	datasets, err := a.repo.GetDatasets(domain.GetDatasetsArgs{
 		UserID:           args.UserID,

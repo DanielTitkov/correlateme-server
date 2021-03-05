@@ -88,19 +88,19 @@ func (h *Handler) GetIndicators(c echo.Context) error {
 		if i.Author != nil {
 			authorID = i.Author.ID
 		}
-		var dataset *model.GetIndicatorsResponseDataset
+		var dataset *model.Dataset
 		if i.UserDataset != nil {
-			var observations []model.GetIndicatorsResponseObservation
+			var observations []model.Observation
 			if i.UserDataset.Observations != nil && len(i.UserDataset.Observations) > 0 {
 				for _, obs := range i.UserDataset.Observations {
-					observations = append(observations, model.GetIndicatorsResponseObservation{
+					observations = append(observations, model.Observation{
 						ID:    obs.ID,
 						Value: obs.Value,
 						Date:  obs.Date,
 					})
 				}
 			}
-			dataset = &model.GetIndicatorsResponseDataset{
+			dataset = &model.Dataset{
 				ID:           i.UserDataset.ID,
 				Observations: observations,
 			}

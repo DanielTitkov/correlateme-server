@@ -67,6 +67,49 @@ func (h *Handler) GetCorrelationMatrix(c echo.Context) error {
 	})
 }
 
+func (h *Handler) GetCorrelation(c echo.Context) error {
+	request := new(model.GetCorrelationRequest)
+	if err := c.Bind(request); err != nil {
+		return err
+	}
+
+	userID, err := util.UserIDFromToken(c)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, model.ErrorResponse{
+			Message: "token is invalid",
+			Error:   err.Error(),
+		})
+	}
+
+	corr, err := h.app.GetCorrelation(domain.GetCorrelationArgs{
+		ID:               request.ID,
+		UserID:           userID,
+		WithDatasets:     true,
+		WithObservations: true,
+	})
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, model.ErrorResponse{
+			Message: "failed to get correlation",
+			Error:   err.Error(),
+		})
+	}
+
+	response := model.GetCorrelationResponse{
+		Correlation: model.Correlation{
+			ID:         corr.ID,
+			Coef:       corr.Coef,
+			P:          corr.P,
+			R2:         corr.R2,
+			Type:       corr.Type,
+			UpdateTime: corr.UpdateTime,
+			Left:       domainToApiDataset(corr.Left),
+			Right:      domainToApiDataset(corr.Right),
+		},
+	}
+
+	return c.JSON(http.StatusOK, response)
+}
+
 // FindUserCorrelations method is only for debug on dev
 func (h *Handler) FindUserCorrelations(c echo.Context) error {
 	request := new(model.FindUserCorrelationsRequest)
@@ -96,4 +139,28 @@ func (h *Handler) FindUserCorrelations(c echo.Context) error {
 		Status:  "ok",
 		Message: "done",
 	})
+}
+
+func domainToApiDataset(ds *domain.Dataset) *model.Dataset {
+	if ds == nil {
+		return nil
+	}
+
+	var observations []model.Observation
+	if ds.Observations != nil {
+		for _, obs := range ds.Observations {
+			observations = append(observations, model.Observation{
+				ID:    obs.ID,
+				Value: obs.Value,
+				Date:  obs.Date,
+			})
+		}
+	}
+
+	return &model.Dataset{
+		ID:           ds.ID,
+		Source:       ds.Source,
+		Shared:       ds.Shared,
+		Observations: observations,
+	}
 }

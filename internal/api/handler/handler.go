@@ -45,6 +45,7 @@ func (h *Handler) link(e *echo.Echo) {
 	v1Restricted.POST("/createOrUpdateObservation", h.CreateOrUpdateObservation)
 	// correlation
 	v1Restricted.POST("/getCorrelationMatrix", h.GetCorrelationMatrix)
+	v1Restricted.POST("/getCorrelation", h.GetCorrelation)
 
 	// TODO
 	// v1Restricted.POST("/", h.GetDataset)
