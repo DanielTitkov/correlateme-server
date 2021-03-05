@@ -39,9 +39,11 @@ type UserEdges struct {
 	Indicators []*Indicator `json:"indicators,omitempty"`
 	// Datasets holds the value of the datasets edge.
 	Datasets []*Dataset `json:"datasets,omitempty"`
+	// Settings holds the value of the settings edge.
+	Settings []*UserSettings `json:"settings,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [2]bool
+	loadedTypes [3]bool
 }
 
 // IndicatorsOrErr returns the Indicators value or an error if the edge
@@ -60,6 +62,15 @@ func (e UserEdges) DatasetsOrErr() ([]*Dataset, error) {
 		return e.Datasets, nil
 	}
 	return nil, &NotLoadedError{edge: "datasets"}
+}
+
+// SettingsOrErr returns the Settings value or an error if the edge
+// was not loaded in eager-loading.
+func (e UserEdges) SettingsOrErr() ([]*UserSettings, error) {
+	if e.loadedTypes[2] {
+		return e.Settings, nil
+	}
+	return nil, &NotLoadedError{edge: "settings"}
 }
 
 // scanValues returns the types for scanning values from sql.Rows.
@@ -145,6 +156,11 @@ func (u *User) QueryIndicators() *IndicatorQuery {
 // QueryDatasets queries the "datasets" edge of the User entity.
 func (u *User) QueryDatasets() *DatasetQuery {
 	return (&UserClient{config: u.config}).QueryDatasets(u)
+}
+
+// QuerySettings queries the "settings" edge of the User entity.
+func (u *User) QuerySettings() *UserSettingsQuery {
+	return (&UserClient{config: u.config}).QuerySettings(u)
 }
 
 // Update returns a builder for updating this User.

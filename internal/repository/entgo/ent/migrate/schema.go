@@ -93,6 +93,27 @@ var (
 			},
 		},
 	}
+	// DatasetStylesColumns holds the columns for the "dataset_styles" table.
+	DatasetStylesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "style", Type: field.TypeJSON},
+		{Name: "dataset_style", Type: field.TypeInt, Unique: true, Nullable: true},
+	}
+	// DatasetStylesTable holds the schema information for the "dataset_styles" table.
+	DatasetStylesTable = &schema.Table{
+		Name:       "dataset_styles",
+		Columns:    DatasetStylesColumns,
+		PrimaryKey: []*schema.Column{DatasetStylesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:  "dataset_styles_datasets_style",
+				Columns: []*schema.Column{DatasetStylesColumns[2]},
+
+				RefColumns: []*schema.Column{DatasetsColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// IndicatorsColumns holds the columns for the "indicators" table.
 	IndicatorsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -219,15 +240,37 @@ var (
 		PrimaryKey:  []*schema.Column{UsersColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{},
 	}
+	// UserSettingsColumns holds the columns for the "user_settings" table.
+	UserSettingsColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "user_settings", Type: field.TypeInt, Nullable: true},
+	}
+	// UserSettingsTable holds the schema information for the "user_settings" table.
+	UserSettingsTable = &schema.Table{
+		Name:       "user_settings",
+		Columns:    UserSettingsColumns,
+		PrimaryKey: []*schema.Column{UserSettingsColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:  "user_settings_users_settings",
+				Columns: []*schema.Column{UserSettingsColumns[1]},
+
+				RefColumns: []*schema.Column{UsersColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+	}
 	// Tables holds all the tables in the schema.
 	Tables = []*schema.Table{
 		CorrelationsTable,
 		DatasetsTable,
+		DatasetStylesTable,
 		IndicatorsTable,
 		IndicatorValueAliasTable,
 		ObservationsTable,
 		ScalesTable,
 		UsersTable,
+		UserSettingsTable,
 	}
 )
 
@@ -236,8 +279,10 @@ func init() {
 	CorrelationsTable.ForeignKeys[1].RefTable = DatasetsTable
 	DatasetsTable.ForeignKeys[0].RefTable = IndicatorsTable
 	DatasetsTable.ForeignKeys[1].RefTable = UsersTable
+	DatasetStylesTable.ForeignKeys[0].RefTable = DatasetsTable
 	IndicatorsTable.ForeignKeys[0].RefTable = ScalesTable
 	IndicatorsTable.ForeignKeys[1].RefTable = UsersTable
 	IndicatorValueAliasTable.ForeignKeys[0].RefTable = IndicatorsTable
 	ObservationsTable.ForeignKeys[0].RefTable = DatasetsTable
+	UserSettingsTable.ForeignKeys[0].RefTable = UsersTable
 }

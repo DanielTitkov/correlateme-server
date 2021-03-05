@@ -28,6 +28,7 @@ func (User) Edges() []ent.Edge {
 		// has
 		edge.To("indicators", Indicator.Type),
 		edge.To("datasets", Dataset.Type),
+		edge.To("settings", UserSettings.Type),
 	}
 }
 

@@ -13,6 +13,7 @@ import (
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dataset"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/user"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/usersettings"
 )
 
 // UserCreate is the builder for creating a User entity.
@@ -110,6 +111,21 @@ func (uc *UserCreate) AddDatasets(d ...*Dataset) *UserCreate {
 		ids[i] = d[i].ID
 	}
 	return uc.AddDatasetIDs(ids...)
+}
+
+// AddSettingIDs adds the "settings" edge to the UserSettings entity by IDs.
+func (uc *UserCreate) AddSettingIDs(ids ...int) *UserCreate {
+	uc.mutation.AddSettingIDs(ids...)
+	return uc
+}
+
+// AddSettings adds the "settings" edges to the UserSettings entity.
+func (uc *UserCreate) AddSettings(u ...*UserSettings) *UserCreate {
+	ids := make([]int, len(u))
+	for i := range u {
+		ids[i] = u[i].ID
+	}
+	return uc.AddSettingIDs(ids...)
 }
 
 // Mutation returns the UserMutation object of the builder.
@@ -313,6 +329,25 @@ func (uc *UserCreate) createSpec() (*User, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: dataset.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := uc.mutation.SettingsIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2M,
+			Inverse: false,
+			Table:   user.SettingsTable,
+			Columns: []string{user.SettingsColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: usersettings.FieldID,
 				},
 			},
 		}

@@ -12,6 +12,9 @@ type Correlation func(*sql.Selector)
 // Dataset is the predicate function for dataset builders.
 type Dataset func(*sql.Selector)
 
+// DatasetStyle is the predicate function for datasetstyle builders.
+type DatasetStyle func(*sql.Selector)
+
 // Indicator is the predicate function for indicator builders.
 type Indicator func(*sql.Selector)
 
@@ -26,3 +29,6 @@ type Scale func(*sql.Selector)
 
 // User is the predicate function for user builders.
 type User func(*sql.Selector)
+
+// UserSettings is the predicate function for usersettings builders.
+type UserSettings func(*sql.Selector)

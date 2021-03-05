@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/correlation"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dataset"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/datasetstyle"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/observation"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/user"
@@ -123,6 +124,25 @@ func (dc *DatasetCreate) AddObservations(o ...*Observation) *DatasetCreate {
 		ids[i] = o[i].ID
 	}
 	return dc.AddObservationIDs(ids...)
+}
+
+// SetStyleID sets the "style" edge to the DatasetStyle entity by ID.
+func (dc *DatasetCreate) SetStyleID(id int) *DatasetCreate {
+	dc.mutation.SetStyleID(id)
+	return dc
+}
+
+// SetNillableStyleID sets the "style" edge to the DatasetStyle entity by ID if the given value is not nil.
+func (dc *DatasetCreate) SetNillableStyleID(id *int) *DatasetCreate {
+	if id != nil {
+		dc = dc.SetStyleID(*id)
+	}
+	return dc
+}
+
+// SetStyle sets the "style" edge to the DatasetStyle entity.
+func (dc *DatasetCreate) SetStyle(d *DatasetStyle) *DatasetCreate {
+	return dc.SetStyleID(d.ID)
 }
 
 // SetIndicatorID sets the "indicator" edge to the Indicator entity by ID.
@@ -343,6 +363,25 @@ func (dc *DatasetCreate) createSpec() (*Dataset, *sqlgraph.CreateSpec) {
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: observation.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges = append(_spec.Edges, edge)
+	}
+	if nodes := dc.mutation.StyleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   dataset.StyleTable,
+			Columns: []string{dataset.StyleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: datasetstyle.FieldID,
 				},
 			},
 		}

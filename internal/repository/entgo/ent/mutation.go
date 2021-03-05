@@ -8,14 +8,17 @@ import (
 	"sync"
 	"time"
 
+	"github.com/DanielTitkov/correlateme-server/internal/domain"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/correlation"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dataset"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/datasetstyle"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicatorvaluealias"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/observation"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/predicate"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/scale"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/user"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/usersettings"
 
 	"entgo.io/ent"
 )
@@ -31,11 +34,13 @@ const (
 	// Node types.
 	TypeCorrelation         = "Correlation"
 	TypeDataset             = "Dataset"
+	TypeDatasetStyle        = "DatasetStyle"
 	TypeIndicator           = "Indicator"
 	TypeIndicatorValueAlias = "IndicatorValueAlias"
 	TypeObservation         = "Observation"
 	TypeScale               = "Scale"
 	TypeUser                = "User"
+	TypeUserSettings        = "UserSettings"
 )
 
 // CorrelationMutation represents an operation that mutates the Correlation nodes in the graph.
@@ -845,6 +850,8 @@ type DatasetMutation struct {
 	observations        map[int]struct{}
 	removedobservations map[int]struct{}
 	clearedobservations bool
+	style               *int
+	clearedstyle        bool
 	indicator           *int
 	clearedindicator    bool
 	user                *int
@@ -1249,6 +1256,45 @@ func (m *DatasetMutation) ResetObservations() {
 	m.removedobservations = nil
 }
 
+// SetStyleID sets the "style" edge to the DatasetStyle entity by id.
+func (m *DatasetMutation) SetStyleID(id int) {
+	m.style = &id
+}
+
+// ClearStyle clears the "style" edge to the DatasetStyle entity.
+func (m *DatasetMutation) ClearStyle() {
+	m.clearedstyle = true
+}
+
+// StyleCleared returns if the "style" edge to the DatasetStyle entity was cleared.
+func (m *DatasetMutation) StyleCleared() bool {
+	return m.clearedstyle
+}
+
+// StyleID returns the "style" edge ID in the mutation.
+func (m *DatasetMutation) StyleID() (id int, exists bool) {
+	if m.style != nil {
+		return *m.style, true
+	}
+	return
+}
+
+// StyleIDs returns the "style" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// StyleID instead. It exists only for internal usage by the builders.
+func (m *DatasetMutation) StyleIDs() (ids []int) {
+	if id := m.style; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetStyle resets all changes to the "style" edge.
+func (m *DatasetMutation) ResetStyle() {
+	m.style = nil
+	m.clearedstyle = false
+}
+
 // SetIndicatorID sets the "indicator" edge to the Indicator entity by id.
 func (m *DatasetMutation) SetIndicatorID(id int) {
 	m.indicator = &id
@@ -1500,7 +1546,7 @@ func (m *DatasetMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *DatasetMutation) AddedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 6)
 	if m.left != nil {
 		edges = append(edges, dataset.EdgeLeft)
 	}
@@ -1509,6 +1555,9 @@ func (m *DatasetMutation) AddedEdges() []string {
 	}
 	if m.observations != nil {
 		edges = append(edges, dataset.EdgeObservations)
+	}
+	if m.style != nil {
+		edges = append(edges, dataset.EdgeStyle)
 	}
 	if m.indicator != nil {
 		edges = append(edges, dataset.EdgeIndicator)
@@ -1541,6 +1590,10 @@ func (m *DatasetMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case dataset.EdgeStyle:
+		if id := m.style; id != nil {
+			return []ent.Value{*id}
+		}
 	case dataset.EdgeIndicator:
 		if id := m.indicator; id != nil {
 			return []ent.Value{*id}
@@ -1555,7 +1608,7 @@ func (m *DatasetMutation) AddedIDs(name string) []ent.Value {
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *DatasetMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 6)
 	if m.removedleft != nil {
 		edges = append(edges, dataset.EdgeLeft)
 	}
@@ -1596,7 +1649,7 @@ func (m *DatasetMutation) RemovedIDs(name string) []ent.Value {
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *DatasetMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 5)
+	edges := make([]string, 0, 6)
 	if m.clearedleft {
 		edges = append(edges, dataset.EdgeLeft)
 	}
@@ -1605,6 +1658,9 @@ func (m *DatasetMutation) ClearedEdges() []string {
 	}
 	if m.clearedobservations {
 		edges = append(edges, dataset.EdgeObservations)
+	}
+	if m.clearedstyle {
+		edges = append(edges, dataset.EdgeStyle)
 	}
 	if m.clearedindicator {
 		edges = append(edges, dataset.EdgeIndicator)
@@ -1625,6 +1681,8 @@ func (m *DatasetMutation) EdgeCleared(name string) bool {
 		return m.clearedright
 	case dataset.EdgeObservations:
 		return m.clearedobservations
+	case dataset.EdgeStyle:
+		return m.clearedstyle
 	case dataset.EdgeIndicator:
 		return m.clearedindicator
 	case dataset.EdgeUser:
@@ -1637,6 +1695,9 @@ func (m *DatasetMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *DatasetMutation) ClearEdge(name string) error {
 	switch name {
+	case dataset.EdgeStyle:
+		m.ClearStyle()
+		return nil
 	case dataset.EdgeIndicator:
 		m.ClearIndicator()
 		return nil
@@ -1660,6 +1721,9 @@ func (m *DatasetMutation) ResetEdge(name string) error {
 	case dataset.EdgeObservations:
 		m.ResetObservations()
 		return nil
+	case dataset.EdgeStyle:
+		m.ResetStyle()
+		return nil
 	case dataset.EdgeIndicator:
 		m.ResetIndicator()
 		return nil
@@ -1668,6 +1732,362 @@ func (m *DatasetMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown Dataset edge %s", name)
+}
+
+// DatasetStyleMutation represents an operation that mutates the DatasetStyle nodes in the graph.
+type DatasetStyleMutation struct {
+	config
+	op             Op
+	typ            string
+	id             *int
+	style          *domain.DatasetStyle
+	clearedFields  map[string]struct{}
+	dataset        *int
+	cleareddataset bool
+	done           bool
+	oldValue       func(context.Context) (*DatasetStyle, error)
+	predicates     []predicate.DatasetStyle
+}
+
+var _ ent.Mutation = (*DatasetStyleMutation)(nil)
+
+// datasetstyleOption allows management of the mutation configuration using functional options.
+type datasetstyleOption func(*DatasetStyleMutation)
+
+// newDatasetStyleMutation creates new mutation for the DatasetStyle entity.
+func newDatasetStyleMutation(c config, op Op, opts ...datasetstyleOption) *DatasetStyleMutation {
+	m := &DatasetStyleMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeDatasetStyle,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withDatasetStyleID sets the ID field of the mutation.
+func withDatasetStyleID(id int) datasetstyleOption {
+	return func(m *DatasetStyleMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *DatasetStyle
+		)
+		m.oldValue = func(ctx context.Context) (*DatasetStyle, error) {
+			once.Do(func() {
+				if m.done {
+					err = fmt.Errorf("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().DatasetStyle.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withDatasetStyle sets the old DatasetStyle of the mutation.
+func withDatasetStyle(node *DatasetStyle) datasetstyleOption {
+	return func(m *DatasetStyleMutation) {
+		m.oldValue = func(context.Context) (*DatasetStyle, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m DatasetStyleMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m DatasetStyleMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID
+// is only available if it was provided to the builder.
+func (m *DatasetStyleMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// SetStyle sets the "style" field.
+func (m *DatasetStyleMutation) SetStyle(ds domain.DatasetStyle) {
+	m.style = &ds
+}
+
+// Style returns the value of the "style" field in the mutation.
+func (m *DatasetStyleMutation) Style() (r domain.DatasetStyle, exists bool) {
+	v := m.style
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldStyle returns the old "style" field's value of the DatasetStyle entity.
+// If the DatasetStyle object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DatasetStyleMutation) OldStyle(ctx context.Context) (v domain.DatasetStyle, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldStyle is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldStyle requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldStyle: %w", err)
+	}
+	return oldValue.Style, nil
+}
+
+// ResetStyle resets all changes to the "style" field.
+func (m *DatasetStyleMutation) ResetStyle() {
+	m.style = nil
+}
+
+// SetDatasetID sets the "dataset" edge to the Dataset entity by id.
+func (m *DatasetStyleMutation) SetDatasetID(id int) {
+	m.dataset = &id
+}
+
+// ClearDataset clears the "dataset" edge to the Dataset entity.
+func (m *DatasetStyleMutation) ClearDataset() {
+	m.cleareddataset = true
+}
+
+// DatasetCleared returns if the "dataset" edge to the Dataset entity was cleared.
+func (m *DatasetStyleMutation) DatasetCleared() bool {
+	return m.cleareddataset
+}
+
+// DatasetID returns the "dataset" edge ID in the mutation.
+func (m *DatasetStyleMutation) DatasetID() (id int, exists bool) {
+	if m.dataset != nil {
+		return *m.dataset, true
+	}
+	return
+}
+
+// DatasetIDs returns the "dataset" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// DatasetID instead. It exists only for internal usage by the builders.
+func (m *DatasetStyleMutation) DatasetIDs() (ids []int) {
+	if id := m.dataset; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetDataset resets all changes to the "dataset" edge.
+func (m *DatasetStyleMutation) ResetDataset() {
+	m.dataset = nil
+	m.cleareddataset = false
+}
+
+// Op returns the operation name.
+func (m *DatasetStyleMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (DatasetStyle).
+func (m *DatasetStyleMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *DatasetStyleMutation) Fields() []string {
+	fields := make([]string, 0, 1)
+	if m.style != nil {
+		fields = append(fields, datasetstyle.FieldStyle)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *DatasetStyleMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case datasetstyle.FieldStyle:
+		return m.Style()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *DatasetStyleMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case datasetstyle.FieldStyle:
+		return m.OldStyle(ctx)
+	}
+	return nil, fmt.Errorf("unknown DatasetStyle field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *DatasetStyleMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case datasetstyle.FieldStyle:
+		v, ok := value.(domain.DatasetStyle)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetStyle(v)
+		return nil
+	}
+	return fmt.Errorf("unknown DatasetStyle field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *DatasetStyleMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *DatasetStyleMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *DatasetStyleMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown DatasetStyle numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *DatasetStyleMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *DatasetStyleMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *DatasetStyleMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown DatasetStyle nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *DatasetStyleMutation) ResetField(name string) error {
+	switch name {
+	case datasetstyle.FieldStyle:
+		m.ResetStyle()
+		return nil
+	}
+	return fmt.Errorf("unknown DatasetStyle field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *DatasetStyleMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.dataset != nil {
+		edges = append(edges, datasetstyle.EdgeDataset)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *DatasetStyleMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case datasetstyle.EdgeDataset:
+		if id := m.dataset; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *DatasetStyleMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *DatasetStyleMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *DatasetStyleMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.cleareddataset {
+		edges = append(edges, datasetstyle.EdgeDataset)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *DatasetStyleMutation) EdgeCleared(name string) bool {
+	switch name {
+	case datasetstyle.EdgeDataset:
+		return m.cleareddataset
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *DatasetStyleMutation) ClearEdge(name string) error {
+	switch name {
+	case datasetstyle.EdgeDataset:
+		m.ClearDataset()
+		return nil
+	}
+	return fmt.Errorf("unknown DatasetStyle unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *DatasetStyleMutation) ResetEdge(name string) error {
+	switch name {
+	case datasetstyle.EdgeDataset:
+		m.ResetDataset()
+		return nil
+	}
+	return fmt.Errorf("unknown DatasetStyle edge %s", name)
 }
 
 // IndicatorMutation represents an operation that mutates the Indicator nodes in the graph.
@@ -4064,6 +4484,9 @@ type UserMutation struct {
 	datasets          map[int]struct{}
 	removeddatasets   map[int]struct{}
 	cleareddatasets   bool
+	settings          map[int]struct{}
+	removedsettings   map[int]struct{}
+	clearedsettings   bool
 	done              bool
 	oldValue          func(context.Context) (*User, error)
 	predicates        []predicate.User
@@ -4470,6 +4893,59 @@ func (m *UserMutation) ResetDatasets() {
 	m.removeddatasets = nil
 }
 
+// AddSettingIDs adds the "settings" edge to the UserSettings entity by ids.
+func (m *UserMutation) AddSettingIDs(ids ...int) {
+	if m.settings == nil {
+		m.settings = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.settings[ids[i]] = struct{}{}
+	}
+}
+
+// ClearSettings clears the "settings" edge to the UserSettings entity.
+func (m *UserMutation) ClearSettings() {
+	m.clearedsettings = true
+}
+
+// SettingsCleared returns if the "settings" edge to the UserSettings entity was cleared.
+func (m *UserMutation) SettingsCleared() bool {
+	return m.clearedsettings
+}
+
+// RemoveSettingIDs removes the "settings" edge to the UserSettings entity by IDs.
+func (m *UserMutation) RemoveSettingIDs(ids ...int) {
+	if m.removedsettings == nil {
+		m.removedsettings = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.removedsettings[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedSettings returns the removed IDs of the "settings" edge to the UserSettings entity.
+func (m *UserMutation) RemovedSettingsIDs() (ids []int) {
+	for id := range m.removedsettings {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// SettingsIDs returns the "settings" edge IDs in the mutation.
+func (m *UserMutation) SettingsIDs() (ids []int) {
+	for id := range m.settings {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetSettings resets all changes to the "settings" edge.
+func (m *UserMutation) ResetSettings() {
+	m.settings = nil
+	m.clearedsettings = false
+	m.removedsettings = nil
+}
+
 // Op returns the operation name.
 func (m *UserMutation) Op() Op {
 	return m.op
@@ -4668,12 +5144,15 @@ func (m *UserMutation) ResetField(name string) error {
 
 // AddedEdges returns all edge names that were set/added in this mutation.
 func (m *UserMutation) AddedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.indicators != nil {
 		edges = append(edges, user.EdgeIndicators)
 	}
 	if m.datasets != nil {
 		edges = append(edges, user.EdgeDatasets)
+	}
+	if m.settings != nil {
+		edges = append(edges, user.EdgeSettings)
 	}
 	return edges
 }
@@ -4694,18 +5173,27 @@ func (m *UserMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeSettings:
+		ids := make([]ent.Value, 0, len(m.settings))
+		for id := range m.settings {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
 func (m *UserMutation) RemovedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.removedindicators != nil {
 		edges = append(edges, user.EdgeIndicators)
 	}
 	if m.removeddatasets != nil {
 		edges = append(edges, user.EdgeDatasets)
+	}
+	if m.removedsettings != nil {
+		edges = append(edges, user.EdgeSettings)
 	}
 	return edges
 }
@@ -4726,18 +5214,27 @@ func (m *UserMutation) RemovedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
+	case user.EdgeSettings:
+		ids := make([]ent.Value, 0, len(m.removedsettings))
+		for id := range m.removedsettings {
+			ids = append(ids, id)
+		}
+		return ids
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
 func (m *UserMutation) ClearedEdges() []string {
-	edges := make([]string, 0, 2)
+	edges := make([]string, 0, 3)
 	if m.clearedindicators {
 		edges = append(edges, user.EdgeIndicators)
 	}
 	if m.cleareddatasets {
 		edges = append(edges, user.EdgeDatasets)
+	}
+	if m.clearedsettings {
+		edges = append(edges, user.EdgeSettings)
 	}
 	return edges
 }
@@ -4750,6 +5247,8 @@ func (m *UserMutation) EdgeCleared(name string) bool {
 		return m.clearedindicators
 	case user.EdgeDatasets:
 		return m.cleareddatasets
+	case user.EdgeSettings:
+		return m.clearedsettings
 	}
 	return false
 }
@@ -4772,6 +5271,303 @@ func (m *UserMutation) ResetEdge(name string) error {
 	case user.EdgeDatasets:
 		m.ResetDatasets()
 		return nil
+	case user.EdgeSettings:
+		m.ResetSettings()
+		return nil
 	}
 	return fmt.Errorf("unknown User edge %s", name)
+}
+
+// UserSettingsMutation represents an operation that mutates the UserSettings nodes in the graph.
+type UserSettingsMutation struct {
+	config
+	op            Op
+	typ           string
+	id            *int
+	clearedFields map[string]struct{}
+	user          *int
+	cleareduser   bool
+	done          bool
+	oldValue      func(context.Context) (*UserSettings, error)
+	predicates    []predicate.UserSettings
+}
+
+var _ ent.Mutation = (*UserSettingsMutation)(nil)
+
+// usersettingsOption allows management of the mutation configuration using functional options.
+type usersettingsOption func(*UserSettingsMutation)
+
+// newUserSettingsMutation creates new mutation for the UserSettings entity.
+func newUserSettingsMutation(c config, op Op, opts ...usersettingsOption) *UserSettingsMutation {
+	m := &UserSettingsMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeUserSettings,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withUserSettingsID sets the ID field of the mutation.
+func withUserSettingsID(id int) usersettingsOption {
+	return func(m *UserSettingsMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *UserSettings
+		)
+		m.oldValue = func(ctx context.Context) (*UserSettings, error) {
+			once.Do(func() {
+				if m.done {
+					err = fmt.Errorf("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().UserSettings.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withUserSettings sets the old UserSettings of the mutation.
+func withUserSettings(node *UserSettings) usersettingsOption {
+	return func(m *UserSettingsMutation) {
+		m.oldValue = func(context.Context) (*UserSettings, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m UserSettingsMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m UserSettingsMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// ID returns the ID value in the mutation. Note that the ID
+// is only available if it was provided to the builder.
+func (m *UserSettingsMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// SetUserID sets the "user" edge to the User entity by id.
+func (m *UserSettingsMutation) SetUserID(id int) {
+	m.user = &id
+}
+
+// ClearUser clears the "user" edge to the User entity.
+func (m *UserSettingsMutation) ClearUser() {
+	m.cleareduser = true
+}
+
+// UserCleared returns if the "user" edge to the User entity was cleared.
+func (m *UserSettingsMutation) UserCleared() bool {
+	return m.cleareduser
+}
+
+// UserID returns the "user" edge ID in the mutation.
+func (m *UserSettingsMutation) UserID() (id int, exists bool) {
+	if m.user != nil {
+		return *m.user, true
+	}
+	return
+}
+
+// UserIDs returns the "user" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// UserID instead. It exists only for internal usage by the builders.
+func (m *UserSettingsMutation) UserIDs() (ids []int) {
+	if id := m.user; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetUser resets all changes to the "user" edge.
+func (m *UserSettingsMutation) ResetUser() {
+	m.user = nil
+	m.cleareduser = false
+}
+
+// Op returns the operation name.
+func (m *UserSettingsMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (UserSettings).
+func (m *UserSettingsMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *UserSettingsMutation) Fields() []string {
+	fields := make([]string, 0, 0)
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *UserSettingsMutation) Field(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *UserSettingsMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	return nil, fmt.Errorf("unknown UserSettings field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *UserSettingsMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown UserSettings field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *UserSettingsMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *UserSettingsMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *UserSettingsMutation) AddField(name string, value ent.Value) error {
+	return fmt.Errorf("unknown UserSettings numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *UserSettingsMutation) ClearedFields() []string {
+	return nil
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *UserSettingsMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *UserSettingsMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown UserSettings nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *UserSettingsMutation) ResetField(name string) error {
+	return fmt.Errorf("unknown UserSettings field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *UserSettingsMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.user != nil {
+		edges = append(edges, usersettings.EdgeUser)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *UserSettingsMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case usersettings.EdgeUser:
+		if id := m.user; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *UserSettingsMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *UserSettingsMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *UserSettingsMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.cleareduser {
+		edges = append(edges, usersettings.EdgeUser)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *UserSettingsMutation) EdgeCleared(name string) bool {
+	switch name {
+	case usersettings.EdgeUser:
+		return m.cleareduser
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *UserSettingsMutation) ClearEdge(name string) error {
+	switch name {
+	case usersettings.EdgeUser:
+		m.ClearUser()
+		return nil
+	}
+	return fmt.Errorf("unknown UserSettings unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *UserSettingsMutation) ResetEdge(name string) error {
+	switch name {
+	case usersettings.EdgeUser:
+		m.ResetUser()
+		return nil
+	}
+	return fmt.Errorf("unknown UserSettings edge %s", name)
 }

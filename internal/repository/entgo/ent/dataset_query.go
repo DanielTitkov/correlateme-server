@@ -14,6 +14,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/correlation"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dataset"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/datasetstyle"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/observation"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/predicate"
@@ -32,6 +33,7 @@ type DatasetQuery struct {
 	withLeft         *CorrelationQuery
 	withRight        *CorrelationQuery
 	withObservations *ObservationQuery
+	withStyle        *DatasetStyleQuery
 	withIndicator    *IndicatorQuery
 	withUser         *UserQuery
 	withFKs          bool
@@ -123,6 +125,28 @@ func (dq *DatasetQuery) QueryObservations() *ObservationQuery {
 			sqlgraph.From(dataset.Table, dataset.FieldID, selector),
 			sqlgraph.To(observation.Table, observation.FieldID),
 			sqlgraph.Edge(sqlgraph.O2M, false, dataset.ObservationsTable, dataset.ObservationsColumn),
+		)
+		fromU = sqlgraph.SetNeighbors(dq.driver.Dialect(), step)
+		return fromU, nil
+	}
+	return query
+}
+
+// QueryStyle chains the current query on the "style" edge.
+func (dq *DatasetQuery) QueryStyle() *DatasetStyleQuery {
+	query := &DatasetStyleQuery{config: dq.config}
+	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
+		if err := dq.prepareQuery(ctx); err != nil {
+			return nil, err
+		}
+		selector := dq.sqlQuery(ctx)
+		if err := selector.Err(); err != nil {
+			return nil, err
+		}
+		step := sqlgraph.NewStep(
+			sqlgraph.From(dataset.Table, dataset.FieldID, selector),
+			sqlgraph.To(datasetstyle.Table, datasetstyle.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, dataset.StyleTable, dataset.StyleColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(dq.driver.Dialect(), step)
 		return fromU, nil
@@ -358,6 +382,7 @@ func (dq *DatasetQuery) Clone() *DatasetQuery {
 		withLeft:         dq.withLeft.Clone(),
 		withRight:        dq.withRight.Clone(),
 		withObservations: dq.withObservations.Clone(),
+		withStyle:        dq.withStyle.Clone(),
 		withIndicator:    dq.withIndicator.Clone(),
 		withUser:         dq.withUser.Clone(),
 		// clone intermediate query.
@@ -396,6 +421,17 @@ func (dq *DatasetQuery) WithObservations(opts ...func(*ObservationQuery)) *Datas
 		opt(query)
 	}
 	dq.withObservations = query
+	return dq
+}
+
+// WithStyle tells the query-builder to eager-load the nodes that are connected to
+// the "style" edge. The optional arguments are used to configure the query builder of the edge.
+func (dq *DatasetQuery) WithStyle(opts ...func(*DatasetStyleQuery)) *DatasetQuery {
+	query := &DatasetStyleQuery{config: dq.config}
+	for _, opt := range opts {
+		opt(query)
+	}
+	dq.withStyle = query
 	return dq
 }
 
@@ -487,10 +523,11 @@ func (dq *DatasetQuery) sqlAll(ctx context.Context) ([]*Dataset, error) {
 		nodes       = []*Dataset{}
 		withFKs     = dq.withFKs
 		_spec       = dq.querySpec()
-		loadedTypes = [5]bool{
+		loadedTypes = [6]bool{
 			dq.withLeft != nil,
 			dq.withRight != nil,
 			dq.withObservations != nil,
+			dq.withStyle != nil,
 			dq.withIndicator != nil,
 			dq.withUser != nil,
 		}
@@ -605,6 +642,34 @@ func (dq *DatasetQuery) sqlAll(ctx context.Context) ([]*Dataset, error) {
 				return nil, fmt.Errorf(`unexpected foreign-key "dataset_observations" returned %v for node %v`, *fk, n.ID)
 			}
 			node.Edges.Observations = append(node.Edges.Observations, n)
+		}
+	}
+
+	if query := dq.withStyle; query != nil {
+		fks := make([]driver.Value, 0, len(nodes))
+		nodeids := make(map[int]*Dataset)
+		for i := range nodes {
+			fks = append(fks, nodes[i].ID)
+			nodeids[nodes[i].ID] = nodes[i]
+		}
+		query.withFKs = true
+		query.Where(predicate.DatasetStyle(func(s *sql.Selector) {
+			s.Where(sql.InValues(dataset.StyleColumn, fks...))
+		}))
+		neighbors, err := query.All(ctx)
+		if err != nil {
+			return nil, err
+		}
+		for _, n := range neighbors {
+			fk := n.dataset_style
+			if fk == nil {
+				return nil, fmt.Errorf(`foreign-key "dataset_style" is nil for node %v`, n.ID)
+			}
+			node, ok := nodeids[*fk]
+			if !ok {
+				return nil, fmt.Errorf(`unexpected foreign-key "dataset_style" returned %v for node %v`, *fk, n.ID)
+			}
+			node.Edges.Style = n
 		}
 	}
 

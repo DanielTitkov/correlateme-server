@@ -496,6 +496,34 @@ func HasObservationsWith(preds ...predicate.Observation) predicate.Dataset {
 	})
 }
 
+// HasStyle applies the HasEdge predicate on the "style" edge.
+func HasStyle() predicate.Dataset {
+	return predicate.Dataset(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(StyleTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, StyleTable, StyleColumn),
+		)
+		sqlgraph.HasNeighbors(s, step)
+	})
+}
+
+// HasStyleWith applies the HasEdge predicate on the "style" edge with a given conditions (other predicates).
+func HasStyleWith(preds ...predicate.DatasetStyle) predicate.Dataset {
+	return predicate.Dataset(func(s *sql.Selector) {
+		step := sqlgraph.NewStep(
+			sqlgraph.From(Table, FieldID),
+			sqlgraph.To(StyleInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, StyleTable, StyleColumn),
+		)
+		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
+			for _, p := range preds {
+				p(s)
+			}
+		})
+	})
+}
+
 // HasIndicator applies the HasEdge predicate on the "indicator" edge.
 func HasIndicator() predicate.Dataset {
 	return predicate.Dataset(func(s *sql.Selector) {

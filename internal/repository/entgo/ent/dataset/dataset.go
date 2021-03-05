@@ -26,6 +26,8 @@ const (
 	EdgeRight = "right"
 	// EdgeObservations holds the string denoting the observations edge name in mutations.
 	EdgeObservations = "observations"
+	// EdgeStyle holds the string denoting the style edge name in mutations.
+	EdgeStyle = "style"
 	// EdgeIndicator holds the string denoting the indicator edge name in mutations.
 	EdgeIndicator = "indicator"
 	// EdgeUser holds the string denoting the user edge name in mutations.
@@ -54,6 +56,13 @@ const (
 	ObservationsInverseTable = "observations"
 	// ObservationsColumn is the table column denoting the observations relation/edge.
 	ObservationsColumn = "dataset_observations"
+	// StyleTable is the table the holds the style relation/edge.
+	StyleTable = "dataset_styles"
+	// StyleInverseTable is the table name for the DatasetStyle entity.
+	// It exists in this package in order to avoid circular dependency with the "datasetstyle" package.
+	StyleInverseTable = "dataset_styles"
+	// StyleColumn is the table column denoting the style relation/edge.
+	StyleColumn = "dataset_style"
 	// IndicatorTable is the table the holds the indicator relation/edge.
 	IndicatorTable = "datasets"
 	// IndicatorInverseTable is the table name for the Indicator entity.

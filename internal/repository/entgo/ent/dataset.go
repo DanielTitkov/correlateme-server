@@ -9,6 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dataset"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/datasetstyle"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/user"
 )
@@ -41,13 +42,15 @@ type DatasetEdges struct {
 	Right []*Correlation `json:"right,omitempty"`
 	// Observations holds the value of the observations edge.
 	Observations []*Observation `json:"observations,omitempty"`
+	// Style holds the value of the style edge.
+	Style *DatasetStyle `json:"style,omitempty"`
 	// Indicator holds the value of the indicator edge.
 	Indicator *Indicator `json:"indicator,omitempty"`
 	// User holds the value of the user edge.
 	User *User `json:"user,omitempty"`
 	// loadedTypes holds the information for reporting if a
 	// type was loaded (or requested) in eager-loading or not.
-	loadedTypes [5]bool
+	loadedTypes [6]bool
 }
 
 // LeftOrErr returns the Left value or an error if the edge
@@ -77,10 +80,24 @@ func (e DatasetEdges) ObservationsOrErr() ([]*Observation, error) {
 	return nil, &NotLoadedError{edge: "observations"}
 }
 
+// StyleOrErr returns the Style value or an error if the edge
+// was not loaded in eager-loading, or loaded but was not found.
+func (e DatasetEdges) StyleOrErr() (*DatasetStyle, error) {
+	if e.loadedTypes[3] {
+		if e.Style == nil {
+			// The edge style was loaded in eager-loading,
+			// but was not found.
+			return nil, &NotFoundError{label: datasetstyle.Label}
+		}
+		return e.Style, nil
+	}
+	return nil, &NotLoadedError{edge: "style"}
+}
+
 // IndicatorOrErr returns the Indicator value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e DatasetEdges) IndicatorOrErr() (*Indicator, error) {
-	if e.loadedTypes[3] {
+	if e.loadedTypes[4] {
 		if e.Indicator == nil {
 			// The edge indicator was loaded in eager-loading,
 			// but was not found.
@@ -94,7 +111,7 @@ func (e DatasetEdges) IndicatorOrErr() (*Indicator, error) {
 // UserOrErr returns the User value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
 func (e DatasetEdges) UserOrErr() (*User, error) {
-	if e.loadedTypes[4] {
+	if e.loadedTypes[5] {
 		if e.User == nil {
 			// The edge user was loaded in eager-loading,
 			// but was not found.
@@ -200,6 +217,11 @@ func (d *Dataset) QueryRight() *CorrelationQuery {
 // QueryObservations queries the "observations" edge of the Dataset entity.
 func (d *Dataset) QueryObservations() *ObservationQuery {
 	return (&DatasetClient{config: d.config}).QueryObservations(d)
+}
+
+// QueryStyle queries the "style" edge of the Dataset entity.
+func (d *Dataset) QueryStyle() *DatasetStyleQuery {
+	return (&DatasetClient{config: d.config}).QueryStyle(d)
 }
 
 // QueryIndicator queries the "indicator" edge of the Dataset entity.

@@ -26,11 +26,13 @@ type config struct {
 type hooks struct {
 	Correlation         []ent.Hook
 	Dataset             []ent.Hook
+	DatasetStyle        []ent.Hook
 	Indicator           []ent.Hook
 	IndicatorValueAlias []ent.Hook
 	Observation         []ent.Hook
 	Scale               []ent.Hook
 	User                []ent.Hook
+	UserSettings        []ent.Hook
 }
 
 // Options applies the options on the config object.

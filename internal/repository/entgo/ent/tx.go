@@ -16,6 +16,8 @@ type Tx struct {
 	Correlation *CorrelationClient
 	// Dataset is the client for interacting with the Dataset builders.
 	Dataset *DatasetClient
+	// DatasetStyle is the client for interacting with the DatasetStyle builders.
+	DatasetStyle *DatasetStyleClient
 	// Indicator is the client for interacting with the Indicator builders.
 	Indicator *IndicatorClient
 	// IndicatorValueAlias is the client for interacting with the IndicatorValueAlias builders.
@@ -26,6 +28,8 @@ type Tx struct {
 	Scale *ScaleClient
 	// User is the client for interacting with the User builders.
 	User *UserClient
+	// UserSettings is the client for interacting with the UserSettings builders.
+	UserSettings *UserSettingsClient
 
 	// lazily loaded.
 	client     *Client
@@ -163,11 +167,13 @@ func (tx *Tx) Client() *Client {
 func (tx *Tx) init() {
 	tx.Correlation = NewCorrelationClient(tx.config)
 	tx.Dataset = NewDatasetClient(tx.config)
+	tx.DatasetStyle = NewDatasetStyleClient(tx.config)
 	tx.Indicator = NewIndicatorClient(tx.config)
 	tx.IndicatorValueAlias = NewIndicatorValueAliasClient(tx.config)
 	tx.Observation = NewObservationClient(tx.config)
 	tx.Scale = NewScaleClient(tx.config)
 	tx.User = NewUserClient(tx.config)
+	tx.UserSettings = NewUserSettingsClient(tx.config)
 }
 
 // txDriver wraps the given dialect.Tx with a nop dialect.Driver implementation.

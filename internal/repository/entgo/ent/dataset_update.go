@@ -12,6 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/correlation"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dataset"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/datasetstyle"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/observation"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/predicate"
@@ -110,6 +111,25 @@ func (du *DatasetUpdate) AddObservations(o ...*Observation) *DatasetUpdate {
 	return du.AddObservationIDs(ids...)
 }
 
+// SetStyleID sets the "style" edge to the DatasetStyle entity by ID.
+func (du *DatasetUpdate) SetStyleID(id int) *DatasetUpdate {
+	du.mutation.SetStyleID(id)
+	return du
+}
+
+// SetNillableStyleID sets the "style" edge to the DatasetStyle entity by ID if the given value is not nil.
+func (du *DatasetUpdate) SetNillableStyleID(id *int) *DatasetUpdate {
+	if id != nil {
+		du = du.SetStyleID(*id)
+	}
+	return du
+}
+
+// SetStyle sets the "style" edge to the DatasetStyle entity.
+func (du *DatasetUpdate) SetStyle(d *DatasetStyle) *DatasetUpdate {
+	return du.SetStyleID(d.ID)
+}
+
 // SetIndicatorID sets the "indicator" edge to the Indicator entity by ID.
 func (du *DatasetUpdate) SetIndicatorID(id int) *DatasetUpdate {
 	du.mutation.SetIndicatorID(id)
@@ -206,6 +226,12 @@ func (du *DatasetUpdate) RemoveObservations(o ...*Observation) *DatasetUpdate {
 		ids[i] = o[i].ID
 	}
 	return du.RemoveObservationIDs(ids...)
+}
+
+// ClearStyle clears the "style" edge to the DatasetStyle entity.
+func (du *DatasetUpdate) ClearStyle() *DatasetUpdate {
+	du.mutation.ClearStyle()
+	return du
 }
 
 // ClearIndicator clears the "indicator" edge to the Indicator entity.
@@ -501,6 +527,41 @@ func (du *DatasetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
+	if du.mutation.StyleCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   dataset.StyleTable,
+			Columns: []string{dataset.StyleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: datasetstyle.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := du.mutation.StyleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   dataset.StyleTable,
+			Columns: []string{dataset.StyleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: datasetstyle.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
 	if du.mutation.IndicatorCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.M2O,
@@ -668,6 +729,25 @@ func (duo *DatasetUpdateOne) AddObservations(o ...*Observation) *DatasetUpdateOn
 	return duo.AddObservationIDs(ids...)
 }
 
+// SetStyleID sets the "style" edge to the DatasetStyle entity by ID.
+func (duo *DatasetUpdateOne) SetStyleID(id int) *DatasetUpdateOne {
+	duo.mutation.SetStyleID(id)
+	return duo
+}
+
+// SetNillableStyleID sets the "style" edge to the DatasetStyle entity by ID if the given value is not nil.
+func (duo *DatasetUpdateOne) SetNillableStyleID(id *int) *DatasetUpdateOne {
+	if id != nil {
+		duo = duo.SetStyleID(*id)
+	}
+	return duo
+}
+
+// SetStyle sets the "style" edge to the DatasetStyle entity.
+func (duo *DatasetUpdateOne) SetStyle(d *DatasetStyle) *DatasetUpdateOne {
+	return duo.SetStyleID(d.ID)
+}
+
 // SetIndicatorID sets the "indicator" edge to the Indicator entity by ID.
 func (duo *DatasetUpdateOne) SetIndicatorID(id int) *DatasetUpdateOne {
 	duo.mutation.SetIndicatorID(id)
@@ -764,6 +844,12 @@ func (duo *DatasetUpdateOne) RemoveObservations(o ...*Observation) *DatasetUpdat
 		ids[i] = o[i].ID
 	}
 	return duo.RemoveObservationIDs(ids...)
+}
+
+// ClearStyle clears the "style" edge to the DatasetStyle entity.
+func (duo *DatasetUpdateOne) ClearStyle() *DatasetUpdateOne {
+	duo.mutation.ClearStyle()
+	return duo
 }
 
 // ClearIndicator clears the "indicator" edge to the Indicator entity.
@@ -1056,6 +1142,41 @@ func (duo *DatasetUpdateOne) sqlSave(ctx context.Context) (_node *Dataset, err e
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
 					Column: observation.FieldID,
+				},
+			},
+		}
+		for _, k := range nodes {
+			edge.Target.Nodes = append(edge.Target.Nodes, k)
+		}
+		_spec.Edges.Add = append(_spec.Edges.Add, edge)
+	}
+	if duo.mutation.StyleCleared() {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   dataset.StyleTable,
+			Columns: []string{dataset.StyleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: datasetstyle.FieldID,
+				},
+			},
+		}
+		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
+	}
+	if nodes := duo.mutation.StyleIDs(); len(nodes) > 0 {
+		edge := &sqlgraph.EdgeSpec{
+			Rel:     sqlgraph.O2O,
+			Inverse: false,
+			Table:   dataset.StyleTable,
+			Columns: []string{dataset.StyleColumn},
+			Bidi:    false,
+			Target: &sqlgraph.EdgeTarget{
+				IDSpec: &sqlgraph.FieldSpec{
+					Type:   field.TypeInt,
+					Column: datasetstyle.FieldID,
 				},
 			},
 		}

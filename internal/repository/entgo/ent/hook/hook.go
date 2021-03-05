@@ -35,6 +35,19 @@ func (f DatasetFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, err
 	return f(ctx, mv)
 }
 
+// The DatasetStyleFunc type is an adapter to allow the use of ordinary
+// function as DatasetStyle mutator.
+type DatasetStyleFunc func(context.Context, *ent.DatasetStyleMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f DatasetStyleFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.DatasetStyleMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DatasetStyleMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The IndicatorFunc type is an adapter to allow the use of ordinary
 // function as Indicator mutator.
 type IndicatorFunc func(context.Context, *ent.IndicatorMutation) (ent.Value, error)
@@ -96,6 +109,19 @@ func (f UserFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error)
 	mv, ok := m.(*ent.UserMutation)
 	if !ok {
 		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The UserSettingsFunc type is an adapter to allow the use of ordinary
+// function as UserSettings mutator.
+type UserSettingsFunc func(context.Context, *ent.UserSettingsMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f UserSettingsFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.UserSettingsMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.UserSettingsMutation", m)
 	}
 	return f(ctx, mv)
 }

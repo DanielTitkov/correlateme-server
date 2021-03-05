@@ -28,6 +28,7 @@ func (Dataset) Edges() []ent.Edge {
 		edge.To("left", Correlation.Type),
 		edge.To("right", Correlation.Type),
 		edge.To("observations", Observation.Type),
+		edge.To("style", DatasetStyle.Type).Unique(),
 		// belongs to
 		edge.From("indicator", Indicator.Type).Ref("datasets").Unique().Required(),
 		edge.From("user", User.Type).Ref("datasets").Unique(),
