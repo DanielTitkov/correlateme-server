@@ -27,9 +27,10 @@ type (
 		Description string `json:"description"`
 	}
 	GetIndicatorsRequest struct {
-		WithDataset      bool                       `json:"withDataset"`
-		WithObservations bool                       `json:"withObservations"`
-		Filter           GetIndicatorsRequestFilter `json:"filter"`
+		WithDataset       bool                       `json:"withDataset"`
+		ObservationsLimit int                        `json:"observationsLimit"`
+		Granularity       string                     `json:"granularity"`
+		Filter            GetIndicatorsRequestFilter `json:"filter"`
 	}
 	GetIndicatorsRequestFilter struct {
 		ID        []int    `json:"id"`

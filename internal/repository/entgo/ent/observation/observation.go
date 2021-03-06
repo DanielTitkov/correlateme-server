@@ -3,6 +3,7 @@
 package observation
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -19,6 +20,8 @@ const (
 	FieldValue = "value"
 	// FieldDate holds the string denoting the date field in the database.
 	FieldDate = "date"
+	// FieldGranularity holds the string denoting the granularity field in the database.
+	FieldGranularity = "granularity"
 
 	// EdgeDataset holds the string denoting the dataset edge name in mutations.
 	EdgeDataset = "dataset"
@@ -41,6 +44,7 @@ var Columns = []string{
 	FieldUpdateTime,
 	FieldValue,
 	FieldDate,
+	FieldGranularity,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the Observation type.
@@ -71,3 +75,30 @@ var (
 	// UpdateDefaultUpdateTime holds the default value on update for the "update_time" field.
 	UpdateDefaultUpdateTime func() time.Time
 )
+
+// Granularity defines the type for the "granularity" enum field.
+type Granularity string
+
+// GranularityDay is the default value of the Granularity enum.
+const DefaultGranularity = GranularityDay
+
+// Granularity values.
+const (
+	GranularityDay   Granularity = "day"
+	GranularityWeek  Granularity = "week"
+	GranularityMonth Granularity = "month"
+)
+
+func (gr Granularity) String() string {
+	return string(gr)
+}
+
+// GranularityValidator is a validator for the "granularity" field enum values. It is called by the builders before save.
+func GranularityValidator(gr Granularity) error {
+	switch gr {
+	case GranularityDay, GranularityWeek, GranularityMonth:
+		return nil
+	default:
+		return fmt.Errorf("observation: invalid enum value for granularity field: %q", gr)
+	}
+}

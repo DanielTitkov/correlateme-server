@@ -56,24 +56,26 @@ type (
 	}
 	// Observation is a data point for an indicator
 	Observation struct {
-		ID         int
-		Value      float64
-		Dataset    *Dataset
-		Date       *time.Time
-		CreateTime time.Time
-		UpdateTime time.Time
+		ID          int
+		Value       float64
+		Dataset     *Dataset
+		Date        *time.Time
+		Granularity string
+		CreateTime  time.Time
+		UpdateTime  time.Time
 	}
 	// Correlation is a corr value of a pair of Datasets
 	Correlation struct {
-		ID         int
-		Left       *Dataset
-		Right      *Dataset
-		Coef       float64 // correlation coef
-		P          float64 // p-value
-		R2         float64 // determination coef
-		Type       string  // Pearson or whatever
-		CreateTime time.Time
-		UpdateTime time.Time
+		ID          int
+		Left        *Dataset
+		Right       *Dataset
+		Coef        float64 // correlation coef
+		P           float64 // p-value
+		R2          float64 // determination coef
+		Type        string  // Pearson or whatever
+		Granularity string
+		CreateTime  time.Time
+		UpdateTime  time.Time
 	}
 	// CorrelationMatrix holds correlations of user datasets to be shown in the app.
 	CorrelationMatrix struct {

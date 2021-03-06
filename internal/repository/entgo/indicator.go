@@ -84,9 +84,14 @@ func (r *EntgoRepository) GetIndicators(args domain.GetIndicatorsArgs) ([]*domai
 	if args.WithDataset {
 		query = query.WithDatasets(func(q *ent.DatasetQuery) {
 			q.Where(dataset.HasUserWith(user.IDEQ(args.UserID)))
-			if args.WithObservations {
+			if args.ObservationLimit > 0 {
 				q.WithObservations(func(q *ent.ObservationQuery) {
 					q.Order(ent.Asc(observation.FieldDate))
+					if args.Granularity != "" {
+						q.Where(observation.GranularityEQ(observation.Granularity(args.Granularity)))
+					} else {
+						q.Where(observation.GranularityEQ(observation.Granularity(domain.GranularityDay)))
+					}
 					q.Limit(int(args.ObservationLimit))
 				})
 			}

@@ -44,3 +44,13 @@ func (a *App) CreateOrUpdateObservation(args domain.CreateOrUpdateObservationArg
 
 	return nil
 }
+
+func (a *App) UpdateAggregations(args domain.UpdateAggregationsArgs) error {
+	// get dataset with observations
+
+	// calculate aggregated values
+
+	// save observations
+
+	return nil
+}

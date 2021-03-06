@@ -67,6 +67,20 @@ func (cu *CorrelationUpdate) AddR2(f float64) *CorrelationUpdate {
 	return cu
 }
 
+// SetGranularity sets the "granularity" field.
+func (cu *CorrelationUpdate) SetGranularity(c correlation.Granularity) *CorrelationUpdate {
+	cu.mutation.SetGranularity(c)
+	return cu
+}
+
+// SetNillableGranularity sets the "granularity" field if the given value is not nil.
+func (cu *CorrelationUpdate) SetNillableGranularity(c *correlation.Granularity) *CorrelationUpdate {
+	if c != nil {
+		cu.SetGranularity(*c)
+	}
+	return cu
+}
+
 // SetLeftID sets the "left" edge to the Dataset entity by ID.
 func (cu *CorrelationUpdate) SetLeftID(id int) *CorrelationUpdate {
 	cu.mutation.SetLeftID(id)
@@ -174,6 +188,11 @@ func (cu *CorrelationUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (cu *CorrelationUpdate) check() error {
+	if v, ok := cu.mutation.Granularity(); ok {
+		if err := correlation.GranularityValidator(v); err != nil {
+			return &ValidationError{Name: "granularity", err: fmt.Errorf("ent: validator failed for field \"granularity\": %w", err)}
+		}
+	}
 	if _, ok := cu.mutation.LeftID(); cu.mutation.LeftCleared() && !ok {
 		return errors.New("ent: clearing a required unique edge \"left\"")
 	}
@@ -248,6 +267,13 @@ func (cu *CorrelationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeFloat64,
 			Value:  value,
 			Column: correlation.FieldR2,
+		})
+	}
+	if value, ok := cu.mutation.Granularity(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeEnum,
+			Value:  value,
+			Column: correlation.FieldGranularity,
 		})
 	}
 	if cu.mutation.LeftCleared() {
@@ -377,6 +403,20 @@ func (cuo *CorrelationUpdateOne) AddR2(f float64) *CorrelationUpdateOne {
 	return cuo
 }
 
+// SetGranularity sets the "granularity" field.
+func (cuo *CorrelationUpdateOne) SetGranularity(c correlation.Granularity) *CorrelationUpdateOne {
+	cuo.mutation.SetGranularity(c)
+	return cuo
+}
+
+// SetNillableGranularity sets the "granularity" field if the given value is not nil.
+func (cuo *CorrelationUpdateOne) SetNillableGranularity(c *correlation.Granularity) *CorrelationUpdateOne {
+	if c != nil {
+		cuo.SetGranularity(*c)
+	}
+	return cuo
+}
+
 // SetLeftID sets the "left" edge to the Dataset entity by ID.
 func (cuo *CorrelationUpdateOne) SetLeftID(id int) *CorrelationUpdateOne {
 	cuo.mutation.SetLeftID(id)
@@ -484,6 +524,11 @@ func (cuo *CorrelationUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (cuo *CorrelationUpdateOne) check() error {
+	if v, ok := cuo.mutation.Granularity(); ok {
+		if err := correlation.GranularityValidator(v); err != nil {
+			return &ValidationError{Name: "granularity", err: fmt.Errorf("ent: validator failed for field \"granularity\": %w", err)}
+		}
+	}
 	if _, ok := cuo.mutation.LeftID(); cuo.mutation.LeftCleared() && !ok {
 		return errors.New("ent: clearing a required unique edge \"left\"")
 	}
@@ -563,6 +608,13 @@ func (cuo *CorrelationUpdateOne) sqlSave(ctx context.Context) (_node *Correlatio
 			Type:   field.TypeFloat64,
 			Value:  value,
 			Column: correlation.FieldR2,
+		})
+	}
+	if value, ok := cuo.mutation.Granularity(); ok {
+		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
+			Type:   field.TypeEnum,
+			Value:  value,
+			Column: correlation.FieldGranularity,
 		})
 	}
 	if cuo.mutation.LeftCleared() {

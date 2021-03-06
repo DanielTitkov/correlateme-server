@@ -3,6 +3,7 @@
 package correlation
 
 import (
+	"fmt"
 	"time"
 )
 
@@ -23,6 +24,8 @@ const (
 	FieldR2 = "r2"
 	// FieldType holds the string denoting the type field in the database.
 	FieldType = "type"
+	// FieldGranularity holds the string denoting the granularity field in the database.
+	FieldGranularity = "granularity"
 
 	// EdgeLeft holds the string denoting the left edge name in mutations.
 	EdgeLeft = "left"
@@ -56,6 +59,7 @@ var Columns = []string{
 	FieldP,
 	FieldR2,
 	FieldType,
+	FieldGranularity,
 }
 
 // ForeignKeys holds the SQL foreign-keys that are owned by the Correlation type.
@@ -89,3 +93,30 @@ var (
 	// TypeValidator is a validator for the "type" field. It is called by the builders before save.
 	TypeValidator func(string) error
 )
+
+// Granularity defines the type for the "granularity" enum field.
+type Granularity string
+
+// GranularityDay is the default value of the Granularity enum.
+const DefaultGranularity = GranularityDay
+
+// Granularity values.
+const (
+	GranularityDay   Granularity = "day"
+	GranularityWeek  Granularity = "week"
+	GranularityMonth Granularity = "month"
+)
+
+func (gr Granularity) String() string {
+	return string(gr)
+}
+
+// GranularityValidator is a validator for the "granularity" field enum values. It is called by the builders before save.
+func GranularityValidator(gr Granularity) error {
+	switch gr {
+	case GranularityDay, GranularityWeek, GranularityMonth:
+		return nil
+	default:
+		return fmt.Errorf("correlation: invalid enum value for granularity field: %q", gr)
+	}
+}

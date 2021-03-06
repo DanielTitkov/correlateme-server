@@ -58,6 +58,7 @@ type CorrelationMutation struct {
 	r2            *float64
 	addr2         *float64
 	_type         *string
+	granularity   *correlation.Granularity
 	clearedFields map[string]struct{}
 	left          *int
 	clearedleft   bool
@@ -423,6 +424,42 @@ func (m *CorrelationMutation) ResetType() {
 	m._type = nil
 }
 
+// SetGranularity sets the "granularity" field.
+func (m *CorrelationMutation) SetGranularity(c correlation.Granularity) {
+	m.granularity = &c
+}
+
+// Granularity returns the value of the "granularity" field in the mutation.
+func (m *CorrelationMutation) Granularity() (r correlation.Granularity, exists bool) {
+	v := m.granularity
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGranularity returns the old "granularity" field's value of the Correlation entity.
+// If the Correlation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *CorrelationMutation) OldGranularity(ctx context.Context) (v correlation.Granularity, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldGranularity is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldGranularity requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGranularity: %w", err)
+	}
+	return oldValue.Granularity, nil
+}
+
+// ResetGranularity resets all changes to the "granularity" field.
+func (m *CorrelationMutation) ResetGranularity() {
+	m.granularity = nil
+}
+
 // SetLeftID sets the "left" edge to the Dataset entity by id.
 func (m *CorrelationMutation) SetLeftID(id int) {
 	m.left = &id
@@ -515,7 +552,7 @@ func (m *CorrelationMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *CorrelationMutation) Fields() []string {
-	fields := make([]string, 0, 6)
+	fields := make([]string, 0, 7)
 	if m.create_time != nil {
 		fields = append(fields, correlation.FieldCreateTime)
 	}
@@ -533,6 +570,9 @@ func (m *CorrelationMutation) Fields() []string {
 	}
 	if m._type != nil {
 		fields = append(fields, correlation.FieldType)
+	}
+	if m.granularity != nil {
+		fields = append(fields, correlation.FieldGranularity)
 	}
 	return fields
 }
@@ -554,6 +594,8 @@ func (m *CorrelationMutation) Field(name string) (ent.Value, bool) {
 		return m.R2()
 	case correlation.FieldType:
 		return m.GetType()
+	case correlation.FieldGranularity:
+		return m.Granularity()
 	}
 	return nil, false
 }
@@ -575,6 +617,8 @@ func (m *CorrelationMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldR2(ctx)
 	case correlation.FieldType:
 		return m.OldType(ctx)
+	case correlation.FieldGranularity:
+		return m.OldGranularity(ctx)
 	}
 	return nil, fmt.Errorf("unknown Correlation field %s", name)
 }
@@ -625,6 +669,13 @@ func (m *CorrelationMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetType(v)
+		return nil
+	case correlation.FieldGranularity:
+		v, ok := value.(correlation.Granularity)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGranularity(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Correlation field %s", name)
@@ -731,6 +782,9 @@ func (m *CorrelationMutation) ResetField(name string) error {
 		return nil
 	case correlation.FieldType:
 		m.ResetType()
+		return nil
+	case correlation.FieldGranularity:
+		m.ResetGranularity()
 		return nil
 	}
 	return fmt.Errorf("unknown Correlation field %s", name)
@@ -3435,6 +3489,7 @@ type ObservationMutation struct {
 	value          *float64
 	addvalue       *float64
 	date           *time.Time
+	granularity    *observation.Granularity
 	clearedFields  map[string]struct{}
 	dataset        *int
 	cleareddataset bool
@@ -3686,6 +3741,42 @@ func (m *ObservationMutation) ResetDate() {
 	m.date = nil
 }
 
+// SetGranularity sets the "granularity" field.
+func (m *ObservationMutation) SetGranularity(o observation.Granularity) {
+	m.granularity = &o
+}
+
+// Granularity returns the value of the "granularity" field in the mutation.
+func (m *ObservationMutation) Granularity() (r observation.Granularity, exists bool) {
+	v := m.granularity
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldGranularity returns the old "granularity" field's value of the Observation entity.
+// If the Observation object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *ObservationMutation) OldGranularity(ctx context.Context) (v observation.Granularity, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldGranularity is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldGranularity requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldGranularity: %w", err)
+	}
+	return oldValue.Granularity, nil
+}
+
+// ResetGranularity resets all changes to the "granularity" field.
+func (m *ObservationMutation) ResetGranularity() {
+	m.granularity = nil
+}
+
 // SetDatasetID sets the "dataset" edge to the Dataset entity by id.
 func (m *ObservationMutation) SetDatasetID(id int) {
 	m.dataset = &id
@@ -3739,7 +3830,7 @@ func (m *ObservationMutation) Type() string {
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
 func (m *ObservationMutation) Fields() []string {
-	fields := make([]string, 0, 4)
+	fields := make([]string, 0, 5)
 	if m.create_time != nil {
 		fields = append(fields, observation.FieldCreateTime)
 	}
@@ -3751,6 +3842,9 @@ func (m *ObservationMutation) Fields() []string {
 	}
 	if m.date != nil {
 		fields = append(fields, observation.FieldDate)
+	}
+	if m.granularity != nil {
+		fields = append(fields, observation.FieldGranularity)
 	}
 	return fields
 }
@@ -3768,6 +3862,8 @@ func (m *ObservationMutation) Field(name string) (ent.Value, bool) {
 		return m.Value()
 	case observation.FieldDate:
 		return m.Date()
+	case observation.FieldGranularity:
+		return m.Granularity()
 	}
 	return nil, false
 }
@@ -3785,6 +3881,8 @@ func (m *ObservationMutation) OldField(ctx context.Context, name string) (ent.Va
 		return m.OldValue(ctx)
 	case observation.FieldDate:
 		return m.OldDate(ctx)
+	case observation.FieldGranularity:
+		return m.OldGranularity(ctx)
 	}
 	return nil, fmt.Errorf("unknown Observation field %s", name)
 }
@@ -3821,6 +3919,13 @@ func (m *ObservationMutation) SetField(name string, value ent.Value) error {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetDate(v)
+		return nil
+	case observation.FieldGranularity:
+		v, ok := value.(observation.Granularity)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetGranularity(v)
 		return nil
 	}
 	return fmt.Errorf("unknown Observation field %s", name)
@@ -3897,6 +4002,9 @@ func (m *ObservationMutation) ResetField(name string) error {
 		return nil
 	case observation.FieldDate:
 		m.ResetDate()
+		return nil
+	case observation.FieldGranularity:
+		m.ResetGranularity()
 		return nil
 	}
 	return fmt.Errorf("unknown Observation field %s", name)

@@ -14,8 +14,8 @@ type (
 	GetIndicatorsArgs struct {
 		UserID           int
 		WithDataset      bool
-		WithObservations bool
-		ObservationLimit int64
+		ObservationLimit int
+		Granularity      string
 		Filter           GetIndicatorsArgsFilter
 	}
 	GetIndicatorsArgsFilter struct {
@@ -37,6 +37,11 @@ type (
 		Value       float64
 		Date        *time.Time
 	}
+	UpdateAggregationsArgs struct {
+		UserID    int
+		DatasetID int
+		// Method    string // mean, median, sum
+	}
 
 	// Dataset
 
@@ -45,8 +50,8 @@ type (
 		UserID           int
 		WithIndicator    bool
 		WithUser         bool
-		WithObservations bool
-		ObservationLimit int64
+		ObservationLimit int
+		Granularity      string
 		Filter           GetDatasetsArgsFilter
 	}
 	GetDatasetsArgsFilter struct {
@@ -59,12 +64,14 @@ type (
 	UpdateCorrelationsArgs struct {
 		UserID     int
 		WithShared bool
-		Method     string // pearson, spearman or auto
+		// Granularity string
+		Method string // pearson, spearman or auto
 	}
 
 	GetCorrelationMatrixArgs struct {
-		UserID     int
-		WithShared bool
+		UserID      int
+		WithShared  bool
+		Granularity string
 	}
 
 	GetCorrelationArgs struct {

@@ -41,8 +41,9 @@ func (a *App) GetIndicators(args domain.GetIndicatorsArgs) ([]*domain.Indicator,
 	if args.Filter.BuiltIn != nil && *args.Filter.BuiltIn == true {
 		args.Filter.AuthorID = nil
 	}
-
-	args.ObservationLimit = a.cfg.App.DefaultObservationLimit
+	if args.ObservationLimit > a.cfg.App.DefaultObservationLimit {
+		args.ObservationLimit = a.cfg.App.DefaultObservationLimit
+	}
 
 	return a.repo.GetIndicators(args)
 }

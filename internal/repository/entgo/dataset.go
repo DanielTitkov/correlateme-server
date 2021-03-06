@@ -8,6 +8,7 @@ import (
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dataset"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/observation"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/user"
 )
 
@@ -26,32 +27,51 @@ func (r *EntgoRepository) CreateDataset(d *domain.Dataset) (*domain.Dataset, err
 	return entToDomainDataset(dataset), nil
 }
 
-func (r *EntgoRepository) GetDatasetByID(id int) (*domain.Dataset, error) {
-	ds, err := r.client.Dataset.
+func (r *EntgoRepository) GetDatasetByID(id int, observationsLimit int, granularity string) (*domain.Dataset, error) {
+	query := r.client.Dataset.
 		Query().
 		WithIndicator(func(q *ent.IndicatorQuery) {
 			q.WithAuthor()
 			q.WithScale()
 		}).
 		WithUser().
-		Where(dataset.IDEQ(id)).
-		Only(context.TODO())
+		Where(dataset.IDEQ(id))
+
+	if observationsLimit > 0 {
+		query.WithObservations(func(q *ent.ObservationQuery) {
+			q.Limit(observationsLimit)
+			if granularity != "" {
+				q.Where(observation.GranularityEQ(observation.Granularity(granularity)))
+			} else {
+				q.Where(observation.GranularityEQ(observation.Granularity(domain.GranularityDay)))
+			}
+			q.Order(ent.Asc(observation.FieldDate))
+		})
+	}
+
+	ds, err := query.Only(context.TODO())
 	if err != nil {
 		return nil, err
 	}
 
-	// safe because dataset must have an indicator edge
 	return entToDomainDataset(ds), nil
 }
 
 // GetUserDatasets fetches all datasets created or avaliable to user,
 // including shared datasets.
-func (r *EntgoRepository) GetUserDatasets(userID int, withObservations, withShared bool) ([]*domain.Dataset, error) {
+func (r *EntgoRepository) GetUserDatasets(userID int, withShared bool, observationsLimit int, granularity string) ([]*domain.Dataset, error) {
 	query := r.client.Dataset.Query()
 
-	if withObservations {
-		query.WithObservations()
-		// TODO: maybe set limit for observations
+	if observationsLimit > 0 {
+		query.WithObservations(func(q *ent.ObservationQuery) {
+			q.Limit(observationsLimit)
+			if granularity != "" {
+				q.Where(observation.GranularityEQ(observation.Granularity(granularity)))
+			} else {
+				q.Where(observation.GranularityEQ(observation.Granularity(domain.GranularityDay)))
+			}
+			q.Order(ent.Asc(observation.FieldDate))
+		})
 	}
 
 	if withShared {
@@ -80,9 +100,17 @@ func (r *EntgoRepository) GetDatasets(args domain.GetDatasetsArgs) ([]*domain.Da
 	query := r.client.Dataset.Query()
 
 	// edges
-	if args.WithObservations {
-		query.WithObservations()
-		// TODO: maybe set limit for observations
+	if args.ObservationLimit > 0 {
+		// TODO: refactor // DRY
+		query.WithObservations(func(q *ent.ObservationQuery) {
+			q.Limit(args.ObservationLimit)
+			if args.Granularity != "" {
+				q.Where(observation.GranularityEQ(observation.Granularity(args.Granularity)))
+			} else {
+				q.Where(observation.GranularityEQ(observation.Granularity(domain.GranularityDay)))
+			}
+			q.Order(ent.Asc(observation.FieldDate))
+		})
 	}
 
 	if args.WithIndicator {

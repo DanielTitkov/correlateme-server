@@ -45,10 +45,10 @@ type (
 
 		// datasets
 		CreateDataset(*domain.Dataset) (*domain.Dataset, error)
-		GetDatasetByID(int) (*domain.Dataset, error)
+		GetDatasetByID(id int, observationsLimit int, granularity string) (*domain.Dataset, error)
 		GetUserIndicatorDataset(*domain.User, *domain.Indicator) (*domain.Dataset, error)
 		GetOrCreateUserIndicatorDataset(*domain.User, *domain.Indicator) (*domain.Dataset, error)
-		GetUserDatasets(userID int, withObservations, withShared bool) ([]*domain.Dataset, error) // to be deprecated
+		GetUserDatasets(userID int, withShared bool, observationsLimit int, granularity string) ([]*domain.Dataset, error) // to be deprecated
 		GetDatasets(domain.GetDatasetsArgs) ([]*domain.Dataset, error)
 
 		// observations

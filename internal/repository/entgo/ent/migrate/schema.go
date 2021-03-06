@@ -17,6 +17,7 @@ var (
 		{Name: "p", Type: field.TypeFloat64},
 		{Name: "r2", Type: field.TypeFloat64},
 		{Name: "type", Type: field.TypeString},
+		{Name: "granularity", Type: field.TypeEnum, Enums: []string{"day", "week", "month"}, Default: "day"},
 		{Name: "dataset_left", Type: field.TypeInt, Nullable: true},
 		{Name: "dataset_right", Type: field.TypeInt, Nullable: true},
 	}
@@ -28,14 +29,14 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:  "correlations_datasets_left",
-				Columns: []*schema.Column{CorrelationsColumns[7]},
+				Columns: []*schema.Column{CorrelationsColumns[8]},
 
 				RefColumns: []*schema.Column{DatasetsColumns[0]},
 				OnDelete:   schema.SetNull,
 			},
 			{
 				Symbol:  "correlations_datasets_right",
-				Columns: []*schema.Column{CorrelationsColumns[8]},
+				Columns: []*schema.Column{CorrelationsColumns[9]},
 
 				RefColumns: []*schema.Column{DatasetsColumns[0]},
 				OnDelete:   schema.SetNull,
@@ -45,12 +46,12 @@ var (
 			{
 				Name:    "correlation_dataset_left_dataset_right",
 				Unique:  true,
-				Columns: []*schema.Column{CorrelationsColumns[7], CorrelationsColumns[8]},
+				Columns: []*schema.Column{CorrelationsColumns[8], CorrelationsColumns[9]},
 			},
 			{
 				Name:    "correlation_dataset_right_dataset_left",
 				Unique:  true,
-				Columns: []*schema.Column{CorrelationsColumns[8], CorrelationsColumns[7]},
+				Columns: []*schema.Column{CorrelationsColumns[9], CorrelationsColumns[8]},
 			},
 		},
 	}
@@ -185,6 +186,7 @@ var (
 		{Name: "update_time", Type: field.TypeTime},
 		{Name: "value", Type: field.TypeFloat64},
 		{Name: "date", Type: field.TypeTime, SchemaType: map[string]string{"mysql": "DATE", "postgres": "date"}},
+		{Name: "granularity", Type: field.TypeEnum, Enums: []string{"day", "week", "month"}, Default: "day"},
 		{Name: "dataset_observations", Type: field.TypeInt, Nullable: true},
 	}
 	// ObservationsTable holds the schema information for the "observations" table.
@@ -195,7 +197,7 @@ var (
 		ForeignKeys: []*schema.ForeignKey{
 			{
 				Symbol:  "observations_datasets_observations",
-				Columns: []*schema.Column{ObservationsColumns[5]},
+				Columns: []*schema.Column{ObservationsColumns[6]},
 
 				RefColumns: []*schema.Column{DatasetsColumns[0]},
 				OnDelete:   schema.SetNull,
@@ -205,7 +207,7 @@ var (
 			{
 				Name:    "observation_date_dataset_observations",
 				Unique:  true,
-				Columns: []*schema.Column{ObservationsColumns[4], ObservationsColumns[5]},
+				Columns: []*schema.Column{ObservationsColumns[4], ObservationsColumns[6]},
 			},
 		},
 	}

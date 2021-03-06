@@ -61,6 +61,20 @@ func (oc *ObservationCreate) SetDate(t time.Time) *ObservationCreate {
 	return oc
 }
 
+// SetGranularity sets the "granularity" field.
+func (oc *ObservationCreate) SetGranularity(o observation.Granularity) *ObservationCreate {
+	oc.mutation.SetGranularity(o)
+	return oc
+}
+
+// SetNillableGranularity sets the "granularity" field if the given value is not nil.
+func (oc *ObservationCreate) SetNillableGranularity(o *observation.Granularity) *ObservationCreate {
+	if o != nil {
+		oc.SetGranularity(*o)
+	}
+	return oc
+}
+
 // SetDatasetID sets the "dataset" edge to the Dataset entity by ID.
 func (oc *ObservationCreate) SetDatasetID(id int) *ObservationCreate {
 	oc.mutation.SetDatasetID(id)
@@ -132,6 +146,10 @@ func (oc *ObservationCreate) defaults() {
 		v := observation.DefaultUpdateTime()
 		oc.mutation.SetUpdateTime(v)
 	}
+	if _, ok := oc.mutation.Granularity(); !ok {
+		v := observation.DefaultGranularity
+		oc.mutation.SetGranularity(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -147,6 +165,14 @@ func (oc *ObservationCreate) check() error {
 	}
 	if _, ok := oc.mutation.Date(); !ok {
 		return &ValidationError{Name: "date", err: errors.New("ent: missing required field \"date\"")}
+	}
+	if _, ok := oc.mutation.Granularity(); !ok {
+		return &ValidationError{Name: "granularity", err: errors.New("ent: missing required field \"granularity\"")}
+	}
+	if v, ok := oc.mutation.Granularity(); ok {
+		if err := observation.GranularityValidator(v); err != nil {
+			return &ValidationError{Name: "granularity", err: fmt.Errorf("ent: validator failed for field \"granularity\": %w", err)}
+		}
 	}
 	if _, ok := oc.mutation.DatasetID(); !ok {
 		return &ValidationError{Name: "dataset", err: errors.New("ent: missing required edge \"dataset\"")}
@@ -209,6 +235,14 @@ func (oc *ObservationCreate) createSpec() (*Observation, *sqlgraph.CreateSpec) {
 			Column: observation.FieldDate,
 		})
 		_node.Date = value
+	}
+	if value, ok := oc.mutation.Granularity(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeEnum,
+			Value:  value,
+			Column: observation.FieldGranularity,
+		})
+		_node.Granularity = value
 	}
 	if nodes := oc.mutation.DatasetIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

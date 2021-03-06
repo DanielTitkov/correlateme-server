@@ -29,6 +29,8 @@ type Correlation struct {
 	R2 float64 `json:"r2,omitempty"`
 	// Type holds the value of the "type" field.
 	Type string `json:"type,omitempty"`
+	// Granularity holds the value of the "granularity" field.
+	Granularity correlation.Granularity `json:"granularity,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the CorrelationQuery when eager-loading is set.
 	Edges         CorrelationEdges `json:"edges"`
@@ -84,7 +86,7 @@ func (*Correlation) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = &sql.NullFloat64{}
 		case correlation.FieldID:
 			values[i] = &sql.NullInt64{}
-		case correlation.FieldType:
+		case correlation.FieldType, correlation.FieldGranularity:
 			values[i] = &sql.NullString{}
 		case correlation.FieldCreateTime, correlation.FieldUpdateTime:
 			values[i] = &sql.NullTime{}
@@ -148,6 +150,12 @@ func (c *Correlation) assignValues(columns []string, values []interface{}) error
 				return fmt.Errorf("unexpected type %T for field type", values[i])
 			} else if value.Valid {
 				c.Type = value.String
+			}
+		case correlation.FieldGranularity:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field granularity", values[i])
+			} else if value.Valid {
+				c.Granularity = correlation.Granularity(value.String)
 			}
 		case correlation.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
@@ -213,6 +221,8 @@ func (c *Correlation) String() string {
 	builder.WriteString(fmt.Sprintf("%v", c.R2))
 	builder.WriteString(", type=")
 	builder.WriteString(c.Type)
+	builder.WriteString(", granularity=")
+	builder.WriteString(fmt.Sprintf("%v", c.Granularity))
 	builder.WriteByte(')')
 	return builder.String()
 }

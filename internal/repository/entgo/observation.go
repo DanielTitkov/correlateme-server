@@ -76,11 +76,12 @@ func entToDomainObservation(obs *ent.Observation) *domain.Observation {
 	}
 
 	return &domain.Observation{
-		ID:         obs.ID,
-		Value:      obs.Value,
-		Dataset:    dataset,
-		Date:       &obs.Date,
-		CreateTime: obs.CreateTime,
-		UpdateTime: obs.UpdateTime,
+		ID:          obs.ID,
+		Value:       obs.Value,
+		Dataset:     dataset,
+		Date:        &obs.Date,
+		Granularity: obs.Granularity.String(),
+		CreateTime:  obs.CreateTime,
+		UpdateTime:  obs.UpdateTime,
 	}
 }

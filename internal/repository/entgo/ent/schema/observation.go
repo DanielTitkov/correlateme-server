@@ -7,6 +7,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
 	"entgo.io/ent/schema/mixin"
+	"github.com/DanielTitkov/correlateme-server/internal/domain"
 )
 
 // Observation holds the schema definition for the Observation entity.
@@ -22,6 +23,11 @@ func (Observation) Fields() []ent.Field {
 			dialect.Postgres: "date",
 			dialect.MySQL:    "DATE",
 		}),
+		field.Enum("granularity").Values(
+			domain.GranularityDay,
+			domain.GranularityWeek,
+			domain.GranularityMonth,
+		).Default(domain.GranularityDay),
 	}
 }
 

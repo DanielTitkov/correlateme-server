@@ -64,7 +64,8 @@ func (h *Handler) GetIndicators(c echo.Context) error {
 	indicators, err := h.app.GetIndicators(domain.GetIndicatorsArgs{
 		UserID:           userID,
 		WithDataset:      request.WithDataset,
-		WithObservations: request.WithObservations,
+		ObservationLimit: request.ObservationsLimit,
+		Granularity:      request.Granularity,
 		Filter: domain.GetIndicatorsArgsFilter{
 			AuthorID:  &userID,
 			ID:        filter.ID,

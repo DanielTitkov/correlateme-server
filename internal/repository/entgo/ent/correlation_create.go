@@ -73,6 +73,20 @@ func (cc *CorrelationCreate) SetType(s string) *CorrelationCreate {
 	return cc
 }
 
+// SetGranularity sets the "granularity" field.
+func (cc *CorrelationCreate) SetGranularity(c correlation.Granularity) *CorrelationCreate {
+	cc.mutation.SetGranularity(c)
+	return cc
+}
+
+// SetNillableGranularity sets the "granularity" field if the given value is not nil.
+func (cc *CorrelationCreate) SetNillableGranularity(c *correlation.Granularity) *CorrelationCreate {
+	if c != nil {
+		cc.SetGranularity(*c)
+	}
+	return cc
+}
+
 // SetLeftID sets the "left" edge to the Dataset entity by ID.
 func (cc *CorrelationCreate) SetLeftID(id int) *CorrelationCreate {
 	cc.mutation.SetLeftID(id)
@@ -155,6 +169,10 @@ func (cc *CorrelationCreate) defaults() {
 		v := correlation.DefaultUpdateTime()
 		cc.mutation.SetUpdateTime(v)
 	}
+	if _, ok := cc.mutation.Granularity(); !ok {
+		v := correlation.DefaultGranularity
+		cc.mutation.SetGranularity(v)
+	}
 }
 
 // check runs all checks and user-defined validators on the builder.
@@ -180,6 +198,14 @@ func (cc *CorrelationCreate) check() error {
 	if v, ok := cc.mutation.GetType(); ok {
 		if err := correlation.TypeValidator(v); err != nil {
 			return &ValidationError{Name: "type", err: fmt.Errorf("ent: validator failed for field \"type\": %w", err)}
+		}
+	}
+	if _, ok := cc.mutation.Granularity(); !ok {
+		return &ValidationError{Name: "granularity", err: errors.New("ent: missing required field \"granularity\"")}
+	}
+	if v, ok := cc.mutation.Granularity(); ok {
+		if err := correlation.GranularityValidator(v); err != nil {
+			return &ValidationError{Name: "granularity", err: fmt.Errorf("ent: validator failed for field \"granularity\": %w", err)}
 		}
 	}
 	if _, ok := cc.mutation.LeftID(); !ok {
@@ -262,6 +288,14 @@ func (cc *CorrelationCreate) createSpec() (*Correlation, *sqlgraph.CreateSpec) {
 			Column: correlation.FieldType,
 		})
 		_node.Type = value
+	}
+	if value, ok := cc.mutation.Granularity(); ok {
+		_spec.Fields = append(_spec.Fields, &sqlgraph.FieldSpec{
+			Type:   field.TypeEnum,
+			Value:  value,
+			Column: correlation.FieldGranularity,
+		})
+		_node.Granularity = value
 	}
 	if nodes := cc.mutation.LeftIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{

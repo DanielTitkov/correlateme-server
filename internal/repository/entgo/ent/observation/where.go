@@ -425,6 +425,54 @@ func DateLTE(v time.Time) predicate.Observation {
 	})
 }
 
+// GranularityEQ applies the EQ predicate on the "granularity" field.
+func GranularityEQ(v Granularity) predicate.Observation {
+	return predicate.Observation(func(s *sql.Selector) {
+		s.Where(sql.EQ(s.C(FieldGranularity), v))
+	})
+}
+
+// GranularityNEQ applies the NEQ predicate on the "granularity" field.
+func GranularityNEQ(v Granularity) predicate.Observation {
+	return predicate.Observation(func(s *sql.Selector) {
+		s.Where(sql.NEQ(s.C(FieldGranularity), v))
+	})
+}
+
+// GranularityIn applies the In predicate on the "granularity" field.
+func GranularityIn(vs ...Granularity) predicate.Observation {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Observation(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.In(s.C(FieldGranularity), v...))
+	})
+}
+
+// GranularityNotIn applies the NotIn predicate on the "granularity" field.
+func GranularityNotIn(vs ...Granularity) predicate.Observation {
+	v := make([]interface{}, len(vs))
+	for i := range v {
+		v[i] = vs[i]
+	}
+	return predicate.Observation(func(s *sql.Selector) {
+		// if not arguments were provided, append the FALSE constants,
+		// since we can't apply "IN ()". This will make this predicate falsy.
+		if len(v) == 0 {
+			s.Where(sql.False())
+			return
+		}
+		s.Where(sql.NotIn(s.C(FieldGranularity), v...))
+	})
+}
+
 // HasDataset applies the HasEdge predicate on the "dataset" edge.
 func HasDataset() predicate.Observation {
 	return predicate.Observation(func(s *sql.Selector) {

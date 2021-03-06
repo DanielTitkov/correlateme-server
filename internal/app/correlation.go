@@ -25,7 +25,7 @@ func (a *App) GetCorrelationMatrix(args domain.GetCorrelationMatrixArgs) (*domai
 	datasets, err := a.repo.GetDatasets(domain.GetDatasetsArgs{
 		UserID:           args.UserID,
 		WithIndicator:    true,
-		WithObservations: false,
+		ObservationLimit: 0,
 		Filter: domain.GetDatasetsArgsFilter{
 			WithShared: args.WithShared,
 		},
@@ -78,7 +78,8 @@ func (a *App) GetCorrelationMatrix(args domain.GetCorrelationMatrixArgs) (*domai
 }
 
 func (a *App) UpdateCorrelations(args domain.UpdateCorrelationsArgs) error {
-	datasets, err := a.repo.GetUserDatasets(args.UserID, true, args.WithShared)
+	// day // FIXME
+	datasets, err := a.repo.GetUserDatasets(args.UserID, args.WithShared, int(a.cfg.App.MaxCorrelationObservations), "day")
 	if err != nil {
 		return err
 	}

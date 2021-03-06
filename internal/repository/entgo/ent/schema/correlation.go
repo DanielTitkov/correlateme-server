@@ -6,6 +6,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"entgo.io/ent/schema/index"
 	"entgo.io/ent/schema/mixin"
+	"github.com/DanielTitkov/correlateme-server/internal/domain"
 )
 
 // Correlation holds the schema definition for the Correlation entity.
@@ -20,6 +21,11 @@ func (Correlation) Fields() []ent.Field {
 		field.Float("p"),
 		field.Float("r2"),
 		field.String("type").NotEmpty().Immutable(),
+		field.Enum("granularity").Values(
+			domain.GranularityDay,
+			domain.GranularityWeek,
+			domain.GranularityMonth,
+		).Default(domain.GranularityDay),
 	}
 }
 

@@ -25,6 +25,8 @@ type Observation struct {
 	Value float64 `json:"value,omitempty"`
 	// Date holds the value of the "date" field.
 	Date time.Time `json:"date,omitempty"`
+	// Granularity holds the value of the "granularity" field.
+	Granularity observation.Granularity `json:"granularity,omitempty"`
 	// Edges holds the relations/edges for other nodes in the graph.
 	// The values are being populated by the ObservationQuery when eager-loading is set.
 	Edges                ObservationEdges `json:"edges"`
@@ -63,6 +65,8 @@ func (*Observation) scanValues(columns []string) ([]interface{}, error) {
 			values[i] = &sql.NullFloat64{}
 		case observation.FieldID:
 			values[i] = &sql.NullInt64{}
+		case observation.FieldGranularity:
+			values[i] = &sql.NullString{}
 		case observation.FieldCreateTime, observation.FieldUpdateTime, observation.FieldDate:
 			values[i] = &sql.NullTime{}
 		case observation.ForeignKeys[0]: // dataset_observations
@@ -112,6 +116,12 @@ func (o *Observation) assignValues(columns []string, values []interface{}) error
 			} else if value.Valid {
 				o.Date = value.Time
 			}
+		case observation.FieldGranularity:
+			if value, ok := values[i].(*sql.NullString); !ok {
+				return fmt.Errorf("unexpected type %T for field granularity", values[i])
+			} else if value.Valid {
+				o.Granularity = observation.Granularity(value.String)
+			}
 		case observation.ForeignKeys[0]:
 			if value, ok := values[i].(*sql.NullInt64); !ok {
 				return fmt.Errorf("unexpected type %T for edge-field dataset_observations", value)
@@ -160,6 +170,8 @@ func (o *Observation) String() string {
 	builder.WriteString(fmt.Sprintf("%v", o.Value))
 	builder.WriteString(", date=")
 	builder.WriteString(o.Date.Format(time.ANSIC))
+	builder.WriteString(", granularity=")
+	builder.WriteString(fmt.Sprintf("%v", o.Granularity))
 	builder.WriteByte(')')
 	return builder.String()
 }
