@@ -12,6 +12,10 @@ type (
 )
 
 type (
+	// UpdateAggregationsRequest is just for testing
+	UpdateAggregationsRequest struct {
+		DatasetID int `json:"datasetID"`
+	}
 	CreateOrUpdateObservationRequest struct {
 		IndicatorID int
 		Value       float64

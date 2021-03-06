@@ -48,20 +48,6 @@ func (ou *ObservationUpdate) SetDate(t time.Time) *ObservationUpdate {
 	return ou
 }
 
-// SetGranularity sets the "granularity" field.
-func (ou *ObservationUpdate) SetGranularity(o observation.Granularity) *ObservationUpdate {
-	ou.mutation.SetGranularity(o)
-	return ou
-}
-
-// SetNillableGranularity sets the "granularity" field if the given value is not nil.
-func (ou *ObservationUpdate) SetNillableGranularity(o *observation.Granularity) *ObservationUpdate {
-	if o != nil {
-		ou.SetGranularity(*o)
-	}
-	return ou
-}
-
 // SetDatasetID sets the "dataset" edge to the Dataset entity by ID.
 func (ou *ObservationUpdate) SetDatasetID(id int) *ObservationUpdate {
 	ou.mutation.SetDatasetID(id)
@@ -152,11 +138,6 @@ func (ou *ObservationUpdate) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (ou *ObservationUpdate) check() error {
-	if v, ok := ou.mutation.Granularity(); ok {
-		if err := observation.GranularityValidator(v); err != nil {
-			return &ValidationError{Name: "granularity", err: fmt.Errorf("ent: validator failed for field \"granularity\": %w", err)}
-		}
-	}
 	if _, ok := ou.mutation.DatasetID(); ou.mutation.DatasetCleared() && !ok {
 		return errors.New("ent: clearing a required unique edge \"dataset\"")
 	}
@@ -207,13 +188,6 @@ func (ou *ObservationUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Type:   field.TypeTime,
 			Value:  value,
 			Column: observation.FieldDate,
-		})
-	}
-	if value, ok := ou.mutation.Granularity(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeEnum,
-			Value:  value,
-			Column: observation.FieldGranularity,
 		})
 	}
 	if ou.mutation.DatasetCleared() {
@@ -285,20 +259,6 @@ func (ouo *ObservationUpdateOne) AddValue(f float64) *ObservationUpdateOne {
 // SetDate sets the "date" field.
 func (ouo *ObservationUpdateOne) SetDate(t time.Time) *ObservationUpdateOne {
 	ouo.mutation.SetDate(t)
-	return ouo
-}
-
-// SetGranularity sets the "granularity" field.
-func (ouo *ObservationUpdateOne) SetGranularity(o observation.Granularity) *ObservationUpdateOne {
-	ouo.mutation.SetGranularity(o)
-	return ouo
-}
-
-// SetNillableGranularity sets the "granularity" field if the given value is not nil.
-func (ouo *ObservationUpdateOne) SetNillableGranularity(o *observation.Granularity) *ObservationUpdateOne {
-	if o != nil {
-		ouo.SetGranularity(*o)
-	}
 	return ouo
 }
 
@@ -392,11 +352,6 @@ func (ouo *ObservationUpdateOne) defaults() {
 
 // check runs all checks and user-defined validators on the builder.
 func (ouo *ObservationUpdateOne) check() error {
-	if v, ok := ouo.mutation.Granularity(); ok {
-		if err := observation.GranularityValidator(v); err != nil {
-			return &ValidationError{Name: "granularity", err: fmt.Errorf("ent: validator failed for field \"granularity\": %w", err)}
-		}
-	}
 	if _, ok := ouo.mutation.DatasetID(); ouo.mutation.DatasetCleared() && !ok {
 		return errors.New("ent: clearing a required unique edge \"dataset\"")
 	}
@@ -452,13 +407,6 @@ func (ouo *ObservationUpdateOne) sqlSave(ctx context.Context) (_node *Observatio
 			Type:   field.TypeTime,
 			Value:  value,
 			Column: observation.FieldDate,
-		})
-	}
-	if value, ok := ouo.mutation.Granularity(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeEnum,
-			Value:  value,
-			Column: observation.FieldGranularity,
 		})
 	}
 	if ouo.mutation.DatasetCleared() {

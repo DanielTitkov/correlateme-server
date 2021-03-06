@@ -2,6 +2,7 @@ package app
 
 import (
 	"github.com/DanielTitkov/correlateme-server/internal/domain"
+	"github.com/DanielTitkov/correlateme-server/internal/helper"
 	"github.com/DanielTitkov/correlateme-server/internal/service/metrics"
 )
 
@@ -47,10 +48,49 @@ func (a *App) CreateOrUpdateObservation(args domain.CreateOrUpdateObservationArg
 
 func (a *App) UpdateAggregations(args domain.UpdateAggregationsArgs) error {
 	// get dataset with observations
+	dataset, err := a.repo.GetDatasetByID(args.DatasetID, a.cfg.App.MaxMonthAggregationObservations, "day")
+	if err != nil {
+		return err
+	}
 
 	// calculate aggregated values
+	valueMap := make(map[string][]float64)
+	for _, obs := range dataset.Observations {
+		y, w := obs.Date.ISOWeek()
+		week := helper.PairOfIDsToString(y, w)
+		valueMap[week] = append(valueMap[week], obs.Value)
+	}
+
+	var aggregatedObs []domain.Observation
+	for week, values := range valueMap {
+		var sum float64 = 0
+		for _, value := range values {
+			sum += value
+		}
+		mean := sum / float64(len(values))
+		y, w, err := helper.StringToPairOfIDs(week)
+		if err != nil {
+			return err // TODO: maybe save error, not exit right now
+		}
+
+		weekStart := helper.WeekStart(y, w)
+		aggregatedObs = append(aggregatedObs, domain.Observation{
+			Value:       mean,
+			Dataset:     dataset,
+			Date:        &weekStart,
+			Granularity: domain.GranularityWeek,
+		})
+	}
 
 	// save observations
+	for _, obs := range aggregatedObs { // TODO: change to bulk? but ent doens't support that as yet
+		_, err := a.repo.CreateOrUpdateObservation(&obs)
+		if err != nil {
+			return err // TODO: maybe save error, not exit right now
+		}
+	}
+
+	// TODO: add month
 
 	return nil
 }

@@ -14,6 +14,7 @@ func (r *EntgoRepository) CreateObservation(o *domain.Observation) (*domain.Obse
 	create := r.client.Observation.
 		Create().
 		SetValue(o.Value).
+		SetGranularity(observation.Granularity(o.Granularity)).
 		SetDatasetID(o.Dataset.ID)
 
 	// because ent can't validate "empty" go date
@@ -38,6 +39,7 @@ func (r *EntgoRepository) CreateOrUpdateObservation(o *domain.Observation) (*dom
 		Query().
 		Where(observation.And(
 			observation.HasDatasetWith(dataset.IDEQ(o.Dataset.ID)),
+			observation.GranularityEQ(observation.Granularity(o.Granularity)),
 			observation.DateEQ(*o.Date),
 		)).
 		Only(context.TODO())
@@ -51,6 +53,7 @@ func (r *EntgoRepository) CreateOrUpdateObservation(o *domain.Observation) (*dom
 			SetValue(o.Value).
 			SetDatasetID(o.Dataset.ID).
 			SetDate(*o.Date).
+			SetGranularity(observation.Granularity(o.Granularity)).
 			Save(context.TODO())
 		if err != nil {
 			return nil, err

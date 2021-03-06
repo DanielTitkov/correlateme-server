@@ -205,9 +205,9 @@ var (
 		},
 		Indexes: []*schema.Index{
 			{
-				Name:    "observation_date_dataset_observations",
+				Name:    "observation_date_granularity_dataset_observations",
 				Unique:  true,
-				Columns: []*schema.Column{ObservationsColumns[4], ObservationsColumns[6]},
+				Columns: []*schema.Column{ObservationsColumns[4], ObservationsColumns[5], ObservationsColumns[6]},
 			},
 		},
 	}

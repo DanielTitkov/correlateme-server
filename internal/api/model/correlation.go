@@ -17,6 +17,7 @@ type (
 )
 
 type (
+	// FindUserCorrelationsRequest is just for testing
 	FindUserCorrelationsRequest struct {
 		UserID     int  `json:"userID"`
 		WithShared bool `json:"withShared"`

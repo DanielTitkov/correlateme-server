@@ -41,3 +41,32 @@ func (h *Handler) CreateOrUpdateObservation(c echo.Context) error {
 		Message: "observation created/updated",
 	})
 }
+
+func (h *Handler) UpdateAggregations(c echo.Context) error {
+	request := new(model.UpdateAggregationsRequest)
+	if err := c.Bind(request); err != nil {
+		return err
+	}
+
+	if request.DatasetID == 0 {
+		return c.JSON(http.StatusInternalServerError, model.ErrorResponse{
+			Message: "failed",
+			Error:   "datasetID is not provided",
+		})
+	}
+
+	err := h.app.UpdateAggregations(domain.UpdateAggregationsArgs{
+		DatasetID: request.DatasetID,
+	})
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, model.ErrorResponse{
+			Message: "failed",
+			Error:   err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, model.OKResponse{
+		Status:  "ok",
+		Message: "done",
+	})
+}

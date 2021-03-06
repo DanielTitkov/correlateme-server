@@ -57,6 +57,7 @@ func (h *Handler) link(e *echo.Echo) {
 	// dev endpoints for testing and debug
 	// not accessible on not-dev instances
 	if h.cfg.Env == "dev" {
-		v1.POST("/findUserCorrelations", h.FindUserCorrelations)
+		v1.POST("/dev/findUserCorrelations", h.FindUserCorrelations)
+		v1.POST("/dev/updateAggregations", h.UpdateAggregations)
 	}
 }

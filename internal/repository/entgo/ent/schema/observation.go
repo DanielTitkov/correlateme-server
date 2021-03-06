@@ -27,7 +27,7 @@ func (Observation) Fields() []ent.Field {
 			domain.GranularityDay,
 			domain.GranularityWeek,
 			domain.GranularityMonth,
-		).Default(domain.GranularityDay),
+		).Default(domain.GranularityDay).Immutable(),
 	}
 }
 
@@ -43,7 +43,7 @@ func (Observation) Edges() []ent.Edge {
 
 func (Observation) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Fields("date").Edges("dataset").Unique(),
+		index.Fields("date", "granularity").Edges("dataset").Unique(),
 	}
 }
 

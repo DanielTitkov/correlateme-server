@@ -3,11 +3,10 @@ package app
 import (
 	"fmt"
 	"math"
-	"strconv"
-	"strings"
 	"time"
 
 	"github.com/DanielTitkov/correlateme-server/internal/domain"
+	"github.com/DanielTitkov/correlateme-server/internal/helper"
 	"github.com/dgryski/go-onlinestats"
 	combinations "github.com/mxschmitt/golang-combinations"
 )
@@ -51,7 +50,7 @@ func (a *App) GetCorrelationMatrix(args domain.GetCorrelationMatrixArgs) (*domai
 				matrixRow = append(matrixRow, makeSelfCorrelationMatrixItem())
 				continue
 			}
-			corr, ok := corrMap[pairOfIDsToString(iDataset.ID, jDataset.ID)]
+			corr, ok := corrMap[helper.PairOfIDsToString(iDataset.ID, jDataset.ID)]
 			if !ok {
 				matrixRow = append(matrixRow, makeZeroCorrelationMatrixItem())
 				continue
@@ -163,17 +162,10 @@ func mapCorrelation(corrs []*domain.Correlation) map[string]*domain.Correlation 
 	corrMap := make(map[string]*domain.Correlation)
 	for _, corr := range corrs {
 		// this way map size is doubled but it provides results for every order
-		corrMap[pairOfIDsToString(corr.Left.ID, corr.Right.ID)] = corr
-		corrMap[pairOfIDsToString(corr.Right.ID, corr.Left.ID)] = corr
+		corrMap[helper.PairOfIDsToString(corr.Left.ID, corr.Right.ID)] = corr
+		corrMap[helper.PairOfIDsToString(corr.Right.ID, corr.Left.ID)] = corr
 	}
 	return corrMap
-}
-
-func pairOfIDsToString(left, right int) string {
-	return strings.Join([]string{
-		strconv.Itoa(left),
-		strconv.Itoa(right),
-	}, "_") // separator is for readability
 }
 
 func makeSelfCorrelationMatrixItem() domain.CorrelationMatrixBodyItem {
