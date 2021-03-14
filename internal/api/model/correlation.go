@@ -23,7 +23,7 @@ type (
 		WithShared bool `json:"withShared"`
 	}
 	GetCorrelationMatrixRequest struct {
-		WithShared bool `json:withShared`
+		WithShared bool `json:"withShared"`
 	}
 	GetCorrelationMatrixResponse struct {
 		Header []GetCorrelationMatrixResponseHeaderItem `json:"header"`
