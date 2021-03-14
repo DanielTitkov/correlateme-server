@@ -94,21 +94,22 @@ var (
 			},
 		},
 	}
-	// DatasetStylesColumns holds the columns for the "dataset_styles" table.
-	DatasetStylesColumns = []*schema.Column{
+	// DatasetParamsColumns holds the columns for the "dataset_params" table.
+	DatasetParamsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "style", Type: field.TypeJSON},
-		{Name: "dataset_style", Type: field.TypeInt, Unique: true, Nullable: true},
+		{Name: "aggregation", Type: field.TypeJSON},
+		{Name: "dataset_dataset_params", Type: field.TypeInt, Unique: true, Nullable: true},
 	}
-	// DatasetStylesTable holds the schema information for the "dataset_styles" table.
-	DatasetStylesTable = &schema.Table{
-		Name:       "dataset_styles",
-		Columns:    DatasetStylesColumns,
-		PrimaryKey: []*schema.Column{DatasetStylesColumns[0]},
+	// DatasetParamsTable holds the schema information for the "dataset_params" table.
+	DatasetParamsTable = &schema.Table{
+		Name:       "dataset_params",
+		Columns:    DatasetParamsColumns,
+		PrimaryKey: []*schema.Column{DatasetParamsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:  "dataset_styles_datasets_style",
-				Columns: []*schema.Column{DatasetStylesColumns[2]},
+				Symbol:  "dataset_params_datasets_dataset_params",
+				Columns: []*schema.Column{DatasetParamsColumns[3]},
 
 				RefColumns: []*schema.Column{DatasetsColumns[0]},
 				OnDelete:   schema.SetNull,
@@ -266,7 +267,7 @@ var (
 	Tables = []*schema.Table{
 		CorrelationsTable,
 		DatasetsTable,
-		DatasetStylesTable,
+		DatasetParamsTable,
 		IndicatorsTable,
 		IndicatorValueAliasTable,
 		ObservationsTable,
@@ -281,7 +282,7 @@ func init() {
 	CorrelationsTable.ForeignKeys[1].RefTable = DatasetsTable
 	DatasetsTable.ForeignKeys[0].RefTable = IndicatorsTable
 	DatasetsTable.ForeignKeys[1].RefTable = UsersTable
-	DatasetStylesTable.ForeignKeys[0].RefTable = DatasetsTable
+	DatasetParamsTable.ForeignKeys[0].RefTable = DatasetsTable
 	IndicatorsTable.ForeignKeys[0].RefTable = ScalesTable
 	IndicatorsTable.ForeignKeys[1].RefTable = UsersTable
 	IndicatorValueAliasTable.ForeignKeys[0].RefTable = IndicatorsTable

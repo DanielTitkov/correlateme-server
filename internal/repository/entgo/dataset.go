@@ -30,6 +30,7 @@ func (r *EntgoRepository) CreateDataset(d *domain.Dataset) (*domain.Dataset, err
 func (r *EntgoRepository) GetDatasetByID(id int, observationsLimit int, granularity string) (*domain.Dataset, error) {
 	query := r.client.Dataset.
 		Query().
+		WithDatasetParams().
 		WithIndicator(func(q *ent.IndicatorQuery) {
 			q.WithAuthor()
 			q.WithScale()
@@ -60,7 +61,7 @@ func (r *EntgoRepository) GetDatasetByID(id int, observationsLimit int, granular
 // GetUserDatasets fetches all datasets created or avaliable to user,
 // including shared datasets.
 func (r *EntgoRepository) GetUserDatasets(userID int, withShared bool, observationsLimit int, granularity string) ([]*domain.Dataset, error) {
-	query := r.client.Dataset.Query()
+	query := r.client.Dataset.Query().WithDatasetParams()
 
 	if observationsLimit > 0 {
 		query.WithObservations(func(q *ent.ObservationQuery) {
@@ -97,7 +98,7 @@ func (r *EntgoRepository) GetUserDatasets(userID int, withShared bool, observati
 }
 
 func (r *EntgoRepository) GetDatasets(args domain.GetDatasetsArgs) ([]*domain.Dataset, error) {
-	query := r.client.Dataset.Query()
+	query := r.client.Dataset.Query().WithDatasetParams()
 
 	// edges
 	if args.ObservationLimit > 0 {
@@ -155,6 +156,7 @@ func (r *EntgoRepository) GetUserIndicatorDataset(u *domain.User, ind *domain.In
 			q.WithScale()
 		}).
 		WithUser().
+		WithDatasetParams().
 		Where(dataset.And(
 			dataset.HasIndicatorWith(indicator.IDEQ(ind.ID)),
 			dataset.HasUserWith(user.IDEQ(u.ID)),
@@ -205,6 +207,12 @@ func entToDomainDataset(d *ent.Dataset) *domain.Dataset {
 		indicator = entToDomainIndicator(d.Edges.Indicator)
 	}
 
+	var params *domain.DatasetParams
+	if d.Edges.DatasetParams != nil {
+		params.Style = d.Edges.DatasetParams.Style
+		params.Aggregation = d.Edges.DatasetParams.Aggregation
+	}
+
 	var observations []*domain.Observation
 	if d.Edges.Observations != nil {
 		for _, obs := range d.Edges.Observations {
@@ -218,6 +226,7 @@ func entToDomainDataset(d *ent.Dataset) *domain.Dataset {
 		User:         user,      // required
 		Indicator:    indicator, // required
 		Observations: observations,
+		Params:       params,
 		CreateTime:   d.CreateTime,
 		UpdateTime:   d.UpdateTime,
 		// Source: *d.Source, // not used by now

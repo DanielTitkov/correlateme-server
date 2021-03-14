@@ -55,7 +55,14 @@ func (a *App) UpdateAggregations(args domain.UpdateAggregationsArgs) error {
 
 	// calculate aggregated values
 	valueMap := make(map[string][]float64)
+	var includeZeroValues bool
+	if dataset.Params != nil {
+		includeZeroValues = dataset.Params.Aggregation.IncludeZeroValues
+	}
 	for _, obs := range dataset.Observations {
+		if !includeZeroValues && obs.Value == 0 {
+			continue
+		}
 		y, w := obs.Date.ISOWeek()
 		week := helper.PairOfIDsToString(y, w)
 		valueMap[week] = append(valueMap[week], obs.Value)
@@ -82,6 +89,8 @@ func (a *App) UpdateAggregations(args domain.UpdateAggregationsArgs) error {
 		})
 	}
 
+	// TODO: add month
+
 	// save observations
 	for _, obs := range aggregatedObs { // TODO: change to bulk? but ent doens't support that as yet
 		_, err := a.repo.CreateOrUpdateObservation(&obs)
@@ -89,8 +98,6 @@ func (a *App) UpdateAggregations(args domain.UpdateAggregationsArgs) error {
 			return err // TODO: maybe save error, not exit right now
 		}
 	}
-
-	// TODO: add month
 
 	return nil
 }

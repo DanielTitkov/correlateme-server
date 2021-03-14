@@ -105,6 +105,10 @@ func (h *Handler) GetIndicators(c echo.Context) error {
 				ID:           i.UserDataset.ID,
 				Observations: observations,
 			}
+			if i.UserDataset.Params != nil {
+				dataset.Style = i.UserDataset.Params.Style
+				dataset.Aggregation = i.UserDataset.Params.Aggregation
+			}
 		}
 
 		response = append(response, model.GetIndicatorsResponseItem{

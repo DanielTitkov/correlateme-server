@@ -35,15 +35,15 @@ func (f DatasetFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, err
 	return f(ctx, mv)
 }
 
-// The DatasetStyleFunc type is an adapter to allow the use of ordinary
-// function as DatasetStyle mutator.
-type DatasetStyleFunc func(context.Context, *ent.DatasetStyleMutation) (ent.Value, error)
+// The DatasetParamsFunc type is an adapter to allow the use of ordinary
+// function as DatasetParams mutator.
+type DatasetParamsFunc func(context.Context, *ent.DatasetParamsMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f DatasetStyleFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.DatasetStyleMutation)
+func (f DatasetParamsFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.DatasetParamsMutation)
 	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DatasetStyleMutation", m)
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DatasetParamsMutation", m)
 	}
 	return f(ctx, mv)
 }

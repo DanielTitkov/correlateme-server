@@ -14,7 +14,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/correlation"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dataset"
-	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/datasetstyle"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/datasetparams"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/observation"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/predicate"
@@ -30,13 +30,13 @@ type DatasetQuery struct {
 	fields     []string
 	predicates []predicate.Dataset
 	// eager-loading edges.
-	withLeft         *CorrelationQuery
-	withRight        *CorrelationQuery
-	withObservations *ObservationQuery
-	withStyle        *DatasetStyleQuery
-	withIndicator    *IndicatorQuery
-	withUser         *UserQuery
-	withFKs          bool
+	withLeft          *CorrelationQuery
+	withRight         *CorrelationQuery
+	withObservations  *ObservationQuery
+	withDatasetParams *DatasetParamsQuery
+	withIndicator     *IndicatorQuery
+	withUser          *UserQuery
+	withFKs           bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -132,9 +132,9 @@ func (dq *DatasetQuery) QueryObservations() *ObservationQuery {
 	return query
 }
 
-// QueryStyle chains the current query on the "style" edge.
-func (dq *DatasetQuery) QueryStyle() *DatasetStyleQuery {
-	query := &DatasetStyleQuery{config: dq.config}
+// QueryDatasetParams chains the current query on the "dataset_params" edge.
+func (dq *DatasetQuery) QueryDatasetParams() *DatasetParamsQuery {
+	query := &DatasetParamsQuery{config: dq.config}
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := dq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -145,8 +145,8 @@ func (dq *DatasetQuery) QueryStyle() *DatasetStyleQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(dataset.Table, dataset.FieldID, selector),
-			sqlgraph.To(datasetstyle.Table, datasetstyle.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, dataset.StyleTable, dataset.StyleColumn),
+			sqlgraph.To(datasetparams.Table, datasetparams.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, dataset.DatasetParamsTable, dataset.DatasetParamsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(dq.driver.Dialect(), step)
 		return fromU, nil
@@ -374,17 +374,17 @@ func (dq *DatasetQuery) Clone() *DatasetQuery {
 		return nil
 	}
 	return &DatasetQuery{
-		config:           dq.config,
-		limit:            dq.limit,
-		offset:           dq.offset,
-		order:            append([]OrderFunc{}, dq.order...),
-		predicates:       append([]predicate.Dataset{}, dq.predicates...),
-		withLeft:         dq.withLeft.Clone(),
-		withRight:        dq.withRight.Clone(),
-		withObservations: dq.withObservations.Clone(),
-		withStyle:        dq.withStyle.Clone(),
-		withIndicator:    dq.withIndicator.Clone(),
-		withUser:         dq.withUser.Clone(),
+		config:            dq.config,
+		limit:             dq.limit,
+		offset:            dq.offset,
+		order:             append([]OrderFunc{}, dq.order...),
+		predicates:        append([]predicate.Dataset{}, dq.predicates...),
+		withLeft:          dq.withLeft.Clone(),
+		withRight:         dq.withRight.Clone(),
+		withObservations:  dq.withObservations.Clone(),
+		withDatasetParams: dq.withDatasetParams.Clone(),
+		withIndicator:     dq.withIndicator.Clone(),
+		withUser:          dq.withUser.Clone(),
 		// clone intermediate query.
 		sql:  dq.sql.Clone(),
 		path: dq.path,
@@ -424,14 +424,14 @@ func (dq *DatasetQuery) WithObservations(opts ...func(*ObservationQuery)) *Datas
 	return dq
 }
 
-// WithStyle tells the query-builder to eager-load the nodes that are connected to
-// the "style" edge. The optional arguments are used to configure the query builder of the edge.
-func (dq *DatasetQuery) WithStyle(opts ...func(*DatasetStyleQuery)) *DatasetQuery {
-	query := &DatasetStyleQuery{config: dq.config}
+// WithDatasetParams tells the query-builder to eager-load the nodes that are connected to
+// the "dataset_params" edge. The optional arguments are used to configure the query builder of the edge.
+func (dq *DatasetQuery) WithDatasetParams(opts ...func(*DatasetParamsQuery)) *DatasetQuery {
+	query := &DatasetParamsQuery{config: dq.config}
 	for _, opt := range opts {
 		opt(query)
 	}
-	dq.withStyle = query
+	dq.withDatasetParams = query
 	return dq
 }
 
@@ -527,7 +527,7 @@ func (dq *DatasetQuery) sqlAll(ctx context.Context) ([]*Dataset, error) {
 			dq.withLeft != nil,
 			dq.withRight != nil,
 			dq.withObservations != nil,
-			dq.withStyle != nil,
+			dq.withDatasetParams != nil,
 			dq.withIndicator != nil,
 			dq.withUser != nil,
 		}
@@ -645,7 +645,7 @@ func (dq *DatasetQuery) sqlAll(ctx context.Context) ([]*Dataset, error) {
 		}
 	}
 
-	if query := dq.withStyle; query != nil {
+	if query := dq.withDatasetParams; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
 		nodeids := make(map[int]*Dataset)
 		for i := range nodes {
@@ -653,23 +653,23 @@ func (dq *DatasetQuery) sqlAll(ctx context.Context) ([]*Dataset, error) {
 			nodeids[nodes[i].ID] = nodes[i]
 		}
 		query.withFKs = true
-		query.Where(predicate.DatasetStyle(func(s *sql.Selector) {
-			s.Where(sql.InValues(dataset.StyleColumn, fks...))
+		query.Where(predicate.DatasetParams(func(s *sql.Selector) {
+			s.Where(sql.InValues(dataset.DatasetParamsColumn, fks...))
 		}))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			fk := n.dataset_style
+			fk := n.dataset_dataset_params
 			if fk == nil {
-				return nil, fmt.Errorf(`foreign-key "dataset_style" is nil for node %v`, n.ID)
+				return nil, fmt.Errorf(`foreign-key "dataset_dataset_params" is nil for node %v`, n.ID)
 			}
 			node, ok := nodeids[*fk]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "dataset_style" returned %v for node %v`, *fk, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "dataset_dataset_params" returned %v for node %v`, *fk, n.ID)
 			}
-			node.Edges.Style = n
+			node.Edges.DatasetParams = n
 		}
 	}
 

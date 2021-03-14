@@ -11,7 +11,7 @@ import (
 	"github.com/DanielTitkov/correlateme-server/internal/domain"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/correlation"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dataset"
-	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/datasetstyle"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/datasetparams"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicatorvaluealias"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/observation"
@@ -34,7 +34,7 @@ const (
 	// Node types.
 	TypeCorrelation         = "Correlation"
 	TypeDataset             = "Dataset"
-	TypeDatasetStyle        = "DatasetStyle"
+	TypeDatasetParams       = "DatasetParams"
 	TypeIndicator           = "Indicator"
 	TypeIndicatorValueAlias = "IndicatorValueAlias"
 	TypeObservation         = "Observation"
@@ -887,32 +887,32 @@ func (m *CorrelationMutation) ResetEdge(name string) error {
 // DatasetMutation represents an operation that mutates the Dataset nodes in the graph.
 type DatasetMutation struct {
 	config
-	op                  Op
-	typ                 string
-	id                  *int
-	create_time         *time.Time
-	update_time         *time.Time
-	shared              *bool
-	source              *string
-	clearedFields       map[string]struct{}
-	left                map[int]struct{}
-	removedleft         map[int]struct{}
-	clearedleft         bool
-	right               map[int]struct{}
-	removedright        map[int]struct{}
-	clearedright        bool
-	observations        map[int]struct{}
-	removedobservations map[int]struct{}
-	clearedobservations bool
-	style               *int
-	clearedstyle        bool
-	indicator           *int
-	clearedindicator    bool
-	user                *int
-	cleareduser         bool
-	done                bool
-	oldValue            func(context.Context) (*Dataset, error)
-	predicates          []predicate.Dataset
+	op                    Op
+	typ                   string
+	id                    *int
+	create_time           *time.Time
+	update_time           *time.Time
+	shared                *bool
+	source                *string
+	clearedFields         map[string]struct{}
+	left                  map[int]struct{}
+	removedleft           map[int]struct{}
+	clearedleft           bool
+	right                 map[int]struct{}
+	removedright          map[int]struct{}
+	clearedright          bool
+	observations          map[int]struct{}
+	removedobservations   map[int]struct{}
+	clearedobservations   bool
+	dataset_params        *int
+	cleareddataset_params bool
+	indicator             *int
+	clearedindicator      bool
+	user                  *int
+	cleareduser           bool
+	done                  bool
+	oldValue              func(context.Context) (*Dataset, error)
+	predicates            []predicate.Dataset
 }
 
 var _ ent.Mutation = (*DatasetMutation)(nil)
@@ -1310,43 +1310,43 @@ func (m *DatasetMutation) ResetObservations() {
 	m.removedobservations = nil
 }
 
-// SetStyleID sets the "style" edge to the DatasetStyle entity by id.
-func (m *DatasetMutation) SetStyleID(id int) {
-	m.style = &id
+// SetDatasetParamsID sets the "dataset_params" edge to the DatasetParams entity by id.
+func (m *DatasetMutation) SetDatasetParamsID(id int) {
+	m.dataset_params = &id
 }
 
-// ClearStyle clears the "style" edge to the DatasetStyle entity.
-func (m *DatasetMutation) ClearStyle() {
-	m.clearedstyle = true
+// ClearDatasetParams clears the "dataset_params" edge to the DatasetParams entity.
+func (m *DatasetMutation) ClearDatasetParams() {
+	m.cleareddataset_params = true
 }
 
-// StyleCleared returns if the "style" edge to the DatasetStyle entity was cleared.
-func (m *DatasetMutation) StyleCleared() bool {
-	return m.clearedstyle
+// DatasetParamsCleared returns if the "dataset_params" edge to the DatasetParams entity was cleared.
+func (m *DatasetMutation) DatasetParamsCleared() bool {
+	return m.cleareddataset_params
 }
 
-// StyleID returns the "style" edge ID in the mutation.
-func (m *DatasetMutation) StyleID() (id int, exists bool) {
-	if m.style != nil {
-		return *m.style, true
+// DatasetParamsID returns the "dataset_params" edge ID in the mutation.
+func (m *DatasetMutation) DatasetParamsID() (id int, exists bool) {
+	if m.dataset_params != nil {
+		return *m.dataset_params, true
 	}
 	return
 }
 
-// StyleIDs returns the "style" edge IDs in the mutation.
+// DatasetParamsIDs returns the "dataset_params" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
-// StyleID instead. It exists only for internal usage by the builders.
-func (m *DatasetMutation) StyleIDs() (ids []int) {
-	if id := m.style; id != nil {
+// DatasetParamsID instead. It exists only for internal usage by the builders.
+func (m *DatasetMutation) DatasetParamsIDs() (ids []int) {
+	if id := m.dataset_params; id != nil {
 		ids = append(ids, *id)
 	}
 	return
 }
 
-// ResetStyle resets all changes to the "style" edge.
-func (m *DatasetMutation) ResetStyle() {
-	m.style = nil
-	m.clearedstyle = false
+// ResetDatasetParams resets all changes to the "dataset_params" edge.
+func (m *DatasetMutation) ResetDatasetParams() {
+	m.dataset_params = nil
+	m.cleareddataset_params = false
 }
 
 // SetIndicatorID sets the "indicator" edge to the Indicator entity by id.
@@ -1610,8 +1610,8 @@ func (m *DatasetMutation) AddedEdges() []string {
 	if m.observations != nil {
 		edges = append(edges, dataset.EdgeObservations)
 	}
-	if m.style != nil {
-		edges = append(edges, dataset.EdgeStyle)
+	if m.dataset_params != nil {
+		edges = append(edges, dataset.EdgeDatasetParams)
 	}
 	if m.indicator != nil {
 		edges = append(edges, dataset.EdgeIndicator)
@@ -1644,8 +1644,8 @@ func (m *DatasetMutation) AddedIDs(name string) []ent.Value {
 			ids = append(ids, id)
 		}
 		return ids
-	case dataset.EdgeStyle:
-		if id := m.style; id != nil {
+	case dataset.EdgeDatasetParams:
+		if id := m.dataset_params; id != nil {
 			return []ent.Value{*id}
 		}
 	case dataset.EdgeIndicator:
@@ -1713,8 +1713,8 @@ func (m *DatasetMutation) ClearedEdges() []string {
 	if m.clearedobservations {
 		edges = append(edges, dataset.EdgeObservations)
 	}
-	if m.clearedstyle {
-		edges = append(edges, dataset.EdgeStyle)
+	if m.cleareddataset_params {
+		edges = append(edges, dataset.EdgeDatasetParams)
 	}
 	if m.clearedindicator {
 		edges = append(edges, dataset.EdgeIndicator)
@@ -1735,8 +1735,8 @@ func (m *DatasetMutation) EdgeCleared(name string) bool {
 		return m.clearedright
 	case dataset.EdgeObservations:
 		return m.clearedobservations
-	case dataset.EdgeStyle:
-		return m.clearedstyle
+	case dataset.EdgeDatasetParams:
+		return m.cleareddataset_params
 	case dataset.EdgeIndicator:
 		return m.clearedindicator
 	case dataset.EdgeUser:
@@ -1749,8 +1749,8 @@ func (m *DatasetMutation) EdgeCleared(name string) bool {
 // if that edge is not defined in the schema.
 func (m *DatasetMutation) ClearEdge(name string) error {
 	switch name {
-	case dataset.EdgeStyle:
-		m.ClearStyle()
+	case dataset.EdgeDatasetParams:
+		m.ClearDatasetParams()
 		return nil
 	case dataset.EdgeIndicator:
 		m.ClearIndicator()
@@ -1775,8 +1775,8 @@ func (m *DatasetMutation) ResetEdge(name string) error {
 	case dataset.EdgeObservations:
 		m.ResetObservations()
 		return nil
-	case dataset.EdgeStyle:
-		m.ResetStyle()
+	case dataset.EdgeDatasetParams:
+		m.ResetDatasetParams()
 		return nil
 	case dataset.EdgeIndicator:
 		m.ResetIndicator()
@@ -1788,32 +1788,33 @@ func (m *DatasetMutation) ResetEdge(name string) error {
 	return fmt.Errorf("unknown Dataset edge %s", name)
 }
 
-// DatasetStyleMutation represents an operation that mutates the DatasetStyle nodes in the graph.
-type DatasetStyleMutation struct {
+// DatasetParamsMutation represents an operation that mutates the DatasetParams nodes in the graph.
+type DatasetParamsMutation struct {
 	config
 	op             Op
 	typ            string
 	id             *int
 	style          *domain.DatasetStyle
+	aggregation    *domain.DatasetAggregation
 	clearedFields  map[string]struct{}
 	dataset        *int
 	cleareddataset bool
 	done           bool
-	oldValue       func(context.Context) (*DatasetStyle, error)
-	predicates     []predicate.DatasetStyle
+	oldValue       func(context.Context) (*DatasetParams, error)
+	predicates     []predicate.DatasetParams
 }
 
-var _ ent.Mutation = (*DatasetStyleMutation)(nil)
+var _ ent.Mutation = (*DatasetParamsMutation)(nil)
 
-// datasetstyleOption allows management of the mutation configuration using functional options.
-type datasetstyleOption func(*DatasetStyleMutation)
+// datasetparamsOption allows management of the mutation configuration using functional options.
+type datasetparamsOption func(*DatasetParamsMutation)
 
-// newDatasetStyleMutation creates new mutation for the DatasetStyle entity.
-func newDatasetStyleMutation(c config, op Op, opts ...datasetstyleOption) *DatasetStyleMutation {
-	m := &DatasetStyleMutation{
+// newDatasetParamsMutation creates new mutation for the DatasetParams entity.
+func newDatasetParamsMutation(c config, op Op, opts ...datasetparamsOption) *DatasetParamsMutation {
+	m := &DatasetParamsMutation{
 		config:        c,
 		op:            op,
-		typ:           TypeDatasetStyle,
+		typ:           TypeDatasetParams,
 		clearedFields: make(map[string]struct{}),
 	}
 	for _, opt := range opts {
@@ -1822,20 +1823,20 @@ func newDatasetStyleMutation(c config, op Op, opts ...datasetstyleOption) *Datas
 	return m
 }
 
-// withDatasetStyleID sets the ID field of the mutation.
-func withDatasetStyleID(id int) datasetstyleOption {
-	return func(m *DatasetStyleMutation) {
+// withDatasetParamsID sets the ID field of the mutation.
+func withDatasetParamsID(id int) datasetparamsOption {
+	return func(m *DatasetParamsMutation) {
 		var (
 			err   error
 			once  sync.Once
-			value *DatasetStyle
+			value *DatasetParams
 		)
-		m.oldValue = func(ctx context.Context) (*DatasetStyle, error) {
+		m.oldValue = func(ctx context.Context) (*DatasetParams, error) {
 			once.Do(func() {
 				if m.done {
 					err = fmt.Errorf("querying old values post mutation is not allowed")
 				} else {
-					value, err = m.Client().DatasetStyle.Get(ctx, id)
+					value, err = m.Client().DatasetParams.Get(ctx, id)
 				}
 			})
 			return value, err
@@ -1844,10 +1845,10 @@ func withDatasetStyleID(id int) datasetstyleOption {
 	}
 }
 
-// withDatasetStyle sets the old DatasetStyle of the mutation.
-func withDatasetStyle(node *DatasetStyle) datasetstyleOption {
-	return func(m *DatasetStyleMutation) {
-		m.oldValue = func(context.Context) (*DatasetStyle, error) {
+// withDatasetParams sets the old DatasetParams of the mutation.
+func withDatasetParams(node *DatasetParams) datasetparamsOption {
+	return func(m *DatasetParamsMutation) {
+		m.oldValue = func(context.Context) (*DatasetParams, error) {
 			return node, nil
 		}
 		m.id = &node.ID
@@ -1856,7 +1857,7 @@ func withDatasetStyle(node *DatasetStyle) datasetstyleOption {
 
 // Client returns a new `ent.Client` from the mutation. If the mutation was
 // executed in a transaction (ent.Tx), a transactional client is returned.
-func (m DatasetStyleMutation) Client() *Client {
+func (m DatasetParamsMutation) Client() *Client {
 	client := &Client{config: m.config}
 	client.init()
 	return client
@@ -1864,7 +1865,7 @@ func (m DatasetStyleMutation) Client() *Client {
 
 // Tx returns an `ent.Tx` for mutations that were executed in transactions;
 // it returns an error otherwise.
-func (m DatasetStyleMutation) Tx() (*Tx, error) {
+func (m DatasetParamsMutation) Tx() (*Tx, error) {
 	if _, ok := m.driver.(*txDriver); !ok {
 		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
 	}
@@ -1875,7 +1876,7 @@ func (m DatasetStyleMutation) Tx() (*Tx, error) {
 
 // ID returns the ID value in the mutation. Note that the ID
 // is only available if it was provided to the builder.
-func (m *DatasetStyleMutation) ID() (id int, exists bool) {
+func (m *DatasetParamsMutation) ID() (id int, exists bool) {
 	if m.id == nil {
 		return
 	}
@@ -1883,12 +1884,12 @@ func (m *DatasetStyleMutation) ID() (id int, exists bool) {
 }
 
 // SetStyle sets the "style" field.
-func (m *DatasetStyleMutation) SetStyle(ds domain.DatasetStyle) {
+func (m *DatasetParamsMutation) SetStyle(ds domain.DatasetStyle) {
 	m.style = &ds
 }
 
 // Style returns the value of the "style" field in the mutation.
-func (m *DatasetStyleMutation) Style() (r domain.DatasetStyle, exists bool) {
+func (m *DatasetParamsMutation) Style() (r domain.DatasetStyle, exists bool) {
 	v := m.style
 	if v == nil {
 		return
@@ -1896,10 +1897,10 @@ func (m *DatasetStyleMutation) Style() (r domain.DatasetStyle, exists bool) {
 	return *v, true
 }
 
-// OldStyle returns the old "style" field's value of the DatasetStyle entity.
-// If the DatasetStyle object wasn't provided to the builder, the object is fetched from the database.
+// OldStyle returns the old "style" field's value of the DatasetParams entity.
+// If the DatasetParams object wasn't provided to the builder, the object is fetched from the database.
 // An error is returned if the mutation operation is not UpdateOne, or the database query fails.
-func (m *DatasetStyleMutation) OldStyle(ctx context.Context) (v domain.DatasetStyle, err error) {
+func (m *DatasetParamsMutation) OldStyle(ctx context.Context) (v domain.DatasetStyle, err error) {
 	if !m.op.Is(OpUpdateOne) {
 		return v, fmt.Errorf("OldStyle is only allowed on UpdateOne operations")
 	}
@@ -1914,27 +1915,63 @@ func (m *DatasetStyleMutation) OldStyle(ctx context.Context) (v domain.DatasetSt
 }
 
 // ResetStyle resets all changes to the "style" field.
-func (m *DatasetStyleMutation) ResetStyle() {
+func (m *DatasetParamsMutation) ResetStyle() {
 	m.style = nil
 }
 
+// SetAggregation sets the "aggregation" field.
+func (m *DatasetParamsMutation) SetAggregation(da domain.DatasetAggregation) {
+	m.aggregation = &da
+}
+
+// Aggregation returns the value of the "aggregation" field in the mutation.
+func (m *DatasetParamsMutation) Aggregation() (r domain.DatasetAggregation, exists bool) {
+	v := m.aggregation
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldAggregation returns the old "aggregation" field's value of the DatasetParams entity.
+// If the DatasetParams object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DatasetParamsMutation) OldAggregation(ctx context.Context) (v domain.DatasetAggregation, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldAggregation is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldAggregation requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldAggregation: %w", err)
+	}
+	return oldValue.Aggregation, nil
+}
+
+// ResetAggregation resets all changes to the "aggregation" field.
+func (m *DatasetParamsMutation) ResetAggregation() {
+	m.aggregation = nil
+}
+
 // SetDatasetID sets the "dataset" edge to the Dataset entity by id.
-func (m *DatasetStyleMutation) SetDatasetID(id int) {
+func (m *DatasetParamsMutation) SetDatasetID(id int) {
 	m.dataset = &id
 }
 
 // ClearDataset clears the "dataset" edge to the Dataset entity.
-func (m *DatasetStyleMutation) ClearDataset() {
+func (m *DatasetParamsMutation) ClearDataset() {
 	m.cleareddataset = true
 }
 
 // DatasetCleared returns if the "dataset" edge to the Dataset entity was cleared.
-func (m *DatasetStyleMutation) DatasetCleared() bool {
+func (m *DatasetParamsMutation) DatasetCleared() bool {
 	return m.cleareddataset
 }
 
 // DatasetID returns the "dataset" edge ID in the mutation.
-func (m *DatasetStyleMutation) DatasetID() (id int, exists bool) {
+func (m *DatasetParamsMutation) DatasetID() (id int, exists bool) {
 	if m.dataset != nil {
 		return *m.dataset, true
 	}
@@ -1944,7 +1981,7 @@ func (m *DatasetStyleMutation) DatasetID() (id int, exists bool) {
 // DatasetIDs returns the "dataset" edge IDs in the mutation.
 // Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
 // DatasetID instead. It exists only for internal usage by the builders.
-func (m *DatasetStyleMutation) DatasetIDs() (ids []int) {
+func (m *DatasetParamsMutation) DatasetIDs() (ids []int) {
 	if id := m.dataset; id != nil {
 		ids = append(ids, *id)
 	}
@@ -1952,28 +1989,31 @@ func (m *DatasetStyleMutation) DatasetIDs() (ids []int) {
 }
 
 // ResetDataset resets all changes to the "dataset" edge.
-func (m *DatasetStyleMutation) ResetDataset() {
+func (m *DatasetParamsMutation) ResetDataset() {
 	m.dataset = nil
 	m.cleareddataset = false
 }
 
 // Op returns the operation name.
-func (m *DatasetStyleMutation) Op() Op {
+func (m *DatasetParamsMutation) Op() Op {
 	return m.op
 }
 
-// Type returns the node type of this mutation (DatasetStyle).
-func (m *DatasetStyleMutation) Type() string {
+// Type returns the node type of this mutation (DatasetParams).
+func (m *DatasetParamsMutation) Type() string {
 	return m.typ
 }
 
 // Fields returns all fields that were changed during this mutation. Note that in
 // order to get all numeric fields that were incremented/decremented, call
 // AddedFields().
-func (m *DatasetStyleMutation) Fields() []string {
-	fields := make([]string, 0, 1)
+func (m *DatasetParamsMutation) Fields() []string {
+	fields := make([]string, 0, 2)
 	if m.style != nil {
-		fields = append(fields, datasetstyle.FieldStyle)
+		fields = append(fields, datasetparams.FieldStyle)
+	}
+	if m.aggregation != nil {
+		fields = append(fields, datasetparams.FieldAggregation)
 	}
 	return fields
 }
@@ -1981,10 +2021,12 @@ func (m *DatasetStyleMutation) Fields() []string {
 // Field returns the value of a field with the given name. The second boolean
 // return value indicates that this field was not set, or was not defined in the
 // schema.
-func (m *DatasetStyleMutation) Field(name string) (ent.Value, bool) {
+func (m *DatasetParamsMutation) Field(name string) (ent.Value, bool) {
 	switch name {
-	case datasetstyle.FieldStyle:
+	case datasetparams.FieldStyle:
 		return m.Style()
+	case datasetparams.FieldAggregation:
+		return m.Aggregation()
 	}
 	return nil, false
 }
@@ -1992,96 +2034,108 @@ func (m *DatasetStyleMutation) Field(name string) (ent.Value, bool) {
 // OldField returns the old value of the field from the database. An error is
 // returned if the mutation operation is not UpdateOne, or the query to the
 // database failed.
-func (m *DatasetStyleMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+func (m *DatasetParamsMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
 	switch name {
-	case datasetstyle.FieldStyle:
+	case datasetparams.FieldStyle:
 		return m.OldStyle(ctx)
+	case datasetparams.FieldAggregation:
+		return m.OldAggregation(ctx)
 	}
-	return nil, fmt.Errorf("unknown DatasetStyle field %s", name)
+	return nil, fmt.Errorf("unknown DatasetParams field %s", name)
 }
 
 // SetField sets the value of a field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *DatasetStyleMutation) SetField(name string, value ent.Value) error {
+func (m *DatasetParamsMutation) SetField(name string, value ent.Value) error {
 	switch name {
-	case datasetstyle.FieldStyle:
+	case datasetparams.FieldStyle:
 		v, ok := value.(domain.DatasetStyle)
 		if !ok {
 			return fmt.Errorf("unexpected type %T for field %s", value, name)
 		}
 		m.SetStyle(v)
 		return nil
+	case datasetparams.FieldAggregation:
+		v, ok := value.(domain.DatasetAggregation)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetAggregation(v)
+		return nil
 	}
-	return fmt.Errorf("unknown DatasetStyle field %s", name)
+	return fmt.Errorf("unknown DatasetParams field %s", name)
 }
 
 // AddedFields returns all numeric fields that were incremented/decremented during
 // this mutation.
-func (m *DatasetStyleMutation) AddedFields() []string {
+func (m *DatasetParamsMutation) AddedFields() []string {
 	return nil
 }
 
 // AddedField returns the numeric value that was incremented/decremented on a field
 // with the given name. The second boolean return value indicates that this field
 // was not set, or was not defined in the schema.
-func (m *DatasetStyleMutation) AddedField(name string) (ent.Value, bool) {
+func (m *DatasetParamsMutation) AddedField(name string) (ent.Value, bool) {
 	return nil, false
 }
 
 // AddField adds the value to the field with the given name. It returns an error if
 // the field is not defined in the schema, or if the type mismatched the field
 // type.
-func (m *DatasetStyleMutation) AddField(name string, value ent.Value) error {
+func (m *DatasetParamsMutation) AddField(name string, value ent.Value) error {
 	switch name {
 	}
-	return fmt.Errorf("unknown DatasetStyle numeric field %s", name)
+	return fmt.Errorf("unknown DatasetParams numeric field %s", name)
 }
 
 // ClearedFields returns all nullable fields that were cleared during this
 // mutation.
-func (m *DatasetStyleMutation) ClearedFields() []string {
+func (m *DatasetParamsMutation) ClearedFields() []string {
 	return nil
 }
 
 // FieldCleared returns a boolean indicating if a field with the given name was
 // cleared in this mutation.
-func (m *DatasetStyleMutation) FieldCleared(name string) bool {
+func (m *DatasetParamsMutation) FieldCleared(name string) bool {
 	_, ok := m.clearedFields[name]
 	return ok
 }
 
 // ClearField clears the value of the field with the given name. It returns an
 // error if the field is not defined in the schema.
-func (m *DatasetStyleMutation) ClearField(name string) error {
-	return fmt.Errorf("unknown DatasetStyle nullable field %s", name)
+func (m *DatasetParamsMutation) ClearField(name string) error {
+	return fmt.Errorf("unknown DatasetParams nullable field %s", name)
 }
 
 // ResetField resets all changes in the mutation for the field with the given name.
 // It returns an error if the field is not defined in the schema.
-func (m *DatasetStyleMutation) ResetField(name string) error {
+func (m *DatasetParamsMutation) ResetField(name string) error {
 	switch name {
-	case datasetstyle.FieldStyle:
+	case datasetparams.FieldStyle:
 		m.ResetStyle()
 		return nil
+	case datasetparams.FieldAggregation:
+		m.ResetAggregation()
+		return nil
 	}
-	return fmt.Errorf("unknown DatasetStyle field %s", name)
+	return fmt.Errorf("unknown DatasetParams field %s", name)
 }
 
 // AddedEdges returns all edge names that were set/added in this mutation.
-func (m *DatasetStyleMutation) AddedEdges() []string {
+func (m *DatasetParamsMutation) AddedEdges() []string {
 	edges := make([]string, 0, 1)
 	if m.dataset != nil {
-		edges = append(edges, datasetstyle.EdgeDataset)
+		edges = append(edges, datasetparams.EdgeDataset)
 	}
 	return edges
 }
 
 // AddedIDs returns all IDs (to other nodes) that were added for the given edge
 // name in this mutation.
-func (m *DatasetStyleMutation) AddedIDs(name string) []ent.Value {
+func (m *DatasetParamsMutation) AddedIDs(name string) []ent.Value {
 	switch name {
-	case datasetstyle.EdgeDataset:
+	case datasetparams.EdgeDataset:
 		if id := m.dataset; id != nil {
 			return []ent.Value{*id}
 		}
@@ -2090,33 +2144,33 @@ func (m *DatasetStyleMutation) AddedIDs(name string) []ent.Value {
 }
 
 // RemovedEdges returns all edge names that were removed in this mutation.
-func (m *DatasetStyleMutation) RemovedEdges() []string {
+func (m *DatasetParamsMutation) RemovedEdges() []string {
 	edges := make([]string, 0, 1)
 	return edges
 }
 
 // RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
 // the given name in this mutation.
-func (m *DatasetStyleMutation) RemovedIDs(name string) []ent.Value {
+func (m *DatasetParamsMutation) RemovedIDs(name string) []ent.Value {
 	switch name {
 	}
 	return nil
 }
 
 // ClearedEdges returns all edge names that were cleared in this mutation.
-func (m *DatasetStyleMutation) ClearedEdges() []string {
+func (m *DatasetParamsMutation) ClearedEdges() []string {
 	edges := make([]string, 0, 1)
 	if m.cleareddataset {
-		edges = append(edges, datasetstyle.EdgeDataset)
+		edges = append(edges, datasetparams.EdgeDataset)
 	}
 	return edges
 }
 
 // EdgeCleared returns a boolean which indicates if the edge with the given name
 // was cleared in this mutation.
-func (m *DatasetStyleMutation) EdgeCleared(name string) bool {
+func (m *DatasetParamsMutation) EdgeCleared(name string) bool {
 	switch name {
-	case datasetstyle.EdgeDataset:
+	case datasetparams.EdgeDataset:
 		return m.cleareddataset
 	}
 	return false
@@ -2124,24 +2178,24 @@ func (m *DatasetStyleMutation) EdgeCleared(name string) bool {
 
 // ClearEdge clears the value of the edge with the given name. It returns an error
 // if that edge is not defined in the schema.
-func (m *DatasetStyleMutation) ClearEdge(name string) error {
+func (m *DatasetParamsMutation) ClearEdge(name string) error {
 	switch name {
-	case datasetstyle.EdgeDataset:
+	case datasetparams.EdgeDataset:
 		m.ClearDataset()
 		return nil
 	}
-	return fmt.Errorf("unknown DatasetStyle unique edge %s", name)
+	return fmt.Errorf("unknown DatasetParams unique edge %s", name)
 }
 
 // ResetEdge resets all changes to the edge with the given name in this mutation.
 // It returns an error if the edge is not defined in the schema.
-func (m *DatasetStyleMutation) ResetEdge(name string) error {
+func (m *DatasetParamsMutation) ResetEdge(name string) error {
 	switch name {
-	case datasetstyle.EdgeDataset:
+	case datasetparams.EdgeDataset:
 		m.ResetDataset()
 		return nil
 	}
-	return fmt.Errorf("unknown DatasetStyle edge %s", name)
+	return fmt.Errorf("unknown DatasetParams edge %s", name)
 }
 
 // IndicatorMutation represents an operation that mutates the Indicator nodes in the graph.

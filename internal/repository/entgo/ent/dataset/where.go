@@ -496,25 +496,25 @@ func HasObservationsWith(preds ...predicate.Observation) predicate.Dataset {
 	})
 }
 
-// HasStyle applies the HasEdge predicate on the "style" edge.
-func HasStyle() predicate.Dataset {
+// HasDatasetParams applies the HasEdge predicate on the "dataset_params" edge.
+func HasDatasetParams() predicate.Dataset {
 	return predicate.Dataset(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(StyleTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, StyleTable, StyleColumn),
+			sqlgraph.To(DatasetParamsTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, DatasetParamsTable, DatasetParamsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasStyleWith applies the HasEdge predicate on the "style" edge with a given conditions (other predicates).
-func HasStyleWith(preds ...predicate.DatasetStyle) predicate.Dataset {
+// HasDatasetParamsWith applies the HasEdge predicate on the "dataset_params" edge with a given conditions (other predicates).
+func HasDatasetParamsWith(preds ...predicate.DatasetParams) predicate.Dataset {
 	return predicate.Dataset(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(StyleInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, StyleTable, StyleColumn),
+			sqlgraph.To(DatasetParamsInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, DatasetParamsTable, DatasetParamsColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

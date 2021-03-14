@@ -11,7 +11,7 @@ import (
 
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/correlation"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dataset"
-	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/datasetstyle"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/datasetparams"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicatorvaluealias"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/observation"
@@ -33,8 +33,8 @@ type Client struct {
 	Correlation *CorrelationClient
 	// Dataset is the client for interacting with the Dataset builders.
 	Dataset *DatasetClient
-	// DatasetStyle is the client for interacting with the DatasetStyle builders.
-	DatasetStyle *DatasetStyleClient
+	// DatasetParams is the client for interacting with the DatasetParams builders.
+	DatasetParams *DatasetParamsClient
 	// Indicator is the client for interacting with the Indicator builders.
 	Indicator *IndicatorClient
 	// IndicatorValueAlias is the client for interacting with the IndicatorValueAlias builders.
@@ -62,7 +62,7 @@ func (c *Client) init() {
 	c.Schema = migrate.NewSchema(c.driver)
 	c.Correlation = NewCorrelationClient(c.config)
 	c.Dataset = NewDatasetClient(c.config)
-	c.DatasetStyle = NewDatasetStyleClient(c.config)
+	c.DatasetParams = NewDatasetParamsClient(c.config)
 	c.Indicator = NewIndicatorClient(c.config)
 	c.IndicatorValueAlias = NewIndicatorValueAliasClient(c.config)
 	c.Observation = NewObservationClient(c.config)
@@ -104,7 +104,7 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		config:              cfg,
 		Correlation:         NewCorrelationClient(cfg),
 		Dataset:             NewDatasetClient(cfg),
-		DatasetStyle:        NewDatasetStyleClient(cfg),
+		DatasetParams:       NewDatasetParamsClient(cfg),
 		Indicator:           NewIndicatorClient(cfg),
 		IndicatorValueAlias: NewIndicatorValueAliasClient(cfg),
 		Observation:         NewObservationClient(cfg),
@@ -131,7 +131,7 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		config:              cfg,
 		Correlation:         NewCorrelationClient(cfg),
 		Dataset:             NewDatasetClient(cfg),
-		DatasetStyle:        NewDatasetStyleClient(cfg),
+		DatasetParams:       NewDatasetParamsClient(cfg),
 		Indicator:           NewIndicatorClient(cfg),
 		IndicatorValueAlias: NewIndicatorValueAliasClient(cfg),
 		Observation:         NewObservationClient(cfg),
@@ -169,7 +169,7 @@ func (c *Client) Close() error {
 func (c *Client) Use(hooks ...Hook) {
 	c.Correlation.Use(hooks...)
 	c.Dataset.Use(hooks...)
-	c.DatasetStyle.Use(hooks...)
+	c.DatasetParams.Use(hooks...)
 	c.Indicator.Use(hooks...)
 	c.IndicatorValueAlias.Use(hooks...)
 	c.Observation.Use(hooks...)
@@ -429,15 +429,15 @@ func (c *DatasetClient) QueryObservations(d *Dataset) *ObservationQuery {
 	return query
 }
 
-// QueryStyle queries the style edge of a Dataset.
-func (c *DatasetClient) QueryStyle(d *Dataset) *DatasetStyleQuery {
-	query := &DatasetStyleQuery{config: c.config}
+// QueryDatasetParams queries the dataset_params edge of a Dataset.
+func (c *DatasetClient) QueryDatasetParams(d *Dataset) *DatasetParamsQuery {
+	query := &DatasetParamsQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
 		id := d.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(dataset.Table, dataset.FieldID, id),
-			sqlgraph.To(datasetstyle.Table, datasetstyle.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, dataset.StyleTable, dataset.StyleColumn),
+			sqlgraph.To(datasetparams.Table, datasetparams.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, dataset.DatasetParamsTable, dataset.DatasetParamsColumn),
 		)
 		fromV = sqlgraph.Neighbors(d.driver.Dialect(), step)
 		return fromV, nil
@@ -482,82 +482,82 @@ func (c *DatasetClient) Hooks() []Hook {
 	return c.hooks.Dataset
 }
 
-// DatasetStyleClient is a client for the DatasetStyle schema.
-type DatasetStyleClient struct {
+// DatasetParamsClient is a client for the DatasetParams schema.
+type DatasetParamsClient struct {
 	config
 }
 
-// NewDatasetStyleClient returns a client for the DatasetStyle from the given config.
-func NewDatasetStyleClient(c config) *DatasetStyleClient {
-	return &DatasetStyleClient{config: c}
+// NewDatasetParamsClient returns a client for the DatasetParams from the given config.
+func NewDatasetParamsClient(c config) *DatasetParamsClient {
+	return &DatasetParamsClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `datasetstyle.Hooks(f(g(h())))`.
-func (c *DatasetStyleClient) Use(hooks ...Hook) {
-	c.hooks.DatasetStyle = append(c.hooks.DatasetStyle, hooks...)
+// A call to `Use(f, g, h)` equals to `datasetparams.Hooks(f(g(h())))`.
+func (c *DatasetParamsClient) Use(hooks ...Hook) {
+	c.hooks.DatasetParams = append(c.hooks.DatasetParams, hooks...)
 }
 
-// Create returns a create builder for DatasetStyle.
-func (c *DatasetStyleClient) Create() *DatasetStyleCreate {
-	mutation := newDatasetStyleMutation(c.config, OpCreate)
-	return &DatasetStyleCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a create builder for DatasetParams.
+func (c *DatasetParamsClient) Create() *DatasetParamsCreate {
+	mutation := newDatasetParamsMutation(c.config, OpCreate)
+	return &DatasetParamsCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of DatasetStyle entities.
-func (c *DatasetStyleClient) CreateBulk(builders ...*DatasetStyleCreate) *DatasetStyleCreateBulk {
-	return &DatasetStyleCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of DatasetParams entities.
+func (c *DatasetParamsClient) CreateBulk(builders ...*DatasetParamsCreate) *DatasetParamsCreateBulk {
+	return &DatasetParamsCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for DatasetStyle.
-func (c *DatasetStyleClient) Update() *DatasetStyleUpdate {
-	mutation := newDatasetStyleMutation(c.config, OpUpdate)
-	return &DatasetStyleUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for DatasetParams.
+func (c *DatasetParamsClient) Update() *DatasetParamsUpdate {
+	mutation := newDatasetParamsMutation(c.config, OpUpdate)
+	return &DatasetParamsUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *DatasetStyleClient) UpdateOne(ds *DatasetStyle) *DatasetStyleUpdateOne {
-	mutation := newDatasetStyleMutation(c.config, OpUpdateOne, withDatasetStyle(ds))
-	return &DatasetStyleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *DatasetParamsClient) UpdateOne(dp *DatasetParams) *DatasetParamsUpdateOne {
+	mutation := newDatasetParamsMutation(c.config, OpUpdateOne, withDatasetParams(dp))
+	return &DatasetParamsUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *DatasetStyleClient) UpdateOneID(id int) *DatasetStyleUpdateOne {
-	mutation := newDatasetStyleMutation(c.config, OpUpdateOne, withDatasetStyleID(id))
-	return &DatasetStyleUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *DatasetParamsClient) UpdateOneID(id int) *DatasetParamsUpdateOne {
+	mutation := newDatasetParamsMutation(c.config, OpUpdateOne, withDatasetParamsID(id))
+	return &DatasetParamsUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for DatasetStyle.
-func (c *DatasetStyleClient) Delete() *DatasetStyleDelete {
-	mutation := newDatasetStyleMutation(c.config, OpDelete)
-	return &DatasetStyleDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for DatasetParams.
+func (c *DatasetParamsClient) Delete() *DatasetParamsDelete {
+	mutation := newDatasetParamsMutation(c.config, OpDelete)
+	return &DatasetParamsDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a delete builder for the given entity.
-func (c *DatasetStyleClient) DeleteOne(ds *DatasetStyle) *DatasetStyleDeleteOne {
-	return c.DeleteOneID(ds.ID)
+func (c *DatasetParamsClient) DeleteOne(dp *DatasetParams) *DatasetParamsDeleteOne {
+	return c.DeleteOneID(dp.ID)
 }
 
 // DeleteOneID returns a delete builder for the given id.
-func (c *DatasetStyleClient) DeleteOneID(id int) *DatasetStyleDeleteOne {
-	builder := c.Delete().Where(datasetstyle.ID(id))
+func (c *DatasetParamsClient) DeleteOneID(id int) *DatasetParamsDeleteOne {
+	builder := c.Delete().Where(datasetparams.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &DatasetStyleDeleteOne{builder}
+	return &DatasetParamsDeleteOne{builder}
 }
 
-// Query returns a query builder for DatasetStyle.
-func (c *DatasetStyleClient) Query() *DatasetStyleQuery {
-	return &DatasetStyleQuery{config: c.config}
+// Query returns a query builder for DatasetParams.
+func (c *DatasetParamsClient) Query() *DatasetParamsQuery {
+	return &DatasetParamsQuery{config: c.config}
 }
 
-// Get returns a DatasetStyle entity by its id.
-func (c *DatasetStyleClient) Get(ctx context.Context, id int) (*DatasetStyle, error) {
-	return c.Query().Where(datasetstyle.ID(id)).Only(ctx)
+// Get returns a DatasetParams entity by its id.
+func (c *DatasetParamsClient) Get(ctx context.Context, id int) (*DatasetParams, error) {
+	return c.Query().Where(datasetparams.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *DatasetStyleClient) GetX(ctx context.Context, id int) *DatasetStyle {
+func (c *DatasetParamsClient) GetX(ctx context.Context, id int) *DatasetParams {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -565,25 +565,25 @@ func (c *DatasetStyleClient) GetX(ctx context.Context, id int) *DatasetStyle {
 	return obj
 }
 
-// QueryDataset queries the dataset edge of a DatasetStyle.
-func (c *DatasetStyleClient) QueryDataset(ds *DatasetStyle) *DatasetQuery {
+// QueryDataset queries the dataset edge of a DatasetParams.
+func (c *DatasetParamsClient) QueryDataset(dp *DatasetParams) *DatasetQuery {
 	query := &DatasetQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
-		id := ds.ID
+		id := dp.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(datasetstyle.Table, datasetstyle.FieldID, id),
+			sqlgraph.From(datasetparams.Table, datasetparams.FieldID, id),
 			sqlgraph.To(dataset.Table, dataset.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, datasetstyle.DatasetTable, datasetstyle.DatasetColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, datasetparams.DatasetTable, datasetparams.DatasetColumn),
 		)
-		fromV = sqlgraph.Neighbors(ds.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(dp.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // Hooks returns the client hooks.
-func (c *DatasetStyleClient) Hooks() []Hook {
-	return c.hooks.DatasetStyle
+func (c *DatasetParamsClient) Hooks() []Hook {
+	return c.hooks.DatasetParams
 }
 
 // IndicatorClient is a client for the Indicator schema.

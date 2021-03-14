@@ -26,7 +26,7 @@ type config struct {
 type hooks struct {
 	Correlation         []ent.Hook
 	Dataset             []ent.Hook
-	DatasetStyle        []ent.Hook
+	DatasetParams       []ent.Hook
 	Indicator           []ent.Hook
 	IndicatorValueAlias []ent.Hook
 	Observation         []ent.Hook

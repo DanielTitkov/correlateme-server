@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/correlation"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dataset"
-	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/datasetstyle"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/datasetparams"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/observation"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/predicate"
@@ -111,23 +111,23 @@ func (du *DatasetUpdate) AddObservations(o ...*Observation) *DatasetUpdate {
 	return du.AddObservationIDs(ids...)
 }
 
-// SetStyleID sets the "style" edge to the DatasetStyle entity by ID.
-func (du *DatasetUpdate) SetStyleID(id int) *DatasetUpdate {
-	du.mutation.SetStyleID(id)
+// SetDatasetParamsID sets the "dataset_params" edge to the DatasetParams entity by ID.
+func (du *DatasetUpdate) SetDatasetParamsID(id int) *DatasetUpdate {
+	du.mutation.SetDatasetParamsID(id)
 	return du
 }
 
-// SetNillableStyleID sets the "style" edge to the DatasetStyle entity by ID if the given value is not nil.
-func (du *DatasetUpdate) SetNillableStyleID(id *int) *DatasetUpdate {
+// SetNillableDatasetParamsID sets the "dataset_params" edge to the DatasetParams entity by ID if the given value is not nil.
+func (du *DatasetUpdate) SetNillableDatasetParamsID(id *int) *DatasetUpdate {
 	if id != nil {
-		du = du.SetStyleID(*id)
+		du = du.SetDatasetParamsID(*id)
 	}
 	return du
 }
 
-// SetStyle sets the "style" edge to the DatasetStyle entity.
-func (du *DatasetUpdate) SetStyle(d *DatasetStyle) *DatasetUpdate {
-	return du.SetStyleID(d.ID)
+// SetDatasetParams sets the "dataset_params" edge to the DatasetParams entity.
+func (du *DatasetUpdate) SetDatasetParams(d *DatasetParams) *DatasetUpdate {
+	return du.SetDatasetParamsID(d.ID)
 }
 
 // SetIndicatorID sets the "indicator" edge to the Indicator entity by ID.
@@ -228,9 +228,9 @@ func (du *DatasetUpdate) RemoveObservations(o ...*Observation) *DatasetUpdate {
 	return du.RemoveObservationIDs(ids...)
 }
 
-// ClearStyle clears the "style" edge to the DatasetStyle entity.
-func (du *DatasetUpdate) ClearStyle() *DatasetUpdate {
-	du.mutation.ClearStyle()
+// ClearDatasetParams clears the "dataset_params" edge to the DatasetParams entity.
+func (du *DatasetUpdate) ClearDatasetParams() *DatasetUpdate {
+	du.mutation.ClearDatasetParams()
 	return du
 }
 
@@ -527,33 +527,33 @@ func (du *DatasetUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if du.mutation.StyleCleared() {
+	if du.mutation.DatasetParamsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   dataset.StyleTable,
-			Columns: []string{dataset.StyleColumn},
+			Table:   dataset.DatasetParamsTable,
+			Columns: []string{dataset.DatasetParamsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: datasetstyle.FieldID,
+					Column: datasetparams.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := du.mutation.StyleIDs(); len(nodes) > 0 {
+	if nodes := du.mutation.DatasetParamsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   dataset.StyleTable,
-			Columns: []string{dataset.StyleColumn},
+			Table:   dataset.DatasetParamsTable,
+			Columns: []string{dataset.DatasetParamsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: datasetstyle.FieldID,
+					Column: datasetparams.FieldID,
 				},
 			},
 		}
@@ -729,23 +729,23 @@ func (duo *DatasetUpdateOne) AddObservations(o ...*Observation) *DatasetUpdateOn
 	return duo.AddObservationIDs(ids...)
 }
 
-// SetStyleID sets the "style" edge to the DatasetStyle entity by ID.
-func (duo *DatasetUpdateOne) SetStyleID(id int) *DatasetUpdateOne {
-	duo.mutation.SetStyleID(id)
+// SetDatasetParamsID sets the "dataset_params" edge to the DatasetParams entity by ID.
+func (duo *DatasetUpdateOne) SetDatasetParamsID(id int) *DatasetUpdateOne {
+	duo.mutation.SetDatasetParamsID(id)
 	return duo
 }
 
-// SetNillableStyleID sets the "style" edge to the DatasetStyle entity by ID if the given value is not nil.
-func (duo *DatasetUpdateOne) SetNillableStyleID(id *int) *DatasetUpdateOne {
+// SetNillableDatasetParamsID sets the "dataset_params" edge to the DatasetParams entity by ID if the given value is not nil.
+func (duo *DatasetUpdateOne) SetNillableDatasetParamsID(id *int) *DatasetUpdateOne {
 	if id != nil {
-		duo = duo.SetStyleID(*id)
+		duo = duo.SetDatasetParamsID(*id)
 	}
 	return duo
 }
 
-// SetStyle sets the "style" edge to the DatasetStyle entity.
-func (duo *DatasetUpdateOne) SetStyle(d *DatasetStyle) *DatasetUpdateOne {
-	return duo.SetStyleID(d.ID)
+// SetDatasetParams sets the "dataset_params" edge to the DatasetParams entity.
+func (duo *DatasetUpdateOne) SetDatasetParams(d *DatasetParams) *DatasetUpdateOne {
+	return duo.SetDatasetParamsID(d.ID)
 }
 
 // SetIndicatorID sets the "indicator" edge to the Indicator entity by ID.
@@ -846,9 +846,9 @@ func (duo *DatasetUpdateOne) RemoveObservations(o ...*Observation) *DatasetUpdat
 	return duo.RemoveObservationIDs(ids...)
 }
 
-// ClearStyle clears the "style" edge to the DatasetStyle entity.
-func (duo *DatasetUpdateOne) ClearStyle() *DatasetUpdateOne {
-	duo.mutation.ClearStyle()
+// ClearDatasetParams clears the "dataset_params" edge to the DatasetParams entity.
+func (duo *DatasetUpdateOne) ClearDatasetParams() *DatasetUpdateOne {
+	duo.mutation.ClearDatasetParams()
 	return duo
 }
 
@@ -1150,33 +1150,33 @@ func (duo *DatasetUpdateOne) sqlSave(ctx context.Context) (_node *Dataset, err e
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if duo.mutation.StyleCleared() {
+	if duo.mutation.DatasetParamsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   dataset.StyleTable,
-			Columns: []string{dataset.StyleColumn},
+			Table:   dataset.DatasetParamsTable,
+			Columns: []string{dataset.DatasetParamsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: datasetstyle.FieldID,
+					Column: datasetparams.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := duo.mutation.StyleIDs(); len(nodes) > 0 {
+	if nodes := duo.mutation.DatasetParamsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   dataset.StyleTable,
-			Columns: []string{dataset.StyleColumn},
+			Table:   dataset.DatasetParamsTable,
+			Columns: []string{dataset.DatasetParamsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: datasetstyle.FieldID,
+					Column: datasetparams.FieldID,
 				},
 			},
 		}

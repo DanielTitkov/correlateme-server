@@ -9,7 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dataset"
-	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/datasetstyle"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/datasetparams"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/user"
 )
@@ -42,8 +42,8 @@ type DatasetEdges struct {
 	Right []*Correlation `json:"right,omitempty"`
 	// Observations holds the value of the observations edge.
 	Observations []*Observation `json:"observations,omitempty"`
-	// Style holds the value of the style edge.
-	Style *DatasetStyle `json:"style,omitempty"`
+	// DatasetParams holds the value of the dataset_params edge.
+	DatasetParams *DatasetParams `json:"dataset_params,omitempty"`
 	// Indicator holds the value of the indicator edge.
 	Indicator *Indicator `json:"indicator,omitempty"`
 	// User holds the value of the user edge.
@@ -80,18 +80,18 @@ func (e DatasetEdges) ObservationsOrErr() ([]*Observation, error) {
 	return nil, &NotLoadedError{edge: "observations"}
 }
 
-// StyleOrErr returns the Style value or an error if the edge
+// DatasetParamsOrErr returns the DatasetParams value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e DatasetEdges) StyleOrErr() (*DatasetStyle, error) {
+func (e DatasetEdges) DatasetParamsOrErr() (*DatasetParams, error) {
 	if e.loadedTypes[3] {
-		if e.Style == nil {
-			// The edge style was loaded in eager-loading,
+		if e.DatasetParams == nil {
+			// The edge dataset_params was loaded in eager-loading,
 			// but was not found.
-			return nil, &NotFoundError{label: datasetstyle.Label}
+			return nil, &NotFoundError{label: datasetparams.Label}
 		}
-		return e.Style, nil
+		return e.DatasetParams, nil
 	}
-	return nil, &NotLoadedError{edge: "style"}
+	return nil, &NotLoadedError{edge: "dataset_params"}
 }
 
 // IndicatorOrErr returns the Indicator value or an error if the edge
@@ -219,9 +219,9 @@ func (d *Dataset) QueryObservations() *ObservationQuery {
 	return (&DatasetClient{config: d.config}).QueryObservations(d)
 }
 
-// QueryStyle queries the "style" edge of the Dataset entity.
-func (d *Dataset) QueryStyle() *DatasetStyleQuery {
-	return (&DatasetClient{config: d.config}).QueryStyle(d)
+// QueryDatasetParams queries the "dataset_params" edge of the Dataset entity.
+func (d *Dataset) QueryDatasetParams() *DatasetParamsQuery {
+	return (&DatasetClient{config: d.config}).QueryDatasetParams(d)
 }
 
 // QueryIndicator queries the "indicator" edge of the Dataset entity.

@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/correlation"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dataset"
-	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/datasetstyle"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/datasetparams"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/observation"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/user"
@@ -126,23 +126,23 @@ func (dc *DatasetCreate) AddObservations(o ...*Observation) *DatasetCreate {
 	return dc.AddObservationIDs(ids...)
 }
 
-// SetStyleID sets the "style" edge to the DatasetStyle entity by ID.
-func (dc *DatasetCreate) SetStyleID(id int) *DatasetCreate {
-	dc.mutation.SetStyleID(id)
+// SetDatasetParamsID sets the "dataset_params" edge to the DatasetParams entity by ID.
+func (dc *DatasetCreate) SetDatasetParamsID(id int) *DatasetCreate {
+	dc.mutation.SetDatasetParamsID(id)
 	return dc
 }
 
-// SetNillableStyleID sets the "style" edge to the DatasetStyle entity by ID if the given value is not nil.
-func (dc *DatasetCreate) SetNillableStyleID(id *int) *DatasetCreate {
+// SetNillableDatasetParamsID sets the "dataset_params" edge to the DatasetParams entity by ID if the given value is not nil.
+func (dc *DatasetCreate) SetNillableDatasetParamsID(id *int) *DatasetCreate {
 	if id != nil {
-		dc = dc.SetStyleID(*id)
+		dc = dc.SetDatasetParamsID(*id)
 	}
 	return dc
 }
 
-// SetStyle sets the "style" edge to the DatasetStyle entity.
-func (dc *DatasetCreate) SetStyle(d *DatasetStyle) *DatasetCreate {
-	return dc.SetStyleID(d.ID)
+// SetDatasetParams sets the "dataset_params" edge to the DatasetParams entity.
+func (dc *DatasetCreate) SetDatasetParams(d *DatasetParams) *DatasetCreate {
+	return dc.SetDatasetParamsID(d.ID)
 }
 
 // SetIndicatorID sets the "indicator" edge to the Indicator entity by ID.
@@ -371,17 +371,17 @@ func (dc *DatasetCreate) createSpec() (*Dataset, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := dc.mutation.StyleIDs(); len(nodes) > 0 {
+	if nodes := dc.mutation.DatasetParamsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   dataset.StyleTable,
-			Columns: []string{dataset.StyleColumn},
+			Table:   dataset.DatasetParamsTable,
+			Columns: []string{dataset.DatasetParamsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: datasetstyle.FieldID,
+					Column: datasetparams.FieldID,
 				},
 			},
 		}

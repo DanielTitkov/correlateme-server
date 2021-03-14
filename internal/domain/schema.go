@@ -47,12 +47,22 @@ type (
 		CreateTime   time.Time
 		UpdateTime   time.Time
 		Observations []*Observation
+		Params       *DatasetParams
 		Source       string // user input or external system
 		Shared       bool   // if dataset can be shared between all users
 	}
+	// DatasetParams holds various dataset options
+	DatasetParams struct {
+		Style       DatasetStyle
+		Aggregation DatasetAggregation
+	}
 	// DatasetStyle holds dataset apperance params for site/app
 	DatasetStyle struct {
-		Color string
+		Color string `json:"color,omitempty"`
+	}
+	// DatasetAggregation holds params for aggregation
+	DatasetAggregation struct {
+		IncludeZeroValues bool `json:"includeZeroValues"` // use zero values in aggregations
 	}
 	// Observation is a data point for an indicator
 	Observation struct {
