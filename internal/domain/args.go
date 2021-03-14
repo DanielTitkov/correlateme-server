@@ -62,10 +62,10 @@ type (
 	// Correlation
 
 	UpdateCorrelationsArgs struct {
-		UserID     int
-		WithShared bool
-		// Granularity string
-		Method string // pearson, spearman or auto
+		UserID      int
+		WithShared  bool
+		Granularity string
+		Method      string // pearson, spearman or auto
 	}
 
 	GetCorrelationMatrixArgs struct {

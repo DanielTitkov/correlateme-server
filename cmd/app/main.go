@@ -57,6 +57,7 @@ func main() {
 	}
 	j := job.New(cfg, logger, app)
 	go j.ListenUpdateUserCorrelationsChannel()
+	go j.ListenUpdateDatasetAggregationsChannel()
 
 	// prometheus
 	go func() {

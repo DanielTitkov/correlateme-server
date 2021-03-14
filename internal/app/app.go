@@ -25,7 +25,8 @@ type (
 	}
 	// Channels holds app channels for async jobs
 	Channels struct {
-		UpdateUserCorrelationsChan chan domain.UpdateCorrelationsArgs
+		UpdateUserCorrelationsChan    chan domain.UpdateCorrelationsArgs
+		UpdateDatasetAggregationsChan chan domain.UpdateAggregationsArgs
 	}
 	// Repository stores data
 	Repository interface {
@@ -84,7 +85,7 @@ func NewApp(
 	}
 	app.cache = cache
 
-	channels, err := app.buildChannels()
+	channels, err := app.makeChannels()
 	if err != nil {
 		return nil, err
 	}
@@ -114,9 +115,11 @@ func (a *App) buildCache() (*Cache, error) {
 	return &cache, nil
 }
 
-func (a *App) buildChannels() (*Channels, error) {
+func (a *App) makeChannels() (*Channels, error) {
 	updateCorrelationsChan := make(chan domain.UpdateCorrelationsArgs, a.cfg.App.UpdateCorrelationsBuffer)
+	updateAggregationsChan := make(chan domain.UpdateAggregationsArgs, a.cfg.App.UpdateAggregationsBuffer)
 	return &Channels{
-		UpdateUserCorrelationsChan: updateCorrelationsChan,
+		UpdateUserCorrelationsChan:    updateCorrelationsChan,
+		UpdateDatasetAggregationsChan: updateAggregationsChan,
 	}, nil
 }

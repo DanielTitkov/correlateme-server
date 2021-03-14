@@ -8,7 +8,7 @@ import (
 
 func (j *Job) ListenUpdateUserCorrelationsChannel() {
 	for args := range j.app.Channels.UpdateUserCorrelationsChan {
-		msg := fmt.Sprintf("user correlation with args: %+v", args)
+		msg := fmt.Sprintf("user correlations with args: %+v", args)
 		j.logger.Info("got request to update correlations", msg)
 		err := j.app.UpdateCorrelations(args)
 		metrics.UnprocessedUpdateCorrelationsRequests.Add(-1)

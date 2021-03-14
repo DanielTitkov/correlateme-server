@@ -28,9 +28,10 @@ func (a *App) CreateOrUpdateObservation(args domain.CreateOrUpdateObservationArg
 	}
 
 	_, err = a.repo.CreateOrUpdateObservation(&domain.Observation{
-		Value:   args.Value,
-		Dataset: dataset,
-		Date:    args.Date,
+		Value:       args.Value,
+		Dataset:     dataset,
+		Date:        args.Date,
+		Granularity: domain.GranularityDay, // only daily observations can be created by user
 	})
 	if err != nil {
 		return err
@@ -38,11 +39,19 @@ func (a *App) CreateOrUpdateObservation(args domain.CreateOrUpdateObservationArg
 
 	go func() {
 		// TODO: add timeout
+		// update correlations for all user datasets
 		metrics.UnprocessedUpdateCorrelationsRequests.Add(1)
 		a.Channels.UpdateUserCorrelationsChan <- domain.UpdateCorrelationsArgs{
-			UserID:     args.UserID,
-			WithShared: true,
-			Method:     "auto",
+			UserID:      args.UserID,
+			WithShared:  true,
+			Method:      "auto",
+			Granularity: domain.GranularityDay,
+		}
+		// update aggregations for current dataset
+		metrics.UnprocessedUpdateAggregationsRequests.Add(1)
+		a.Channels.UpdateDatasetAggregationsChan <- domain.UpdateAggregationsArgs{
+			UserID:    args.UserID,
+			DatasetID: dataset.ID,
 		}
 	}()
 
