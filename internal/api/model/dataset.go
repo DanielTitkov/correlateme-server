@@ -8,8 +8,9 @@ type (
 		ID           int                       `json:"id,omitempty"`
 		Source       string                    `json:"source,omitempty"`
 		Shared       bool                      `json:"shared,omitempty"`
-		Observations []Observation             `json:"observations,omitempty"`
+		Granularity  string                    `json:"granularity"`
 		Style        domain.DatasetStyle       `json:"style,omitempty"`
 		Aggregation  domain.DatasetAggregation `json:"aggregation,omitempty"`
+		Observations []Observation             `json:"observations,omitempty"`
 	}
 )

@@ -104,6 +104,7 @@ func (h *Handler) GetIndicators(c echo.Context) error {
 			dataset = &model.Dataset{
 				ID:           i.UserDataset.ID,
 				Observations: observations,
+				Granularity:  i.UserDataset.Observations[0].Granularity,
 			}
 			if i.UserDataset.Params != nil {
 				dataset.Style = i.UserDataset.Params.Style
