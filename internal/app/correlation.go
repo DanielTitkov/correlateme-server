@@ -1,6 +1,7 @@
 package app
 
 import (
+	"errors"
 	"fmt"
 	"math"
 	"time"
@@ -84,6 +85,9 @@ func (a *App) UpdateCorrelations(args domain.UpdateCorrelationsArgs) error {
 
 	// map datasets
 	datasetMap := mapDatasets(datasets) // TODO: create combination method for ints to remove conversion
+	if len(datasetMap) < 2 {
+		return errors.New("to few datasets to calculate correlations")
+	}
 
 	// get dataset ids
 	var datasetIDs []string
@@ -120,13 +124,15 @@ func (a *App) UpdateCorrelations(args domain.UpdateCorrelationsArgs) error {
 			continue
 		}
 		correlation := domain.Correlation{
-			Left:  left,
-			Right: right,
-			Coef:  coef,
-			P:     p,
-			Type:  domain.SpearmanCorrelationType,
-			R2:    math.Pow(coef, 2),
+			Left:        left,
+			Right:       right,
+			Coef:        coef,
+			P:           p,
+			Type:        domain.SpearmanCorrelationType,
+			R2:          math.Pow(coef, 2),
+			Granularity: args.Granularity,
 		}
+		fmt.Println("CORR", correlation) // FIXME
 
 		// save correlations to db
 		_, err = a.repo.CreateOrUpdateCorrelation(&correlation)

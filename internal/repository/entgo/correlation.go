@@ -20,10 +20,12 @@ func (r *EntgoRepository) CreateOrUpdateCorrelation(c *domain.Correlation) (*dom
 				correlation.And(
 					correlation.HasLeftWith(dataset.IDEQ(c.Left.ID)),
 					correlation.HasRightWith(dataset.IDEQ(c.Right.ID)),
+					correlation.GranularityEQ(correlation.Granularity(c.Granularity)),
 				),
 				correlation.And(
 					correlation.HasLeftWith(dataset.IDEQ(c.Right.ID)),
 					correlation.HasRightWith(dataset.IDEQ(c.Left.ID)),
+					correlation.GranularityEQ(correlation.Granularity(c.Granularity)),
 				),
 			)).
 		Only(context.TODO())
@@ -40,6 +42,7 @@ func (r *EntgoRepository) CreateOrUpdateCorrelation(c *domain.Correlation) (*dom
 			SetType(c.Type).
 			SetP(c.P).
 			SetR2(c.R2).
+			SetGranularity(correlation.Granularity(c.Granularity)).
 			Save(context.TODO())
 		if err != nil {
 			return nil, err

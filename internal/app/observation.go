@@ -47,6 +47,10 @@ func (a *App) CreateOrUpdateObservation(args domain.CreateOrUpdateObservationArg
 			Method:      "auto",
 			Granularity: domain.GranularityDay,
 		}
+	}()
+
+	go func() {
+		// TODO: add timeout
 		// update aggregations for current dataset
 		metrics.UnprocessedUpdateAggregationsRequests.Add(1)
 		a.Channels.UpdateDatasetAggregationsChan <- domain.UpdateAggregationsArgs{

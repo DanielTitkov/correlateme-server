@@ -44,14 +44,14 @@ var (
 		},
 		Indexes: []*schema.Index{
 			{
-				Name:    "correlation_dataset_left_dataset_right",
+				Name:    "correlation_granularity_dataset_left_dataset_right",
 				Unique:  true,
-				Columns: []*schema.Column{CorrelationsColumns[8], CorrelationsColumns[9]},
+				Columns: []*schema.Column{CorrelationsColumns[7], CorrelationsColumns[8], CorrelationsColumns[9]},
 			},
 			{
-				Name:    "correlation_dataset_right_dataset_left",
+				Name:    "correlation_granularity_dataset_right_dataset_left",
 				Unique:  true,
-				Columns: []*schema.Column{CorrelationsColumns[9], CorrelationsColumns[8]},
+				Columns: []*schema.Column{CorrelationsColumns[7], CorrelationsColumns[9], CorrelationsColumns[8]},
 			},
 		},
 	}

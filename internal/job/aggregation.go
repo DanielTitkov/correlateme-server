@@ -3,6 +3,7 @@ package job
 import (
 	"fmt"
 
+	"github.com/DanielTitkov/correlateme-server/internal/domain"
 	"github.com/DanielTitkov/correlateme-server/internal/service/metrics"
 )
 
@@ -17,5 +18,23 @@ func (j *Job) ListenUpdateDatasetAggregationsChannel() {
 			continue
 		}
 		j.logger.Info("updated aggregations", msg)
+		go func(args domain.UpdateAggregationsArgs) {
+			// update correlations for all user datasets with granularity == week
+			metrics.UnprocessedUpdateCorrelationsRequests.Add(1)
+			j.app.Channels.UpdateUserCorrelationsChan <- domain.UpdateCorrelationsArgs{
+				UserID:      args.UserID,
+				WithShared:  true,
+				Method:      "auto",
+				Granularity: domain.GranularityWeek,
+			}
+			// update correlations for all user datasets with granularity == month
+			metrics.UnprocessedUpdateCorrelationsRequests.Add(1)
+			j.app.Channels.UpdateUserCorrelationsChan <- domain.UpdateCorrelationsArgs{
+				UserID:      args.UserID,
+				WithShared:  true,
+				Method:      "auto",
+				Granularity: domain.GranularityMonth,
+			}
+		}(args)
 	}
 }

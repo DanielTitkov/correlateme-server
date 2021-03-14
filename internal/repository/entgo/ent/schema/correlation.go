@@ -41,8 +41,8 @@ func (Correlation) Edges() []ent.Edge {
 
 func (Correlation) Indexes() []ent.Index {
 	return []ent.Index{
-		index.Edges("left", "right").Unique(),
-		index.Edges("right", "left").Unique(),
+		index.Fields("granularity").Edges("left", "right").Unique(),
+		index.Fields("granularity").Edges("right", "left").Unique(),
 	}
 }
 
