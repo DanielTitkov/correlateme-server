@@ -35,7 +35,7 @@ func (a *App) GetCorrelationMatrix(args domain.GetCorrelationMatrixArgs) (*domai
 		return nil, err
 	}
 
-	correlations, err := a.repo.GetUserCorrelations(args.UserID)
+	correlations, err := a.repo.GetUserCorrelations(args.UserID, args.Granularity)
 	if err != nil {
 		return nil, err
 	}

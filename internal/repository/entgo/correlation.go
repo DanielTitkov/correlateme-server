@@ -64,13 +64,14 @@ func (r *EntgoRepository) CreateOrUpdateCorrelation(c *domain.Correlation) (*dom
 	return entToDomainCorrelation(corr), nil
 }
 
-func (r *EntgoRepository) GetUserCorrelations(userID int) ([]*domain.Correlation, error) {
+func (r *EntgoRepository) GetUserCorrelations(userID int, granularity string) ([]*domain.Correlation, error) {
 	corrs, err := r.client.Correlation.
 		Query().
 		Where(correlation.Or( // TODO: maybe And?
 			correlation.HasLeftWith(dataset.HasUserWith(user.IDEQ(userID))),
 			correlation.HasRightWith(dataset.HasUserWith(user.IDEQ(userID))),
 		)).
+		Where(correlation.GranularityEQ(correlation.Granularity(granularity))).
 		WithLeft(func(q *ent.DatasetQuery) {
 			q.WithIndicator()
 		}).

@@ -23,9 +23,15 @@ func (h *Handler) GetCorrelationMatrix(c echo.Context) error {
 		})
 	}
 
+	granularity := domain.GranularityDay
+	if request.Granularity != "" {
+		granularity = request.Granularity
+	}
+
 	matrix, err := h.app.GetCorrelationMatrix(domain.GetCorrelationMatrixArgs{
-		UserID:     userID,
-		WithShared: request.WithShared,
+		UserID:      userID,
+		WithShared:  request.WithShared,
+		Granularity: granularity,
 	})
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, model.ErrorResponse{
@@ -62,8 +68,9 @@ func (h *Handler) GetCorrelationMatrix(c echo.Context) error {
 	}
 
 	return c.JSON(http.StatusOK, model.GetCorrelationMatrixResponse{
-		Header: header,
-		Body:   body,
+		Granularity: granularity,
+		Header:      header,
+		Body:        body,
 	})
 }
 

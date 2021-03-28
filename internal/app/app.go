@@ -59,7 +59,7 @@ type (
 
 		// correlations
 		CreateOrUpdateCorrelation(*domain.Correlation) (*domain.Correlation, error)
-		GetUserCorrelations(userID int) ([]*domain.Correlation, error)
+		GetUserCorrelations(userID int, granularity string) ([]*domain.Correlation, error)
 		GetCorrelation(domain.GetCorrelationArgs) (*domain.Correlation, error)
 	}
 )

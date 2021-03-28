@@ -24,11 +24,13 @@ type (
 		WithShared bool `json:"withShared"`
 	}
 	GetCorrelationMatrixRequest struct {
-		WithShared bool `json:"withShared"`
+		Granularity string `json:"granularity"`
+		WithShared  bool   `json:"withShared"`
 	}
 	GetCorrelationMatrixResponse struct {
-		Header []GetCorrelationMatrixResponseHeaderItem `json:"header"`
-		Body   [][]GetCorrelationMatrixResponseBodyItem `json:"body"`
+		Granularity string                                   `json:"granularity"`
+		Header      []GetCorrelationMatrixResponseHeaderItem `json:"header"`
+		Body        [][]GetCorrelationMatrixResponseBodyItem `json:"body"`
 	}
 	GetCorrelationMatrixResponseHeaderItem struct {
 		IndicatorID    int    `json:"indicatorID"`
