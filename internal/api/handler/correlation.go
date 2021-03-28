@@ -81,6 +81,8 @@ func (h *Handler) GetCorrelation(c echo.Context) error {
 		})
 	}
 
+	// TODO: check if user exists?
+
 	corr, err := h.app.GetCorrelation(domain.GetCorrelationArgs{
 		ID:               request.ID,
 		UserID:           userID,
@@ -96,14 +98,15 @@ func (h *Handler) GetCorrelation(c echo.Context) error {
 
 	response := model.GetCorrelationResponse{
 		Correlation: model.Correlation{
-			ID:         corr.ID,
-			Coef:       corr.Coef,
-			P:          corr.P,
-			R2:         corr.R2,
-			Type:       corr.Type,
-			UpdateTime: corr.UpdateTime,
-			Left:       domainToApiDataset(corr.Left),
-			Right:      domainToApiDataset(corr.Right),
+			ID:          corr.ID,
+			Coef:        corr.Coef,
+			P:           corr.P,
+			R2:          corr.R2,
+			Type:        corr.Type,
+			Granularity: corr.Granularity,
+			UpdateTime:  corr.UpdateTime,
+			Left:        domainToApiDataset(corr.Left, corr.Granularity),
+			Right:       domainToApiDataset(corr.Right, corr.Granularity),
 		},
 	}
 
@@ -141,7 +144,7 @@ func (h *Handler) FindUserCorrelations(c echo.Context) error {
 	})
 }
 
-func domainToApiDataset(ds *domain.Dataset) *model.Dataset {
+func domainToApiDataset(ds *domain.Dataset, granularity string) *model.Dataset {
 	if ds == nil {
 		return nil
 	}
@@ -161,6 +164,7 @@ func domainToApiDataset(ds *domain.Dataset) *model.Dataset {
 		ID:           ds.ID,
 		Source:       ds.Source,
 		Shared:       ds.Shared,
+		Granularity:  granularity,
 		Observations: observations,
 	}
 }

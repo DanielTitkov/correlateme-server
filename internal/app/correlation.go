@@ -13,6 +13,7 @@ import (
 )
 
 func (a *App) GetCorrelation(args domain.GetCorrelationArgs) (*domain.Correlation, error) {
+	args.ObservationLimit = a.cfg.App.DefaultObservationLimit
 	corr, err := a.repo.GetCorrelation(args)
 	if err != nil {
 		return nil, err

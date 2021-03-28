@@ -7,6 +7,7 @@ import (
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/correlation"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dataset"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/observation"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/user"
 )
 
@@ -98,18 +99,29 @@ func (r *EntgoRepository) GetCorrelation(args domain.GetCorrelationArgs) (*domai
 			correlation.HasRightWith(dataset.HasUserWith(user.IDEQ(args.UserID))),
 		))
 
+	// need to know correlation granularity.
+	// TODO: this is ugly, maybe there is a better way?
+	corr, err := query.Only(context.TODO())
+	if err != nil {
+		return nil, err
+	}
+
 	if args.WithDatasets {
 		var dsQuery func(q *ent.DatasetQuery)
 		if args.WithObservations {
 			dsQuery = func(q *ent.DatasetQuery) {
-				q.WithObservations()
+				q.WithObservations(func(q *ent.ObservationQuery) {
+					q.Limit(args.ObservationLimit)
+					q.Where(observation.GranularityEQ(observation.Granularity(corr.Granularity)))
+					q.Order(ent.Asc(observation.FieldDate))
+				})
 			}
 		}
 		query.WithLeft(dsQuery)
 		query.WithRight(dsQuery)
 	}
 
-	corr, err := query.Only(context.TODO())
+	corr, err = query.Only(context.TODO())
 	if err != nil {
 		return nil, err
 	}

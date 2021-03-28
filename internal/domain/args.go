@@ -79,5 +79,6 @@ type (
 		UserID           int
 		WithDatasets     bool
 		WithObservations bool
+		ObservationLimit int
 	}
 )

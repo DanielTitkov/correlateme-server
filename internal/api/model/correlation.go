@@ -5,14 +5,15 @@ import "time"
 type (
 	// Correlation is a common model to use in various methods
 	Correlation struct {
-		ID         int       `json:"correlationID"`
-		Coef       float64   `json:"coef"`
-		P          float64   `json:"p"`
-		R2         float64   `json:"r2"`
-		Type       string    `json:"type"`
-		UpdateTime time.Time `json:"updateTime"`
-		Left       *Dataset  `json:"left,omitempty"`
-		Right      *Dataset  `json:"right,omitempty"`
+		ID          int       `json:"correlationID"`
+		Coef        float64   `json:"coef"`
+		P           float64   `json:"p"`
+		R2          float64   `json:"r2"`
+		Type        string    `json:"type"`
+		Granularity string    `json:"granularity"`
+		UpdateTime  time.Time `json:"updateTime"`
+		Left        *Dataset  `json:"left,omitempty"`
+		Right       *Dataset  `json:"right,omitempty"`
 	}
 )
 
