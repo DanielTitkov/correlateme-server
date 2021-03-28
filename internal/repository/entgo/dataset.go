@@ -46,7 +46,7 @@ func (r *EntgoRepository) GetDatasetByID(id int, observationsLimit int, granular
 			} else {
 				q.Where(observation.GranularityEQ(observation.Granularity(domain.GranularityDay)))
 			}
-			q.Order(ent.Asc(observation.FieldDate))
+			q.Order(ent.Desc(observation.FieldDate))
 		})
 	}
 
@@ -71,7 +71,7 @@ func (r *EntgoRepository) GetUserDatasets(userID int, withShared bool, observati
 			} else {
 				q.Where(observation.GranularityEQ(observation.Granularity(domain.GranularityDay)))
 			}
-			q.Order(ent.Asc(observation.FieldDate))
+			q.Order(ent.Desc(observation.FieldDate))
 		})
 	}
 
@@ -110,7 +110,7 @@ func (r *EntgoRepository) GetDatasets(args domain.GetDatasetsArgs) ([]*domain.Da
 			} else {
 				q.Where(observation.GranularityEQ(observation.Granularity(domain.GranularityDay)))
 			}
-			q.Order(ent.Asc(observation.FieldDate))
+			q.Order(ent.Desc(observation.FieldDate))
 		})
 	}
 

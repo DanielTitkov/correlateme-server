@@ -114,7 +114,7 @@ func (r *EntgoRepository) GetCorrelation(args domain.GetCorrelationArgs) (*domai
 				q.WithObservations(func(q *ent.ObservationQuery) {
 					q.Limit(args.ObservationLimit)
 					q.Where(observation.GranularityEQ(observation.Granularity(corr.Granularity)))
-					q.Order(ent.Asc(observation.FieldDate))
+					q.Order(ent.Desc(observation.FieldDate))
 				})
 			}
 		}

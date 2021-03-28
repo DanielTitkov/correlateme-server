@@ -19,6 +19,9 @@ func (a *App) GetCorrelation(args domain.GetCorrelationArgs) (*domain.Correlatio
 		return nil, err
 	}
 
+	corr.Left.Observations = orderObservationsAsc(corr.Left.Observations)
+	corr.Right.Observations = orderObservationsAsc(corr.Right.Observations)
+
 	return corr, nil
 }
 

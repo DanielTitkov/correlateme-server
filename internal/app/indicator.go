@@ -45,7 +45,16 @@ func (a *App) GetIndicators(args domain.GetIndicatorsArgs) ([]*domain.Indicator,
 		args.ObservationLimit = a.cfg.App.DefaultObservationLimit
 	}
 
-	return a.repo.GetIndicators(args)
+	inds, err := a.repo.GetIndicators(args)
+	if err != nil {
+		return nil, err
+	}
+
+	for _, ind := range inds {
+		ind.UserDataset.Observations = orderObservationsAsc(ind.UserDataset.Observations)
+	}
+
+	return inds, nil
 }
 
 func makeIndicatorCode(username, scaleType, title string) string {

@@ -2,6 +2,7 @@ package app
 
 import (
 	"errors"
+	"sort"
 	"time"
 
 	"github.com/DanielTitkov/correlateme-server/internal/domain"
@@ -159,4 +160,12 @@ func aggregateObservations(valueMap map[string][]float64, dataset *domain.Datase
 	}
 
 	return aggregatedObs, nil
+}
+
+// this is needed to get correct (asc) observations order with one request with limit
+func orderObservationsAsc(observations []*domain.Observation) []*domain.Observation {
+	sort.Slice(observations, func(i, j int) bool {
+		return observations[i].Date.Before(*observations[j].Date)
+	})
+	return observations
 }
