@@ -1,0 +1,38 @@
+version: '3.7'
+
+services:
+  app:
+    build:
+      context: ../..
+      dockerfile: deployments/docker/Dockerfile
+      # args:
+      #   ELASTIC_APM_SERVER_URL: http://apm-server:8200
+      #   ELASTIC_APM_SECRET_TOKEN: token
+    ports:
+      - "8000:8000"
+    command: "./app ./configs/docker.yml"
+    environment:
+      - ENV=docker
+      - CONFIG_PATH=configs/docker.yml
+    depends_on:
+      - postgres
+    networks:
+      - backend
+
+  postgres:
+    image: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_PASSWORD: pass
+      POSTGRES_USER: test
+      POSTGRES_DB: correlateme
+    volumes:
+      - database-data:/var/lib/postgresql/data/
+    networks:
+      - backend
+
+volumes:
+  database-data:
+
+networks:
+  backend: 

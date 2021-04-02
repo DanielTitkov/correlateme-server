@@ -17,3 +17,6 @@
 # Configs 
 configs/*
 !configs/default.*
+
+# binaries
+bin/*
