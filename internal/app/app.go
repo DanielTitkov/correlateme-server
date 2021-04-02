@@ -43,6 +43,7 @@ type (
 
 		// scales
 		GetScales() ([]*domain.Scale, error)
+		CreateScale(domain.Scale) (*domain.Scale, error)
 
 		// datasets
 		CreateDataset(*domain.Dataset) (*domain.Dataset, error)

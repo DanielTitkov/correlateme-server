@@ -22,6 +22,20 @@ func (r *EntgoRepository) GetScales() ([]*domain.Scale, error) {
 	return res, nil
 }
 
+func (r *EntgoRepository) CreateScale(s domain.Scale) (*domain.Scale, error) {
+	scale, err := r.client.Scale.
+		Create().
+		SetType(s.Type).
+		SetTitle(s.Title).
+		SetDescription(s.Description).
+		Save(context.TODO())
+
+	if err != nil {
+		return nil, err
+	}
+	return entToDomainScale(scale), nil
+}
+
 func entToDomainScale(s *ent.Scale) *domain.Scale {
 	return &domain.Scale{
 		ID:          s.ID,
