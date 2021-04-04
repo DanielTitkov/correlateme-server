@@ -5,21 +5,32 @@ import (
 
 	"github.com/DanielTitkov/correlateme-server/internal/domain"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/scale"
 )
 
 func (r *EntgoRepository) GetScales() ([]*domain.Scale, error) {
-	res := []*domain.Scale{}
-
 	scales, err := r.client.Scale.Query().All(context.TODO())
 	if err != nil {
-		return res, err
+		return nil, err
 	}
 
+	res := []*domain.Scale{}
 	for _, s := range scales {
 		res = append(res, entToDomainScale(s))
 	}
 
 	return res, nil
+}
+
+func (r *EntgoRepository) GetScaleByType(scaleType string) (*domain.Scale, error) {
+	scale, err := r.client.Scale.Query().
+		Where(scale.TypeEQ(scaleType)).
+		Only(context.TODO())
+	if err != nil {
+		return nil, err
+	}
+
+	return entToDomainScale(scale), nil
 }
 
 func (r *EntgoRepository) CreateScale(s domain.Scale) (*domain.Scale, error) {

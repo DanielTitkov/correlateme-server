@@ -43,6 +43,7 @@ type (
 
 		// scales
 		GetScales() ([]*domain.Scale, error)
+		GetScaleByType(string) (*domain.Scale, error)
 		CreateScale(domain.Scale) (*domain.Scale, error)
 
 		// datasets
@@ -78,6 +79,12 @@ func NewApp(
 		logger: logger,
 		repo:   repo,
 		cron:   c,
+	}
+
+	// TODO: maybe move it out from the constructor
+	err := app.initScales()
+	if err != nil {
+		return nil, err
 	}
 
 	cache, err := app.buildCache()

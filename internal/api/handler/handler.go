@@ -47,13 +47,6 @@ func (h *Handler) link(e *echo.Echo) {
 	v1Restricted.POST("/getCorrelationMatrix", h.GetCorrelationMatrix)
 	v1Restricted.POST("/getCorrelation", h.GetCorrelation)
 
-	// TODO
-	// v1Restricted.POST("/", h.GetDataset)
-	// v1Restricted.POST("/", h.GetCorrelation) // ?
-	// v1Restricted.POST("/", h.GetCorrelations) // ?
-	// v1Restricted.POST("/", h.)
-	// v1Restricted.POST("/", h.)
-
 	// dev endpoints for testing and debug
 	// not accessible on not-dev instances
 	if h.cfg.Env == "dev" {
