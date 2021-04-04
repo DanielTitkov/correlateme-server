@@ -8,12 +8,14 @@ on:
   pull_request:
 
 jobs:
+
+  # lint code with golangci-lint using built-in action
   lint:
     name: Lint
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - name: golangci-lint
+      - name: Golangci-lint
         uses: golangci/golangci-lint-action@v2
         with:
           # Optional: version of golangci-lint to use in form of v1.2 or v1.2.3 or `latest` to use the latest version
@@ -37,6 +39,7 @@ jobs:
           # Optional: if set to true then the action don't cache or restore ~/.cache/go-build.
           # skip-build-cache: true
 
+  # build go binary, this is actully not really needed, it just validates the code builds
   build:
     name: Build
     runs-on: ubuntu-latest 
@@ -53,7 +56,9 @@ jobs:
       - name: Build
         run: make build
 
-  build_and_pub:
+  # build docker and push it to docker registry
+  publish:
+    name: Publish
     needs: [lint, build]
     runs-on: ubuntu-latest 
     env:
@@ -62,7 +67,9 @@ jobs:
     steps:
       - name: Login to docker.io
         run:  echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_LOGIN }} --password-stdin
-      - uses: actions/checkout@v2
+
+      - name: Check out code
+        uses: actions/checkout@v2
       
       - name: Build image
         run: docker build -t $LOGIN/$NAME:${GITHUB_REF:11} -f deployments/docker/Dockerfile .
