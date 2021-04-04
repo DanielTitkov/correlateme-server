@@ -52,3 +52,19 @@ jobs:
 
       - name: Build
         run: make build
+
+  build_and_pub:
+    needs: [lint, build]
+    env:
+      LOGIN: ${{ secrets.DOCKER_LOGIN }}
+      NAME: ${{ secrets.DOCKER_NAME }}
+    steps:
+      - name: Login to docker.io
+        run:  echo ${{ secrets.DOCKER_PASSWORD }} | docker login -u ${{ secrets.DOCKER_LOGIN }} --password-stdin
+      - uses: actions/checkout@v2
+      
+      - name: Build image
+        run: docker build -t $LOGIN/$NAME:${GITHUB_REF} -f deployments/docker/Dockerfile .
+
+      - name: Push image to docker.io
+        run: docker push $LOGIN/$NAME:${GITHUB_REF} # :11
