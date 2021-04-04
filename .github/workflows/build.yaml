@@ -113,4 +113,5 @@ jobs:
         # key: ${{ secrets.SSHKEY }}
         envs: TAG
         script: | 
-          docker pull ${{ secrets.DOCKER_LOGIN }}/${{ secrets.DOCKER_NAME }}:$TAG
+          echo "version $TAG"
+          docker pull ${{ secrets.DOCKER_LOGIN }}/${{ secrets.DOCKER_NAME }}:${TAG}
