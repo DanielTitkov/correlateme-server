@@ -113,7 +113,5 @@ jobs:
         # key: ${{ secrets.SSHKEY }}
         envs: TAG
         script: | 
-          echo "version ${GITHUB_REF:11}"
-          echo "version ${GITHUB_REF}"
-          echo "${TAG:11}"
-        # docker pull ${{ secrets.DOCKER_LOGIN }}/${{ secrets.DOCKER_NAME }}:${{ GITHUB_REF:11 ]}
+          echo "container tag ${TAG:11}"
+          docker pull ${{ secrets.DOCKER_LOGIN }}/${{ secrets.DOCKER_NAME }}:${TAG:11}
