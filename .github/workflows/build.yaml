@@ -97,7 +97,7 @@ jobs:
   # tell server to pull new contaner and run it
   deploy:
     name: Deploy
-    needs: [lint, build, test, publish]
+    # needs: [lint, build, test, publish]
     runs-on: ubuntu-latest
     steps:
     - name: Execute remote command
