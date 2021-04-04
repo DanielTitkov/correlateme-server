@@ -22,7 +22,9 @@ entgen:
 
 .PHONY: build
 build:
+	echo "building"
 	${BUILD_CMD}
+	echo "build done"
 
 .PHONY: up
 up:
