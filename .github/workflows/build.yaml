@@ -65,7 +65,7 @@ jobs:
       - uses: actions/checkout@v2
       
       - name: Build image
-        run: docker build -t $LOGIN/$NAME:${GITHUB_REF} -f deployments/docker/Dockerfile .
+        run: docker build -t $LOGIN/$NAME:${GITHUB_REF:10} -f deployments/docker/Dockerfile .
 
       - name: Push image to docker.io
-        run: docker push $LOGIN/$NAME:${GITHUB_REF} # :11
+        run: docker push $LOGIN/$NAME:${GITHUB_REF:10} 
