@@ -100,7 +100,7 @@ jobs:
     # needs: [lint, build, test, publish]
     runs-on: ubuntu-latest
     env: 
-      TAG: ${{ github.ref:11 }}
+      TAG: ${{ github.ref }}
     steps:
     - name: Execute remote command
       uses: appleboy/ssh-action@master
