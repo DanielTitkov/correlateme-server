@@ -110,5 +110,4 @@ jobs:
         password: ${{ secrets.SSH_PASSWORD }}
         # key: ${{ secrets.SSHKEY }}
         script: | 
-          ls -ah
-          ls -as
+          docker pull ${{ secrets.DOCKER_LOGIN }}/${{ secrets.DOCKER_NAME }}:${GITHUB_REF:11}
