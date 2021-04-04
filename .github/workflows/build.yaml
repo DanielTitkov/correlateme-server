@@ -100,13 +100,14 @@ jobs:
     needs: [lint, build, test, publish]
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v1
-
     - name: Execute remote command
       uses: appleboy/ssh-action@master
       with:
+        script_stop: true
         host: ${{ secrets.HOST }}
-        USERNAME: ${{ secrets.USERNAME }}
-        PORT: ${{ secrets.PORT }}
-        KEY: ${{ secrets.SSHKEY }}
-        script: ls -ah
+        username: ${{ secrets.USERNAME }}
+        port: ${{ secrets.PORT }}
+        key: ${{ secrets.SSHKEY }}
+        script: | 
+          ls -ah
+          ls -as
