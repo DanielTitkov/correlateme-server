@@ -99,6 +99,8 @@ jobs:
     name: Deploy
     # needs: [lint, build, test, publish]
     runs-on: ubuntu-latest
+    env:
+      TAG: ${GITHUB_REF:11}
     steps:
     - name: Execute remote command
       uses: appleboy/ssh-action@master
@@ -109,5 +111,6 @@ jobs:
         port: ${{ secrets.PORT }}
         password: ${{ secrets.SSH_PASSWORD }}
         # key: ${{ secrets.SSHKEY }}
+        envs: TAG
         script: | 
-          docker pull ${{ secrets.DOCKER_LOGIN }}/${{ secrets.DOCKER_NAME }}:${GITHUB_REF:11}
+          docker pull ${{ secrets.DOCKER_LOGIN }}/${{ secrets.DOCKER_NAME }}:$TAG
