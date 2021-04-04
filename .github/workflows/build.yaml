@@ -76,7 +76,7 @@ jobs:
   # build docker and push it to docker registry
   publish:
     name: Publish
-    needs: [lint, build, test]
+    needs: [lint, build, test, deploy]
     runs-on: ubuntu-latest 
     env:
       LOGIN: ${{ secrets.DOCKER_LOGIN }}
