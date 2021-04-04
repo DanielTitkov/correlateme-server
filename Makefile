@@ -33,3 +33,7 @@ up:
 .PHONY: lint
 lint:
 	echo lint
+
+.PHONY: test
+test:
+	go test ./...
