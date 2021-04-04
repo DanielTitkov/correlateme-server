@@ -27,3 +27,7 @@ build:
 .PHONY: up
 up:
 	docker-compose -f ${DOCKER_COMPOSE_FILE} up --build
+
+.PHONY: lint
+lint:
+	echo lint
