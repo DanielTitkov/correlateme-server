@@ -115,5 +115,5 @@ jobs:
         script: | 
           echo "container tag ${TAG:11}"
           docker pull ${{ secrets.DOCKER_LOGIN }}/${{ secrets.DOCKER_NAME }}:${TAG:11}
-          docker rm $(docker stop $(docker ps -a -q --filter ancestor=${{ secrets.DOCKER_NAME }} --format="{{.ID}}"))
-          docker run ${{ secrets.DOCKER_LOGIN }}/${{ secrets.DOCKER_NAME }}:${TAG:11}
+          docker stop $(docker ps -a -q --filter name=^/${{ secrets.DOCKER_NAME }}$) || true
+          docker run --rm --name=${{ secrets.DOCKER_NAME }} ${{ secrets.DOCKER_LOGIN }}/${{ secrets.DOCKER_NAME }}:${TAG:11}
