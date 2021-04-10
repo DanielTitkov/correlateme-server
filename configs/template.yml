@@ -1,3 +1,4 @@
+# template to substitute with actual values
 env: deploy
 db:
   uri: "host={{db_host}} port={{db_port}} user={{db_user}} dbname={{db_name}} password={{db_password}} sslmode=require"
@@ -6,7 +7,7 @@ server:
   port: 8000
   host: "0.0.0.0"
 auth:
-  exp: 7200 # hours
+  exp: 72 # hours
   secret: {{secret_key}}
 app:
   defaultObservationLimit: 200

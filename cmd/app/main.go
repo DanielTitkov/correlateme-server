@@ -62,7 +62,10 @@ func main() {
 	// prometheus
 	go func() {
 		http.Handle("/metrics", promhttp.Handler())
-		http.ListenAndServe(":2112", nil)
+		err := http.ListenAndServe(":2112", nil)
+		if err != nil {
+			logger.Error("failed to start metrics handler", err)
+		}
 	}()
 
 	server := prepare.NewServer(cfg, logger, app)

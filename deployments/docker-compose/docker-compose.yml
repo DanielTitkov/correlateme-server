@@ -5,9 +5,6 @@ services:
     build:
       context: ../..
       dockerfile: deployments/docker/Dockerfile
-      # args:
-      #   ELASTIC_APM_SERVER_URL: http://apm-server:8200
-      #   ELASTIC_APM_SECRET_TOKEN: token
     ports:
       - "8000:8000"
     command: "./app ./configs/docker.yml"

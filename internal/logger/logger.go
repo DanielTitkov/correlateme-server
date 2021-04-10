@@ -39,7 +39,7 @@ func (l *Logger) Error(msg string, err error) {
 }
 
 func (l *Logger) Sync() {
-	l.logger.Sync()
+	_ = l.logger.Sync()
 }
 
 func getTime() string {

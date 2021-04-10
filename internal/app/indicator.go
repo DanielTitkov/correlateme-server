@@ -38,7 +38,7 @@ func (a *App) CreateIndicator(args domain.CreateIndicatorArgs) error {
 func (a *App) GetIndicators(args domain.GetIndicatorsArgs) ([]*domain.Indicator, error) {
 	// if user wants to get built-in indicators author is obsolete
 	// otherwise user gets only indicators belonging to them
-	if args.Filter.BuiltIn != nil && *args.Filter.BuiltIn == true {
+	if args.Filter.BuiltIn != nil && *args.Filter.BuiltIn {
 		args.Filter.AuthorID = nil
 	}
 	if args.ObservationLimit > a.cfg.App.DefaultObservationLimit {

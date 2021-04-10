@@ -41,7 +41,9 @@ up:
 
 .PHONY: lint
 lint:
-	echo lint
+	curl -sSfL https://raw.githubusercontent.com/golangci/golangci-lint/master/install.sh | sh -s v1.29.0
+	./bin/golangci-lint run -v
+
 
 .PHONY: test
 test:
