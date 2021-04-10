@@ -1,6 +1,6 @@
-env: dev
+env: deploy
 db:
-  uri: "host={{db_host}} port={{db_port}} user={{db_user}} dbname={{db_name}} password={{db_password}} sslmode=disable"
+  uri: "host={{db_host}} port={{db_port}} user={{db_user}} dbname={{db_name}} password={{db_password}} sslmode=require"
   driver: postgres
 server:
   port: 8000
