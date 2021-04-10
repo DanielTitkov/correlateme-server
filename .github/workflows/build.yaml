@@ -136,7 +136,9 @@ jobs:
         # key: ${{ secrets.SSHKEY }}
         envs: TAG
         script: | 
-          echo "container tag ${TAG:11}"
+          mkdir -p app
+          cd app
+          echo "container tag ${TAG:11}" 
           touch loc.txt
           docker pull ${{ secrets.DOCKER_LOGIN }}/${{ secrets.DOCKER_NAME }}:${TAG:11}
           docker stop $(docker ps -a -q --filter name=^/${{ secrets.DOCKER_NAME }}$) || :
