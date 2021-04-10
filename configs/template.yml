@@ -1,14 +1,13 @@
-# configuration file template
 env: dev
 db:
-  uri: "host=localhost port=5442 user=test dbname=correlateme password=pass sslmode=disable"
+  uri: "host={{db_host}} port={{db_port}} user={{db_user}} dbname={{db_name}} password={{db_password}} sslmode=disable"
   driver: postgres
 server:
   port: 8000
   host: "0.0.0.0"
 auth:
   exp: 7200 # hours
-  secret: secret-key
+  secret: {{secret_key}}
 app:
   defaultObservationLimit: 200
   maxCorrelationObservations: 500

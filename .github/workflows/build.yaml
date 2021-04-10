@@ -101,7 +101,20 @@ jobs:
     runs-on: ubuntu-latest
     env: 
       TAG: ${{ github.ref }}
+      DB_PASSWORD: gh_test
+      DB_NAME: gh_test
+      DB_HOST: gh_test
+      DB_PORT: gh_test
+      DB_USER: gh_test
+      SECRET_KEY: gh_test_key
+      CONFIG_PATH: ./configs/deploy_config_111.yml
     steps:
+    - name: Check out code
+      uses: actions/checkout@v2
+
+    - name: Build deploy config
+      run: make substitute_config_vars
+      
     - name: Execute remote command
       uses: appleboy/ssh-action@master
       with:
@@ -116,5 +129,5 @@ jobs:
           echo "container tag ${TAG:11}"
           docker pull ${{ secrets.DOCKER_LOGIN }}/${{ secrets.DOCKER_NAME }}:${TAG:11}
           docker stop $(docker ps -a -q --filter name=^/${{ secrets.DOCKER_NAME }}$) || :
-          docker run --rm --name=${{ secrets.DOCKER_NAME }} ${{ secrets.DOCKER_LOGIN }}/${{ secrets.DOCKER_NAME }}:${TAG:11}
+          docker run --rm -e CONFIG_PATH=/opt/configs/deploy_config_111.yml --mount type=bind,source=$(pwd)/configs,target=/opt/configs --name=${{ secrets.DOCKER_NAME }} ${{ secrets.DOCKER_LOGIN }}/${{ secrets.DOCKER_NAME }}:${TAG:11}
           echo "all ok"

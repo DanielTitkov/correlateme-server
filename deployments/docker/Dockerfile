@@ -23,6 +23,9 @@ ENV NAME "app"
 # ENV ELASTIC_APM_SERVER_URL ${ELASTIC_APM_SERVER_URL}
 # ENV ELASTIC_APM_SECRET_TOKEN ${ELASTIC_APM_SECRET_TOKEN}
 WORKDIR /opt/${NAME}
-COPY --from=build /opt/${NAME}/configs/*.yml ./configs/
+# COPY --from=build /opt/${NAME}/configs/*.yml ./configs/
 COPY --from=build /opt/${NAME}/bin/${NAME} ./${NAME}
 CMD ./${NAME} ${CONFIG_PATH}
+
+# docker run --rm --restart unless-stopped --name=correlateme delael/correlateme:main 
+# docker run -e CONFIG_PATH=/opt/configs/docker.yml --rm --name=correlateme --mount type=bind,source=$(pwd)/configs,target=/opt/configs delael/correlateme:main 
