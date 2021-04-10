@@ -106,7 +106,7 @@ jobs:
       DB_HOST: gh_test1
       DB_PORT: gh_test1
       DB_USER: gh_test1
-      SECRET_KEY: gh_test_key
+      SECRET_KEY: ${{ secrets.APP_SECRET_KEY }}
       CONFIG_PATH: ./configs/deploy_config_111.yml
     steps:
     - name: Check out code

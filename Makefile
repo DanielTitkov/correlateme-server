@@ -57,5 +57,4 @@ substitute_config_vars:
 		s/{{db_user}}/${DB_USER}/g;         \
 		s/{{secret_key}}/${SECRET_KEY}/g;   \
 		" ${CONFIG_TEMPLATE_PATH})
-	echo ${CONFIG_PATH}
 	cat ${CONFIG_PATH}
