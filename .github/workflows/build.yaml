@@ -123,7 +123,7 @@ jobs:
         port: ${{ secrets.PORT }}
         password: ${{ secrets.SSH_PASSWORD }}
         source: "./configs/deploy_config_111.yml"
-        target: "test"
+        target: "."
 
     - name: Execute remote command
       uses: appleboy/ssh-action@master
@@ -137,6 +137,7 @@ jobs:
         envs: TAG
         script: | 
           echo "container tag ${TAG:11}"
+          touch loc.txt
           docker pull ${{ secrets.DOCKER_LOGIN }}/${{ secrets.DOCKER_NAME }}:${TAG:11}
           docker stop $(docker ps -a -q --filter name=^/${{ secrets.DOCKER_NAME }}$) || :
           docker run --rm -e CONFIG_PATH=/opt/configs/deploy_config_111.yml --mount type=bind,source=$(pwd)/configs,target=/opt/configs --name=${{ secrets.DOCKER_NAME }} ${{ secrets.DOCKER_LOGIN }}/${{ secrets.DOCKER_NAME }}:${TAG:11}
