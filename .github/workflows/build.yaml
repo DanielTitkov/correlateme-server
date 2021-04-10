@@ -122,7 +122,7 @@ jobs:
         username: ${{ secrets.USERNAME }}
         port: ${{ secrets.PORT }}
         password: ${{ secrets.SSH_PASSWORD }}
-        source: "$CONFIG_PATH"
+        source: "./configs/deploy_config_111.yml"
         target: "test"
 
     - name: Execute remote command
