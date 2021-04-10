@@ -101,11 +101,11 @@ jobs:
     runs-on: ubuntu-latest
     env: 
       TAG: ${{ github.ref }}
-      DB_PASSWORD: gh_test
-      DB_NAME: gh_test
-      DB_HOST: gh_test
-      DB_PORT: gh_test
-      DB_USER: gh_test
+      DB_PASSWORD: gh_test1
+      DB_NAME: gh_test1
+      DB_HOST: gh_test1
+      DB_PORT: gh_test1
+      DB_USER: gh_test1
       SECRET_KEY: gh_test_key
       CONFIG_PATH: ./configs/deploy_config_111.yml
     steps:
