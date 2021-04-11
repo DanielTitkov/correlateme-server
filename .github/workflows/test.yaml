@@ -9,7 +9,7 @@ jobs:
       - name: Curl actuator
         id: ping
         run: |
-          echo "::set-output name=status::$(curl -X POST ${{ secrets.HOST }}:${{ secrets.PORT }}/api/v1/actuator/health)"
+          echo "::set-output name=status::$(curl -X POST ${{ secrets.HOST }}:${{ secrets.API_PORT }}/api/v1/actuator/health)"
 
       - name: Health check
         run: |
@@ -20,13 +20,12 @@ jobs:
           echo "It's ok"
 
       - name: Send alert in telegram
-        if: ${{ failure() }}
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           message: |
             Health check of the:
-            ${{secrets.SERVER_HOST}}/api/actuator/health
+            ${{ secrets.HOST }}/api/v1/actuator/health
             failed with the result:
             ${{ steps.ping.outputs.status }}
