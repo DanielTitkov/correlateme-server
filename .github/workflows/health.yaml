@@ -1,7 +1,7 @@
 name: Health Check
 on:
   schedule:
-    - cron:  '*/5 * * * *'
+    - cron: '30 * * * *'
 
 jobs:
   ping:
@@ -15,7 +15,7 @@ jobs:
 
       - name: Health check
         run: |
-          if [[ ${{ steps.ping.outputs.status }} != *"ok"* ]]; then
+          if [[ ${{ steps.ping.outputs.status }} != *"service is running"* ]]; then
             echo "health check is failed"
             exit 1
           fi

@@ -122,3 +122,33 @@ jobs:
           docker stop $(docker ps -a -q --filter name=^/${{ secrets.DOCKER_NAME }}$) || :
           docker run -p 8000:8000 -d --rm -e CONFIG_PATH=/opt/configs/deploy_config_111.yml --mount type=bind,source=$(pwd)/configs,target=/opt/configs --name=${{ secrets.DOCKER_NAME }} ${{ secrets.DOCKER_LOGIN }}/${{ secrets.DOCKER_NAME }}:${TAG:11}
           echo "all ok"
+
+  ping:
+    name: Ping
+    needs: [lint, build, test, publish, deploy]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Curl actuator
+        id: ping
+        run: |
+          echo "::set-output name=status::$(curl -X POST ${{ secrets.HOST }}:${{ secrets.API_PORT }}/api/v1/actuator/health)"
+
+      - name: Health check
+        run: |
+          if [[ ${{ steps.ping.outputs.status }} != *"service is running"* ]]; then
+            echo "health check is failed"
+            exit 1
+          fi
+          echo "It's ok"
+
+      - name: Send alert in telegram
+        if: ${{ failure() }}
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            Health check of the:
+            ${{ secrets.HOST }}:${{ secrets.API_PORT }}/api/v1/actuator/health
+            failed with the result:
+            ${{ steps.ping.outputs.status }}
