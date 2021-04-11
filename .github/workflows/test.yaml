@@ -13,19 +13,20 @@ jobs:
 
       - name: Health check
         run: |
-          if [[ ${{ steps.ping.outputs.status }} != *"ok"* ]]; then
+          if [[ ${{ steps.ping.outputs.status }} != *"service is running"* ]]; then
             echo "health check is failed"
             exit 1
           fi
           echo "It's ok"
 
       - name: Send alert in telegram
+        if: ${{ failure() }}
         uses: appleboy/telegram-action@master
         with:
           to: ${{ secrets.TELEGRAM_TO }}
           token: ${{ secrets.TELEGRAM_TOKEN }}
           message: |
             Health check of the:
-            ${{ secrets.HOST }}/api/v1/actuator/health
+            ${{ secrets.HOST }}:${{ secrets.API_PORT }}/api/v1/actuator/health
             failed with the result:
             ${{ steps.ping.outputs.status }}
