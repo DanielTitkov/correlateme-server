@@ -76,7 +76,7 @@ jobs:
   # tell server to pull new contaner and run it
   deploy:
     name: Deploy
-    needs: [lint, build, test, publish]
+    needs: [publish]
     runs-on: ubuntu-latest
     env: 
       TAG: ${{ github.ref }}
@@ -112,7 +112,6 @@ jobs:
         username: ${{ secrets.USERNAME }}
         port: ${{ secrets.PORT }}
         password: ${{ secrets.SSH_PASSWORD }}
-        # key: ${{ secrets.SSHKEY }}
         envs: TAG
         script: | 
           mkdir -p app
@@ -125,7 +124,7 @@ jobs:
 
   ping:
     name: Ping
-    needs: [lint, build, test, publish, deploy]
+    needs: [deploy]
     runs-on: ubuntu-latest
     steps:
       - name: Curl actuator
@@ -152,3 +151,17 @@ jobs:
             ${{ secrets.HOST }}:${{ secrets.API_PORT }}/api/v1/actuator/health
             failed with the result:
             ${{ steps.ping.outputs.status }}
+
+  report:
+    name: Report deploy
+    needs: [ping]
+    runs-on: ubuntu-latest
+    steps:
+      - name: Report deploy
+        uses: appleboy/telegram-action@master
+        with:
+          to: ${{ secrets.TELEGRAM_TO }}
+          token: ${{ secrets.TELEGRAM_TOKEN }}
+          message: |
+            Deploy done from ${{ github.ref }}
+            Service is listening at ${{ secrets.HOST }}:${{ secrets.API_PORT }}
