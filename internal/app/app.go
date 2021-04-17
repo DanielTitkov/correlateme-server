@@ -15,8 +15,8 @@ type (
 		cfg      configs.Config
 		logger   *logger.Logger
 		repo     Repository
-		cron     *cron.Cron
 		cache    *Cache
+		Cron     *cron.Cron
 		Channels *Channels
 	}
 	// Cache stores data loaded on app start
@@ -31,22 +31,26 @@ type (
 	// Repository stores data
 	Repository interface {
 		// users
+		UserCount() (int, error)
 		CreateUser(*domain.User) (*domain.User, error)
 		GetUserByUsername(string) (*domain.User, error)
 		GetUserByID(int) (*domain.User, error)
 		GetUserCount() (int, error)
 
 		// indicators
+		IndicatorCount() (int, error)
 		CreateIndicator(*domain.Indicator) (*domain.Indicator, error)
 		GetIndicatorByID(int) (*domain.Indicator, error)
 		GetIndicators(domain.GetIndicatorsArgs) ([]*domain.Indicator, error)
 
 		// scales
+		ScaleCount() (int, error)
 		GetScales() ([]*domain.Scale, error)
 		GetScaleByType(string) (*domain.Scale, error)
 		CreateScale(domain.Scale) (*domain.Scale, error)
 
 		// datasets
+		DatasetCount() (int, error)
 		CreateDataset(*domain.Dataset) (*domain.Dataset, error)
 		GetDatasetByID(id int, observationsLimit int, granularity string) (*domain.Dataset, error)
 		GetUserIndicatorDataset(*domain.User, *domain.Indicator) (*domain.Dataset, error)
@@ -55,11 +59,13 @@ type (
 		GetDatasets(domain.GetDatasetsArgs) ([]*domain.Dataset, error)
 
 		// observations
+		ObservationCount() (int, error)
 		CreateObservation(*domain.Observation) (*domain.Observation, error)
 		CreateOrUpdateObservation(*domain.Observation) (*domain.Observation, error)
 		// UpdateObservation
 
 		// correlations
+		CorrelationCount() (int, error)
 		CreateOrUpdateCorrelation(*domain.Correlation) (*domain.Correlation, error)
 		GetUserCorrelations(userID int, granularity string) ([]*domain.Correlation, error)
 		GetCorrelation(domain.GetCorrelationArgs) (*domain.Correlation, error)
@@ -78,7 +84,7 @@ func NewApp(
 		cfg:    cfg,
 		logger: logger,
 		repo:   repo,
-		cron:   c,
+		Cron:   c,
 	}
 
 	// TODO: maybe move it out from the constructor

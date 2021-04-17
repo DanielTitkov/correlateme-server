@@ -37,6 +37,7 @@ func (h *Handler) link(e *echo.Echo) {
 	// actuator urls
 	v1Actuator := v1.Group("/actuator")
 	v1Actuator.POST("/health", h.HealthHandler)
+	v1Actuator.POST("/stats", h.StatsHandler)
 	// restricted group only with valid JWT
 	v1Restricted := v1.Group("/private")
 	v1Restricted.Use(middleware.JWT([]byte(h.cfg.Auth.Secret)))

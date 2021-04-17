@@ -86,6 +86,8 @@ jobs:
       DB_USER: ${{ secrets.DB_USER }}
       DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
       SECRET_KEY: ${{ secrets.APP_SECRET_KEY }}
+      TELEGRAM_TO: ${{ secrets.TELEGRAM_TO }}
+      TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
       CONFIG_PATH: ./configs/deploy_config_111.yml
     steps:
     - name: Check out code

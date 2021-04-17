@@ -10,6 +10,10 @@ import (
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/observation"
 )
 
+func (r *EntgoRepository) ObservationCount() (int, error) {
+	return r.client.Observation.Query().Count(context.TODO())
+}
+
 func (r *EntgoRepository) CreateObservation(o *domain.Observation) (*domain.Observation, error) {
 	create := r.client.Observation.
 		Create().

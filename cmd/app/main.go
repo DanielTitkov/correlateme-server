@@ -58,6 +58,10 @@ func main() {
 	j := job.New(cfg, logger, app)
 	go j.ListenUpdateUserCorrelationsChannel()
 	go j.ListenUpdateDatasetAggregationsChannel()
+	err = app.Cron.AddFunc(cfg.Job.GatherAndSendServiceStatsSchedule, j.GatherAndSendServiceStats)
+	if err != nil {
+		logger.Fatal("failed to set up cron job", err)
+	}
 
 	// prometheus
 	go func() {

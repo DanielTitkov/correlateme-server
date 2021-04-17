@@ -16,7 +16,6 @@ func (a *App) GetScaleByType(scaleType string) (*domain.Scale, error) {
 }
 
 func (a *App) initScales() error {
-
 	scales := []domain.Scale{
 		{
 			Type:        domain.ScaleTypeNumeric,

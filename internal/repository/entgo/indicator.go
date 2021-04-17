@@ -12,6 +12,10 @@ import (
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/user"
 )
 
+func (r *EntgoRepository) IndicatorCount() (int, error) {
+	return r.client.Indicator.Query().Count(context.TODO())
+}
+
 func (r *EntgoRepository) CreateIndicator(i *domain.Indicator) (*domain.Indicator, error) {
 	ind, err := r.client.Indicator.
 		Create().

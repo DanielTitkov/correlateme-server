@@ -8,6 +8,10 @@ import (
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/user"
 )
 
+func (r *EntgoRepository) UserCount() (int, error) {
+	return r.client.User.Query().Count(context.TODO())
+}
+
 func (r *EntgoRepository) GetUserByUsername(username string) (*domain.User, error) {
 	user, err := r.client.User.
 		Query().

@@ -12,6 +12,10 @@ import (
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/user"
 )
 
+func (r *EntgoRepository) DatasetCount() (int, error) {
+	return r.client.Dataset.Query().Count(context.TODO())
+}
+
 func (r *EntgoRepository) CreateDataset(d *domain.Dataset) (*domain.Dataset, error) {
 	dataset, err := r.client.Dataset.
 		Create().

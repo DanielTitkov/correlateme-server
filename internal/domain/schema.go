@@ -108,4 +108,13 @@ type (
 		Type          string  // Pearson or whatever
 		UpdateTime    time.Time
 	}
+	// ServiceStats struct holds service stats
+	ServiceStats struct {
+		Users        int `json:"users,omitempty"`
+		Scales       int `json:"scales,omitempty"`
+		Indicators   int `json:"indicators,omitempty"`
+		Datasets     int `json:"datasets,omitempty"`
+		Observations int `json:"observations,omitempty"`
+		Correlations int `json:"correlations,omitempty"`
+	}
 )

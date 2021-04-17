@@ -13,3 +13,22 @@ func (h *Handler) HealthHandler(c echo.Context) error {
 		Message: "service is running",
 	})
 }
+
+func (h *Handler) StatsHandler(c echo.Context) error {
+	stats, err := h.app.ServiceStats()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, model.ErrorResponse{
+			Message: "failed to get service stats",
+			Error:   err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, model.ServiceStatsResponse{
+		Users:        stats.Users,
+		Scales:       stats.Scales,
+		Indicators:   stats.Indicators,
+		Datasets:     stats.Datasets,
+		Observations: stats.Observations,
+		Correlations: stats.Correlations,
+	})
+}

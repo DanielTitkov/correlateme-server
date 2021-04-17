@@ -8,6 +8,10 @@ import (
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/scale"
 )
 
+func (r *EntgoRepository) ScaleCount() (int, error) {
+	return r.client.Scale.Query().Count(context.TODO())
+}
+
 func (r *EntgoRepository) GetScales() ([]*domain.Scale, error) {
 	scales, err := r.client.Scale.Query().All(context.TODO())
 	if err != nil {

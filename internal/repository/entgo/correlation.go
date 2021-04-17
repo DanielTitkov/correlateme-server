@@ -11,6 +11,10 @@ import (
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/user"
 )
 
+func (r *EntgoRepository) CorrelationCount() (int, error) {
+	return r.client.Correlation.Query().Count(context.TODO())
+}
+
 func (r *EntgoRepository) CreateOrUpdateCorrelation(c *domain.Correlation) (*domain.Correlation, error) {
 	corr, err := r.client.Correlation.
 		Query().

@@ -7,11 +7,13 @@ import (
 )
 
 type Config struct {
-	Env    string
-	DB     DBConfig
-	Server ServerConfig
-	Auth   AuthConfig
-	App    AppConfig
+	Env      string
+	DB       DBConfig
+	Server   ServerConfig
+	Auth     AuthConfig
+	App      AppConfig
+	Job      JobConfig
+	External ExternalConfig
 }
 
 func ReadConfigs(path string) (Config, error) {

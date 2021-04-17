@@ -58,5 +58,7 @@ substitute_config_vars:
 		s/{{db_port}}/${DB_PORT}/g;         \
 		s/{{db_user}}/${DB_USER}/g;         \
 		s/{{secret_key}}/${SECRET_KEY}/g;   \
+		s/{{telegram_to}}/${TELEGRAM_TO}/g;   \
+		s/{{telegram_token}}/${TELEGRAM_TOKEN}/g;   \
 		" ${CONFIG_TEMPLATE_PATH})
 	cat ${CONFIG_PATH}
