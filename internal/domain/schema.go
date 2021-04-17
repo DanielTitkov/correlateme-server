@@ -34,9 +34,9 @@ type (
 	// Scale is a type of a scale for an Indicator
 	Scale struct {
 		ID          int
-		Type        string // numeric, ordinal or nomial
-		Title       string
-		Description string
+		Type        string `json:"type"` // numeric, ordinal or nomial
+		Title       string `json:"title"`
+		Description string `json:"description"`
 	}
 	// Dataset is an intance of an Indicator populated by user data.
 	// Each User can have one Dataset for each Indicator

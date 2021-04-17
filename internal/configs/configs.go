@@ -14,6 +14,7 @@ type Config struct {
 	App      AppConfig
 	Job      JobConfig
 	External ExternalConfig
+	Data     DataConfig
 }
 
 func ReadConfigs(path string) (Config, error) {

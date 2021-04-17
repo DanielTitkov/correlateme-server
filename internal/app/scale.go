@@ -1,7 +1,9 @@
 package app
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 
 	"github.com/DanielTitkov/correlateme-server/internal/domain"
 )
@@ -16,27 +18,16 @@ func (a *App) GetScaleByType(scaleType string) (*domain.Scale, error) {
 }
 
 func (a *App) initScales() error {
-	scales := []domain.Scale{
-		{
-			Type:        domain.ScaleTypeNumeric,
-			Title:       "Numeric",
-			Description: "Numeric scale",
-		},
-		{
-			Type:        domain.ScaleTypeNominal,
-			Title:       "Nominal",
-			Description: "Nominal scale",
-		},
-		{
-			Type:        domain.ScaleTypeBinary,
-			Title:       "Binary",
-			Description: "Binary scale",
-		},
-		{
-			Type:        domain.ScaleTypeOrdinal,
-			Title:       "Ordinal",
-			Description: "Ordinal scale",
-		},
+	var scales []domain.Scale
+
+	data, err := ioutil.ReadFile(a.cfg.Data.Presets.ScalePresetsPath)
+	if err != nil {
+		return err
+	}
+
+	err = json.Unmarshal(data, &scales)
+	if err != nil {
+		return err
 	}
 
 	for _, scale := range scales {

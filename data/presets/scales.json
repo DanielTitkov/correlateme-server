@@ -1,0 +1,22 @@
+[
+    {
+        "type": "numeric",
+        "title": "Numeric",
+        "description": "Numeric scale"
+    },
+    {
+        "type": "nominal",
+        "title": "Nominal",
+        "description": "Nominal scale"
+    },
+    {
+        "type": "binary",
+        "title": "Binary",
+        "description": "Binary scale"
+    },
+    {
+        "type": "ordinal",
+        "title": "Ordinal",
+        "description": "Ordinal scale"
+    }
+]
