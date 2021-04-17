@@ -3,7 +3,6 @@
         "code": "builtin-numeric-sleep-quality-0",
         "title": "Sleep quality",
         "description": "Built-in sleep quality indicator",
-        "built_in": true,
         "external": false,
         "scale": {
             "type": "numeric"
@@ -13,7 +12,6 @@
         "code": "builtin-numeric-steps-0",
         "title": "Steps",
         "description": "Built-in steps indicator",
-        "built_in": true,
         "external": false,
         "scale": {
             "type": "numeric"
