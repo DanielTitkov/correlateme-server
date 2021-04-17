@@ -1,6 +1,8 @@
 package app
 
 import (
+	"encoding/json"
+	"io/ioutil"
 	"regexp"
 	"strconv"
 	"strings"
@@ -35,6 +37,27 @@ func (a *App) CreateIndicator(args domain.CreateIndicatorArgs) error {
 	return nil
 }
 
+func (a *App) CreateIndicatorFromPreset(ind domain.Indicator) (*domain.Indicator, error) {
+	scale, err := a.GetScaleByType(ind.Scale.Type)
+	if err != nil {
+		return nil, err
+	}
+
+	indicator, err := a.repo.CreateIndicator(&domain.Indicator{
+		Code:        ind.Code,
+		Title:       ind.Title,
+		Description: ind.Description,
+		Scale:       scale,
+		BuiltIn:     true,
+		Active:      true,
+	})
+	if err != nil {
+		return nil, err
+	}
+
+	return indicator, nil
+}
+
 func (a *App) GetIndicators(args domain.GetIndicatorsArgs) ([]*domain.Indicator, error) {
 	// if user wants to get built-in indicators author is obsolete
 	// otherwise user gets only indicators belonging to them
@@ -67,4 +90,34 @@ func makeIndicatorCode(username, scaleType, title string) string {
 		ts,
 	}, "-")
 	return code
+}
+
+func (a *App) initBuiltinIndicators() error {
+	data, err := ioutil.ReadFile(a.cfg.Data.Presets.IndicatorPresetsPath)
+	if err != nil {
+		return err
+	}
+
+	var indicators []domain.Indicator
+	err = json.Unmarshal(data, &indicators)
+	if err != nil {
+		return err
+	}
+
+	for _, indicator := range indicators {
+		ind, err := a.repo.GetIndicatorByCode(indicator.Code)
+		if err == nil && ind.ID != 0 {
+			a.logger.Info("indicator already exists", ind.JSONString())
+			continue
+		}
+
+		ind, err = a.CreateIndicatorFromPreset(indicator)
+		if err != nil {
+			return err
+		}
+
+		a.logger.Info("created indicator", ind.JSONString())
+	}
+
+	return nil
 }

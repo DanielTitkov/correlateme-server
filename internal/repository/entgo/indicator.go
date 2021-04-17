@@ -17,17 +17,21 @@ func (r *EntgoRepository) IndicatorCount() (int, error) {
 }
 
 func (r *EntgoRepository) CreateIndicator(i *domain.Indicator) (*domain.Indicator, error) {
-	ind, err := r.client.Indicator.
+	query := r.client.Indicator.
 		Create().
 		SetCode(i.Code).
-		SetAuthorID(i.Author.ID).
 		SetScaleID(i.Scale.ID).
 		SetActive(i.Active).
 		SetBuiltIn(i.BuiltIn).
 		SetExternal(i.External).
 		SetDescription(i.Description).
-		SetTitle(i.Title).
-		Save(context.TODO())
+		SetTitle(i.Title)
+
+	if i.Author != nil {
+		query.SetAuthorID(i.Author.ID)
+	}
+
+	ind, err := query.Save(context.TODO())
 	if err != nil {
 		return nil, err
 	}
@@ -41,6 +45,20 @@ func (r *EntgoRepository) GetIndicatorByID(id int) (*domain.Indicator, error) {
 		WithAuthor().
 		WithScale().
 		Where(indicator.IDEQ(id)).
+		Only(context.TODO())
+	if err != nil {
+		return nil, err
+	}
+
+	return entToDomainIndicator(ind), nil
+}
+
+func (r *EntgoRepository) GetIndicatorByCode(code string) (*domain.Indicator, error) {
+	ind, err := r.client.Indicator.
+		Query().
+		WithAuthor().
+		WithScale().
+		Where(indicator.CodeEQ(code)).
 		Only(context.TODO())
 	if err != nil {
 		return nil, err

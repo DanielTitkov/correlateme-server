@@ -41,6 +41,7 @@ type (
 		IndicatorCount() (int, error)
 		CreateIndicator(*domain.Indicator) (*domain.Indicator, error)
 		GetIndicatorByID(int) (*domain.Indicator, error)
+		GetIndicatorByCode(string) (*domain.Indicator, error)
 		GetIndicators(domain.GetIndicatorsArgs) ([]*domain.Indicator, error)
 
 		// scales
@@ -92,12 +93,17 @@ func NewApp(
 	if err != nil {
 		return nil, err
 	}
-
 	cache, err := app.buildCache()
 	if err != nil {
 		return nil, err
 	}
 	app.cache = cache
+
+	// indicators can be set up only after scales are loaded and cached
+	err = app.initBuiltinIndicators()
+	if err != nil {
+		return nil, err
+	}
 
 	channels, err := app.makeChannels()
 	if err != nil {
@@ -136,4 +142,18 @@ func (a *App) makeChannels() (*Channels, error) {
 		UpdateUserCorrelationsChan:    updateCorrelationsChan,
 		UpdateDatasetAggregationsChan: updateAggregationsChan,
 	}, nil
+}
+
+func (a *App) loadPresets() error {
+	err := a.initScales()
+	if err != nil {
+		return err
+	}
+
+	err = a.initBuiltinIndicators()
+	if err != nil {
+		return err
+	}
+
+	return nil
 }

@@ -17,23 +17,23 @@ type (
 	}
 	// Indicator is a set of user-created data
 	Indicator struct {
-		ID           int
-		Code         string // unique code for external systems
-		Title        string
-		Description  string
-		Active       bool // FIXME move to dataset?
-		BuiltIn      bool // if Indicator is created by the service
-		External     bool // if Indicator is populated by the user or external system
-		Scale        *Scale
-		Author       *User
-		UserDataset  *Dataset           // dataset for a specific user
-		ValueMapping map[float64]string // aliases for nomial and ordinal scales
-		CreateTime   time.Time
-		UpdateTime   time.Time
+		ID           int                `json:"id"`
+		Code         string             `json:"code"` // unique code for external systems
+		Title        string             `json:"title"`
+		Description  string             `json:"description"`
+		Active       bool               `json:"active"`   // FIXME move to dataset?
+		BuiltIn      bool               `json:"built_in"` // if Indicator is created by the service
+		External     bool               `json:"extrnal"`  // if Indicator is populated by the user or external system
+		Scale        *Scale             `json:"scale"`
+		Author       *User              `json:"author"`
+		UserDataset  *Dataset           `json:"user_dataset"` // dataset for a specific user
+		ValueMapping map[float64]string `json:"-"`            // aliases for nomial and ordinal scales
+		CreateTime   time.Time          `json:"create_time"`
+		UpdateTime   time.Time          `json:"update_time"`
 	}
 	// Scale is a type of a scale for an Indicator
 	Scale struct {
-		ID          int
+		ID          int    `json:"id"`
 		Type        string `json:"type"` // numeric, ordinal or nomial
 		Title       string `json:"title"`
 		Description string `json:"description"`

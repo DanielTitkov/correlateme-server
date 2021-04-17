@@ -18,13 +18,12 @@ func (a *App) GetScaleByType(scaleType string) (*domain.Scale, error) {
 }
 
 func (a *App) initScales() error {
-	var scales []domain.Scale
-
 	data, err := ioutil.ReadFile(a.cfg.Data.Presets.ScalePresetsPath)
 	if err != nil {
 		return err
 	}
 
+	var scales []domain.Scale
 	err = json.Unmarshal(data, &scales)
 	if err != nil {
 		return err
@@ -33,7 +32,7 @@ func (a *App) initScales() error {
 	for _, scale := range scales {
 		s, err := a.repo.GetScaleByType(scale.Type)
 		if err == nil && s.ID != 0 {
-			a.logger.Info("scale already exists", fmt.Sprintf("%+v", s))
+			a.logger.Info("scale already exists", s.JSONString())
 			continue
 		}
 
@@ -41,7 +40,7 @@ func (a *App) initScales() error {
 		if err != nil {
 			return err
 		}
-		a.logger.Info("created scale", fmt.Sprintf("%+v", s))
+		a.logger.Info("created scale", s.JSONString())
 	}
 
 	return nil
