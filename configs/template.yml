@@ -18,8 +18,7 @@ app:
   maxWeekAggregationObservations: 1400
   maxMonthAggregationObservations: 3000
 job:
-  gatherAndSendServiceStatsSchedule: "*/50 * * * ?"
-  # gatherAndSendServiceStatsSchedule: "0 22 * * 1"
+  gatherAndSendServiceStatsSchedule: "0 22 * * 1"
 external:
   telegram:
     telegramTo: {{telegram_to}}
