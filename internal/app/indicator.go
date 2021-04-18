@@ -2,6 +2,7 @@ package app
 
 import (
 	"encoding/json"
+	"errors"
 	"io/ioutil"
 	"regexp"
 	"strconv"
@@ -33,6 +34,35 @@ func (a *App) CreateIndicator(args domain.CreateIndicatorArgs) error {
 	if err != nil {
 		return err
 	}
+
+	return nil
+}
+
+func (a *App) UpdateIndicator(args domain.UpdateIndicatorArgs) error {
+	indicator, err := a.repo.GetIndicatorByID(args.ID)
+	if err != nil {
+		return err
+	}
+
+	// update builtins is used only internally, not accessible via api
+	if !args.UpdateBuiltins {
+		user, err := a.repo.GetUserByID(args.UserID)
+		if err != nil {
+			return err
+		}
+
+		if indicator.Author == nil || indicator.Author.ID != user.ID {
+			return errors.New("attempted to update indicator belonging to another user, access denied")
+		}
+	}
+
+	_, err = a.repo.UpdateIndicator(
+		&domain.Indicator{
+			ID:          indicator.ID,
+			Title:       args.Title,
+			Description: args.Description,
+			Active:      args.Active,
+		})
 
 	return nil
 }

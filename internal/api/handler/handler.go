@@ -34,16 +34,19 @@ func (h *Handler) link(e *echo.Echo) {
 	v1 := e.Group("/api/v1")
 	v1.POST("/getToken", h.GetTokenHandler)
 	v1.POST("/createUser", h.CreateUserHandler)
+
 	// actuator urls
 	v1Actuator := v1.Group("/actuator")
 	v1Actuator.POST("/health", h.HealthHandler)
 	v1Actuator.POST("/stats", h.StatsHandler)
+
 	// restricted group only with valid JWT
 	v1Restricted := v1.Group("/private")
 	v1Restricted.Use(middleware.JWT([]byte(h.cfg.Auth.Secret)))
 	v1Restricted.POST("/getUser", h.GetUserHandler)
 	// indicator
 	v1Restricted.POST("/createIndicator", h.CreateIndicator)
+	v1Restricted.POST("/updateIndicator", h.UpdateIndicator)
 	v1Restricted.POST("/getIndicators", h.GetIndicators)
 	// observation
 	v1Restricted.POST("/createOrUpdateObservation", h.CreateOrUpdateObservation)

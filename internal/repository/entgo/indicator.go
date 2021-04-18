@@ -39,6 +39,31 @@ func (r *EntgoRepository) CreateIndicator(i *domain.Indicator) (*domain.Indicato
 	return entToDomainIndicator(ind), nil
 }
 
+func (r *EntgoRepository) UpdateIndicator(i *domain.Indicator) (*domain.Indicator, error) {
+	ind, err := r.client.Indicator.
+		Query().
+		WithAuthor().
+		WithScale().
+		Where(indicator.IDEQ(i.ID)).
+		Only(context.TODO())
+	if err != nil {
+		return nil, err
+	}
+
+	ind, err = ind.Update().
+		// SetExternal(i.External). // TODO: probably should be immutable
+		// SetScaleID(i.Scale.ID). // probably should be immutable
+		SetActive(i.Active).
+		SetDescription(i.Description).
+		SetTitle(i.Title).
+		Save(context.TODO())
+	if err != nil {
+		return nil, err
+	}
+
+	return entToDomainIndicator(ind), nil
+}
+
 func (r *EntgoRepository) GetIndicatorByID(id int) (*domain.Indicator, error) {
 	ind, err := r.client.Indicator.
 		Query().

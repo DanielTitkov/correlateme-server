@@ -46,6 +46,41 @@ func (h *Handler) CreateIndicator(c echo.Context) error {
 	})
 }
 
+func (h *Handler) UpdateIndicator(c echo.Context) error {
+	request := new(model.UpdateIndicatorRequest)
+	if err := c.Bind(request); err != nil {
+		return err
+	}
+
+	userID, err := util.UserIDFromToken(c)
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, model.ErrorResponse{
+			Message: "token is invalid",
+			Error:   err.Error(),
+		})
+	}
+
+	err = h.app.UpdateIndicator(domain.UpdateIndicatorArgs{
+		UserID:         userID,
+		ID:             request.ID,
+		Active:         request.Active,
+		Title:          request.Title,
+		Description:    request.Description,
+		UpdateBuiltins: false,
+	})
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, model.ErrorResponse{
+			Message: "failed to update indicator",
+			Error:   err.Error(),
+		})
+	}
+
+	return c.JSON(http.StatusOK, model.OKResponse{
+		Status:  "ok",
+		Message: "indicator updated",
+	})
+}
+
 func (h *Handler) GetIndicators(c echo.Context) error {
 	request := new(model.GetIndicatorsRequest)
 	if err := c.Bind(request); err != nil {

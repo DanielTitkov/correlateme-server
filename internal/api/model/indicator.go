@@ -26,6 +26,12 @@ type (
 		ScaleType   string `json:"scaleType" validate:"required"`
 		Description string `json:"description"`
 	}
+	UpdateIndicatorRequest struct {
+		ID          int    `json:"id"`
+		Title       string `json:"title"`
+		Description string `json:"description"`
+		Active      bool   `json:"active"`
+	}
 	GetIndicatorsRequest struct {
 		WithDataset       bool                       `json:"withDataset"`
 		ObservationsLimit int                        `json:"observationsLimit"`

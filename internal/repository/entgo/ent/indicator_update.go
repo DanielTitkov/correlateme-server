@@ -71,20 +71,6 @@ func (iu *IndicatorUpdate) SetNillableActive(b *bool) *IndicatorUpdate {
 	return iu
 }
 
-// SetBuiltIn sets the "built_in" field.
-func (iu *IndicatorUpdate) SetBuiltIn(b bool) *IndicatorUpdate {
-	iu.mutation.SetBuiltIn(b)
-	return iu
-}
-
-// SetNillableBuiltIn sets the "built_in" field if the given value is not nil.
-func (iu *IndicatorUpdate) SetNillableBuiltIn(b *bool) *IndicatorUpdate {
-	if b != nil {
-		iu.SetBuiltIn(*b)
-	}
-	return iu
-}
-
 // SetExternal sets the "external" field.
 func (iu *IndicatorUpdate) SetExternal(b bool) *IndicatorUpdate {
 	iu.mutation.SetExternal(b)
@@ -338,13 +324,6 @@ func (iu *IndicatorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 			Column: indicator.FieldActive,
 		})
 	}
-	if value, ok := iu.mutation.BuiltIn(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeBool,
-			Value:  value,
-			Column: indicator.FieldBuiltIn,
-		})
-	}
 	if value, ok := iu.mutation.External(); ok {
 		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
 			Type:   field.TypeBool,
@@ -565,20 +544,6 @@ func (iuo *IndicatorUpdateOne) SetActive(b bool) *IndicatorUpdateOne {
 func (iuo *IndicatorUpdateOne) SetNillableActive(b *bool) *IndicatorUpdateOne {
 	if b != nil {
 		iuo.SetActive(*b)
-	}
-	return iuo
-}
-
-// SetBuiltIn sets the "built_in" field.
-func (iuo *IndicatorUpdateOne) SetBuiltIn(b bool) *IndicatorUpdateOne {
-	iuo.mutation.SetBuiltIn(b)
-	return iuo
-}
-
-// SetNillableBuiltIn sets the "built_in" field if the given value is not nil.
-func (iuo *IndicatorUpdateOne) SetNillableBuiltIn(b *bool) *IndicatorUpdateOne {
-	if b != nil {
-		iuo.SetBuiltIn(*b)
 	}
 	return iuo
 }
@@ -839,13 +804,6 @@ func (iuo *IndicatorUpdateOne) sqlSave(ctx context.Context) (_node *Indicator, e
 			Type:   field.TypeBool,
 			Value:  value,
 			Column: indicator.FieldActive,
-		})
-	}
-	if value, ok := iuo.mutation.BuiltIn(); ok {
-		_spec.Fields.Set = append(_spec.Fields.Set, &sqlgraph.FieldSpec{
-			Type:   field.TypeBool,
-			Value:  value,
-			Column: indicator.FieldBuiltIn,
 		})
 	}
 	if value, ok := iuo.mutation.External(); ok {

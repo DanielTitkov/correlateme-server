@@ -11,6 +11,14 @@ type (
 		Description string
 		ScaleType   string
 	}
+	UpdateIndicatorArgs struct {
+		ID             int // immutable, only for getting indicator
+		UserID         int
+		Title          string
+		Description    string
+		Active         bool
+		UpdateBuiltins bool
+	}
 	GetIndicatorsArgs struct {
 		UserID           int
 		WithDataset      bool

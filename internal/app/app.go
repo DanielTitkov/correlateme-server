@@ -40,6 +40,7 @@ type (
 		// indicators
 		IndicatorCount() (int, error)
 		CreateIndicator(*domain.Indicator) (*domain.Indicator, error)
+		UpdateIndicator(*domain.Indicator) (*domain.Indicator, error)
 		GetIndicatorByID(int) (*domain.Indicator, error)
 		GetIndicatorByCode(string) (*domain.Indicator, error)
 		GetIndicators(domain.GetIndicatorsArgs) ([]*domain.Indicator, error)

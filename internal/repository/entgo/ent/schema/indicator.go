@@ -20,7 +20,7 @@ func (Indicator) Fields() []ent.Field {
 		field.String("title").NotEmpty(),
 		field.String("description").Optional(),
 		field.Bool("active").Default(true),
-		field.Bool("built_in").Default(false),
+		field.Bool("built_in").Default(false).Immutable(),
 		field.Bool("external").Default(false),
 	}
 }
