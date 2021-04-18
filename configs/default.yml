@@ -23,3 +23,7 @@ external:
   telegram:
     telegramTo: 1999 # chat id
     telegramToken: "tg-token"
+data:
+  presets:
+    scalePresetsPath: "./data/presets/scales.json"
+    indicatorPresetsPath: "./data/presets/indicators.json"
