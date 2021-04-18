@@ -74,7 +74,9 @@ func (a *App) GetIndicators(args domain.GetIndicatorsArgs) ([]*domain.Indicator,
 	}
 
 	for _, ind := range inds {
-		ind.UserDataset.Observations = orderObservationsAsc(ind.UserDataset.Observations)
+		if ind.UserDataset != nil {
+			ind.UserDataset.Observations = orderObservationsAsc(ind.UserDataset.Observations)
+		}
 	}
 
 	return inds, nil

@@ -17,4 +17,5 @@ ARG VERSION
 ENV NAME "app"
 WORKDIR /opt/${NAME}
 COPY --from=build /opt/${NAME}/bin/${NAME} ./${NAME}
+COPY --from=build /opt/${NAME}/data ./data
 CMD ./${NAME} ${CONFIG_PATH}

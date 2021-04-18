@@ -7,12 +7,14 @@ services:
       dockerfile: deployments/docker/Dockerfile
     ports:
       - "8000:8000"
-    command: "./app ./configs/docker.yml"
+    command: "./app /opt/configs/docker.yml"
     environment:
       - ENV=docker
       - CONFIG_PATH=configs/docker.yml
     depends_on:
       - postgres
+    volumes: 
+      - ./configs:/opt/configs
     networks:
       - backend
 
