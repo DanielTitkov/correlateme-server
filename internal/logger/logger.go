@@ -6,15 +6,32 @@ import (
 	"go.uber.org/zap"
 )
 
+const (
+	LevelDebug = "debug"
+	LevelInfo  = "info"
+)
+
 type Logger struct {
 	logger *zap.Logger
 }
 
-func NewLogger() *Logger {
-	logger, _ := zap.NewProduction()
+func NewLogger(env string) *Logger {
+	var logger *zap.Logger
+	switch env {
+	case "dev":
+		logger, _ = zap.NewDevelopment()
+	default:
+		logger, _ = zap.NewProduction()
+	}
 	return &Logger{
 		logger: logger,
 	}
+}
+
+func (l *Logger) Debug(msg, info string) {
+	l.logger.Debug(msg,
+		zap.String("info", info),
+	)
 }
 
 func (l *Logger) Info(msg, info string) {

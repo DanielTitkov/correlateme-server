@@ -32,7 +32,7 @@ func (a *App) initScales() error {
 	for _, scale := range scales {
 		s, err := a.repo.GetScaleByType(scale.Type)
 		if err == nil && s.ID != 0 {
-			a.logger.Info("scale already exists", s.JSONString())
+			a.logger.Debug("scale already exists", s.JSONString())
 			continue
 		}
 
@@ -40,7 +40,7 @@ func (a *App) initScales() error {
 		if err != nil {
 			return err
 		}
-		a.logger.Info("created scale", s.JSONString())
+		a.logger.Debug("created scale", s.JSONString())
 	}
 
 	return nil

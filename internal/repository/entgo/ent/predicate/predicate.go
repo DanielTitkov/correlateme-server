@@ -15,6 +15,12 @@ type Dataset func(*sql.Selector)
 // DatasetParams is the predicate function for datasetparams builders.
 type DatasetParams func(*sql.Selector)
 
+// Dictionary is the predicate function for dictionary builders.
+type Dictionary func(*sql.Selector)
+
+// DictionaryEntry is the predicate function for dictionaryentry builders.
+type DictionaryEntry func(*sql.Selector)
+
 // Indicator is the predicate function for indicator builders.
 type Indicator func(*sql.Selector)
 

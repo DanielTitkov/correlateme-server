@@ -1,0 +1,12 @@
+[
+    {
+        "id": 100,
+        "code": "granularity",
+        "description": "granularity levels"
+    },
+    {
+        "id": 200,
+        "code": "correlation_methods",
+        "description": "correlation methods"
+    }
+]

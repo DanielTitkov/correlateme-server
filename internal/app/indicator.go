@@ -139,7 +139,7 @@ func (a *App) initBuiltinIndicators() error {
 	for _, indicator := range indicators {
 		ind, err := a.repo.GetIndicatorByCode(indicator.Code)
 		if err == nil && ind.ID != 0 {
-			a.logger.Info("indicator already exists", ind.JSONString())
+			a.logger.Debug("indicator already exists", ind.JSONString())
 			continue
 		}
 
@@ -148,7 +148,7 @@ func (a *App) initBuiltinIndicators() error {
 			return err
 		}
 
-		a.logger.Info("created indicator", ind.JSONString())
+		a.logger.Debug("created indicator", ind.JSONString())
 	}
 
 	return nil

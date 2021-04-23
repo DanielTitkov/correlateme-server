@@ -7,6 +7,8 @@ import (
 
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/correlation"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dataset"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dictionary"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dictionaryentry"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/observation"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/scale"
@@ -56,6 +58,26 @@ func init() {
 	datasetDescShared := datasetFields[0].Descriptor()
 	// dataset.DefaultShared holds the default value on creation for the shared field.
 	dataset.DefaultShared = datasetDescShared.Default.(bool)
+	dictionaryFields := schema.Dictionary{}.Fields()
+	_ = dictionaryFields
+	// dictionaryDescCode is the schema descriptor for code field.
+	dictionaryDescCode := dictionaryFields[1].Descriptor()
+	// dictionary.CodeValidator is a validator for the "code" field. It is called by the builders before save.
+	dictionary.CodeValidator = dictionaryDescCode.Validators[0].(func(string) error)
+	// dictionaryDescID is the schema descriptor for id field.
+	dictionaryDescID := dictionaryFields[0].Descriptor()
+	// dictionary.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	dictionary.IDValidator = dictionaryDescID.Validators[0].(func(int) error)
+	dictionaryentryFields := schema.DictionaryEntry{}.Fields()
+	_ = dictionaryentryFields
+	// dictionaryentryDescCode is the schema descriptor for code field.
+	dictionaryentryDescCode := dictionaryentryFields[1].Descriptor()
+	// dictionaryentry.CodeValidator is a validator for the "code" field. It is called by the builders before save.
+	dictionaryentry.CodeValidator = dictionaryentryDescCode.Validators[0].(func(string) error)
+	// dictionaryentryDescID is the schema descriptor for id field.
+	dictionaryentryDescID := dictionaryentryFields[0].Descriptor()
+	// dictionaryentry.IDValidator is a validator for the "id" field. It is called by the builders before save.
+	dictionaryentry.IDValidator = dictionaryentryDescID.Validators[0].(func(int) error)
 	indicatorMixin := schema.Indicator{}.Mixin()
 	indicatorMixinFields0 := indicatorMixin[0].Fields()
 	_ = indicatorMixinFields0

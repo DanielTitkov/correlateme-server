@@ -27,6 +27,8 @@ type hooks struct {
 	Correlation         []ent.Hook
 	Dataset             []ent.Hook
 	DatasetParams       []ent.Hook
+	Dictionary          []ent.Hook
+	DictionaryEntry     []ent.Hook
 	Indicator           []ent.Hook
 	IndicatorValueAlias []ent.Hook
 	Observation         []ent.Hook

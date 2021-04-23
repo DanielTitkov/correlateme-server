@@ -18,6 +18,10 @@ type Tx struct {
 	Dataset *DatasetClient
 	// DatasetParams is the client for interacting with the DatasetParams builders.
 	DatasetParams *DatasetParamsClient
+	// Dictionary is the client for interacting with the Dictionary builders.
+	Dictionary *DictionaryClient
+	// DictionaryEntry is the client for interacting with the DictionaryEntry builders.
+	DictionaryEntry *DictionaryEntryClient
 	// Indicator is the client for interacting with the Indicator builders.
 	Indicator *IndicatorClient
 	// IndicatorValueAlias is the client for interacting with the IndicatorValueAlias builders.
@@ -168,6 +172,8 @@ func (tx *Tx) init() {
 	tx.Correlation = NewCorrelationClient(tx.config)
 	tx.Dataset = NewDatasetClient(tx.config)
 	tx.DatasetParams = NewDatasetParamsClient(tx.config)
+	tx.Dictionary = NewDictionaryClient(tx.config)
+	tx.DictionaryEntry = NewDictionaryEntryClient(tx.config)
 	tx.Indicator = NewIndicatorClient(tx.config)
 	tx.IndicatorValueAlias = NewIndicatorValueAliasClient(tx.config)
 	tx.Observation = NewObservationClient(tx.config)

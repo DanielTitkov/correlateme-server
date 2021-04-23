@@ -1,0 +1,26 @@
+[
+    {
+        "dictionaryId": 100,
+        "id": 100100,
+        "code": "day",
+        "description": "daily"
+    },
+    {
+        "dictionaryId": 100,
+        "id": 100200,
+        "code": "week",
+        "description": "weekly"
+    },
+    {
+        "dictionaryId": 100,
+        "id": 100300,
+        "code": "month",
+        "description": "monthly"
+    },
+    {
+        "dictionaryId": 200,
+        "id": 200100,
+        "code": "spearman",
+        "description": "spearman correlation"
+    }
+]

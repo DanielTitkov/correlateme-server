@@ -48,6 +48,32 @@ func (f DatasetParamsFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Valu
 	return f(ctx, mv)
 }
 
+// The DictionaryFunc type is an adapter to allow the use of ordinary
+// function as Dictionary mutator.
+type DictionaryFunc func(context.Context, *ent.DictionaryMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f DictionaryFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.DictionaryMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DictionaryMutation", m)
+	}
+	return f(ctx, mv)
+}
+
+// The DictionaryEntryFunc type is an adapter to allow the use of ordinary
+// function as DictionaryEntry mutator.
+type DictionaryEntryFunc func(context.Context, *ent.DictionaryEntryMutation) (ent.Value, error)
+
+// Mutate calls f(ctx, m).
+func (f DictionaryEntryFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.DictionaryEntryMutation)
+	if !ok {
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.DictionaryEntryMutation", m)
+	}
+	return f(ctx, mv)
+}
+
 // The IndicatorFunc type is an adapter to allow the use of ordinary
 // function as Indicator mutator.
 type IndicatorFunc func(context.Context, *ent.IndicatorMutation) (ent.Value, error)

@@ -116,6 +116,48 @@ var (
 			},
 		},
 	}
+	// DictionariesColumns holds the columns for the "dictionaries" table.
+	DictionariesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "code", Type: field.TypeString, Unique: true},
+		{Name: "description", Type: field.TypeString, Nullable: true},
+	}
+	// DictionariesTable holds the schema information for the "dictionaries" table.
+	DictionariesTable = &schema.Table{
+		Name:        "dictionaries",
+		Columns:     DictionariesColumns,
+		PrimaryKey:  []*schema.Column{DictionariesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{},
+	}
+	// DictionaryEntriesColumns holds the columns for the "dictionary_entries" table.
+	DictionaryEntriesColumns = []*schema.Column{
+		{Name: "id", Type: field.TypeInt, Increment: true},
+		{Name: "code", Type: field.TypeString},
+		{Name: "description", Type: field.TypeString, Nullable: true},
+		{Name: "dictionary_entries", Type: field.TypeInt, Nullable: true},
+	}
+	// DictionaryEntriesTable holds the schema information for the "dictionary_entries" table.
+	DictionaryEntriesTable = &schema.Table{
+		Name:       "dictionary_entries",
+		Columns:    DictionaryEntriesColumns,
+		PrimaryKey: []*schema.Column{DictionaryEntriesColumns[0]},
+		ForeignKeys: []*schema.ForeignKey{
+			{
+				Symbol:  "dictionary_entries_dictionaries_entries",
+				Columns: []*schema.Column{DictionaryEntriesColumns[3]},
+
+				RefColumns: []*schema.Column{DictionariesColumns[0]},
+				OnDelete:   schema.SetNull,
+			},
+		},
+		Indexes: []*schema.Index{
+			{
+				Name:    "dictionaryentry_code_dictionary_entries",
+				Unique:  true,
+				Columns: []*schema.Column{DictionaryEntriesColumns[1], DictionaryEntriesColumns[3]},
+			},
+		},
+	}
 	// IndicatorsColumns holds the columns for the "indicators" table.
 	IndicatorsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
@@ -268,6 +310,8 @@ var (
 		CorrelationsTable,
 		DatasetsTable,
 		DatasetParamsTable,
+		DictionariesTable,
+		DictionaryEntriesTable,
 		IndicatorsTable,
 		IndicatorValueAliasTable,
 		ObservationsTable,
@@ -283,6 +327,7 @@ func init() {
 	DatasetsTable.ForeignKeys[0].RefTable = IndicatorsTable
 	DatasetsTable.ForeignKeys[1].RefTable = UsersTable
 	DatasetParamsTable.ForeignKeys[0].RefTable = DatasetsTable
+	DictionaryEntriesTable.ForeignKeys[0].RefTable = DictionariesTable
 	IndicatorsTable.ForeignKeys[0].RefTable = ScalesTable
 	IndicatorsTable.ForeignKeys[1].RefTable = UsersTable
 	IndicatorValueAliasTable.ForeignKeys[0].RefTable = IndicatorsTable

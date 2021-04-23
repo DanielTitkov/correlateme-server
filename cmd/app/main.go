@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"errors"
+	"log"
 	"net/http"
 	"os"
 
@@ -19,22 +20,22 @@ import (
 )
 
 func main() {
-	logger := logger.NewLogger()
-	defer logger.Sync()
-	logger.Info("starting service", "")
-
 	args := os.Args[1:]
 	if len(args) < 1 {
-		logger.Fatal("failed to load config", errors.New("config path is not provided"))
+		log.Fatal("failed to load config", errors.New("config path is not provided"))
 	}
 	configPath := args[0]
-	logger.Info("loading config from "+configPath, "")
+	log.Println("loading config from "+configPath, "")
 
 	cfg, err := configs.ReadConfigs(configPath)
 	if err != nil {
-		logger.Fatal("failed to load config", err)
+		log.Fatal("failed to load config", err)
 	}
-	logger.Info("loaded config", "")
+	log.Println("loaded config")
+
+	logger := logger.NewLogger(cfg.Env)
+	defer logger.Sync()
+	logger.Info("starting service", "")
 
 	db, err := ent.Open(cfg.DB.Driver, cfg.DB.URI)
 	if err != nil {

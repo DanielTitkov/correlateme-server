@@ -12,6 +12,8 @@ import (
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/correlation"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dataset"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/datasetparams"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dictionary"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dictionaryentry"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicatorvaluealias"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/observation"
@@ -35,6 +37,10 @@ type Client struct {
 	Dataset *DatasetClient
 	// DatasetParams is the client for interacting with the DatasetParams builders.
 	DatasetParams *DatasetParamsClient
+	// Dictionary is the client for interacting with the Dictionary builders.
+	Dictionary *DictionaryClient
+	// DictionaryEntry is the client for interacting with the DictionaryEntry builders.
+	DictionaryEntry *DictionaryEntryClient
 	// Indicator is the client for interacting with the Indicator builders.
 	Indicator *IndicatorClient
 	// IndicatorValueAlias is the client for interacting with the IndicatorValueAlias builders.
@@ -63,6 +69,8 @@ func (c *Client) init() {
 	c.Correlation = NewCorrelationClient(c.config)
 	c.Dataset = NewDatasetClient(c.config)
 	c.DatasetParams = NewDatasetParamsClient(c.config)
+	c.Dictionary = NewDictionaryClient(c.config)
+	c.DictionaryEntry = NewDictionaryEntryClient(c.config)
 	c.Indicator = NewIndicatorClient(c.config)
 	c.IndicatorValueAlias = NewIndicatorValueAliasClient(c.config)
 	c.Observation = NewObservationClient(c.config)
@@ -105,6 +113,8 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 		Correlation:         NewCorrelationClient(cfg),
 		Dataset:             NewDatasetClient(cfg),
 		DatasetParams:       NewDatasetParamsClient(cfg),
+		Dictionary:          NewDictionaryClient(cfg),
+		DictionaryEntry:     NewDictionaryEntryClient(cfg),
 		Indicator:           NewIndicatorClient(cfg),
 		IndicatorValueAlias: NewIndicatorValueAliasClient(cfg),
 		Observation:         NewObservationClient(cfg),
@@ -132,6 +142,8 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 		Correlation:         NewCorrelationClient(cfg),
 		Dataset:             NewDatasetClient(cfg),
 		DatasetParams:       NewDatasetParamsClient(cfg),
+		Dictionary:          NewDictionaryClient(cfg),
+		DictionaryEntry:     NewDictionaryEntryClient(cfg),
 		Indicator:           NewIndicatorClient(cfg),
 		IndicatorValueAlias: NewIndicatorValueAliasClient(cfg),
 		Observation:         NewObservationClient(cfg),
@@ -170,6 +182,8 @@ func (c *Client) Use(hooks ...Hook) {
 	c.Correlation.Use(hooks...)
 	c.Dataset.Use(hooks...)
 	c.DatasetParams.Use(hooks...)
+	c.Dictionary.Use(hooks...)
+	c.DictionaryEntry.Use(hooks...)
 	c.Indicator.Use(hooks...)
 	c.IndicatorValueAlias.Use(hooks...)
 	c.Observation.Use(hooks...)
@@ -584,6 +598,214 @@ func (c *DatasetParamsClient) QueryDataset(dp *DatasetParams) *DatasetQuery {
 // Hooks returns the client hooks.
 func (c *DatasetParamsClient) Hooks() []Hook {
 	return c.hooks.DatasetParams
+}
+
+// DictionaryClient is a client for the Dictionary schema.
+type DictionaryClient struct {
+	config
+}
+
+// NewDictionaryClient returns a client for the Dictionary from the given config.
+func NewDictionaryClient(c config) *DictionaryClient {
+	return &DictionaryClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `dictionary.Hooks(f(g(h())))`.
+func (c *DictionaryClient) Use(hooks ...Hook) {
+	c.hooks.Dictionary = append(c.hooks.Dictionary, hooks...)
+}
+
+// Create returns a create builder for Dictionary.
+func (c *DictionaryClient) Create() *DictionaryCreate {
+	mutation := newDictionaryMutation(c.config, OpCreate)
+	return &DictionaryCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of Dictionary entities.
+func (c *DictionaryClient) CreateBulk(builders ...*DictionaryCreate) *DictionaryCreateBulk {
+	return &DictionaryCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for Dictionary.
+func (c *DictionaryClient) Update() *DictionaryUpdate {
+	mutation := newDictionaryMutation(c.config, OpUpdate)
+	return &DictionaryUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *DictionaryClient) UpdateOne(d *Dictionary) *DictionaryUpdateOne {
+	mutation := newDictionaryMutation(c.config, OpUpdateOne, withDictionary(d))
+	return &DictionaryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *DictionaryClient) UpdateOneID(id int) *DictionaryUpdateOne {
+	mutation := newDictionaryMutation(c.config, OpUpdateOne, withDictionaryID(id))
+	return &DictionaryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for Dictionary.
+func (c *DictionaryClient) Delete() *DictionaryDelete {
+	mutation := newDictionaryMutation(c.config, OpDelete)
+	return &DictionaryDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *DictionaryClient) DeleteOne(d *Dictionary) *DictionaryDeleteOne {
+	return c.DeleteOneID(d.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *DictionaryClient) DeleteOneID(id int) *DictionaryDeleteOne {
+	builder := c.Delete().Where(dictionary.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &DictionaryDeleteOne{builder}
+}
+
+// Query returns a query builder for Dictionary.
+func (c *DictionaryClient) Query() *DictionaryQuery {
+	return &DictionaryQuery{config: c.config}
+}
+
+// Get returns a Dictionary entity by its id.
+func (c *DictionaryClient) Get(ctx context.Context, id int) (*Dictionary, error) {
+	return c.Query().Where(dictionary.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *DictionaryClient) GetX(ctx context.Context, id int) *Dictionary {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryEntries queries the entries edge of a Dictionary.
+func (c *DictionaryClient) QueryEntries(d *Dictionary) *DictionaryEntryQuery {
+	query := &DictionaryEntryQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := d.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(dictionary.Table, dictionary.FieldID, id),
+			sqlgraph.To(dictionaryentry.Table, dictionaryentry.FieldID),
+			sqlgraph.Edge(sqlgraph.O2M, false, dictionary.EntriesTable, dictionary.EntriesColumn),
+		)
+		fromV = sqlgraph.Neighbors(d.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *DictionaryClient) Hooks() []Hook {
+	return c.hooks.Dictionary
+}
+
+// DictionaryEntryClient is a client for the DictionaryEntry schema.
+type DictionaryEntryClient struct {
+	config
+}
+
+// NewDictionaryEntryClient returns a client for the DictionaryEntry from the given config.
+func NewDictionaryEntryClient(c config) *DictionaryEntryClient {
+	return &DictionaryEntryClient{config: c}
+}
+
+// Use adds a list of mutation hooks to the hooks stack.
+// A call to `Use(f, g, h)` equals to `dictionaryentry.Hooks(f(g(h())))`.
+func (c *DictionaryEntryClient) Use(hooks ...Hook) {
+	c.hooks.DictionaryEntry = append(c.hooks.DictionaryEntry, hooks...)
+}
+
+// Create returns a create builder for DictionaryEntry.
+func (c *DictionaryEntryClient) Create() *DictionaryEntryCreate {
+	mutation := newDictionaryEntryMutation(c.config, OpCreate)
+	return &DictionaryEntryCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// CreateBulk returns a builder for creating a bulk of DictionaryEntry entities.
+func (c *DictionaryEntryClient) CreateBulk(builders ...*DictionaryEntryCreate) *DictionaryEntryCreateBulk {
+	return &DictionaryEntryCreateBulk{config: c.config, builders: builders}
+}
+
+// Update returns an update builder for DictionaryEntry.
+func (c *DictionaryEntryClient) Update() *DictionaryEntryUpdate {
+	mutation := newDictionaryEntryMutation(c.config, OpUpdate)
+	return &DictionaryEntryUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOne returns an update builder for the given entity.
+func (c *DictionaryEntryClient) UpdateOne(de *DictionaryEntry) *DictionaryEntryUpdateOne {
+	mutation := newDictionaryEntryMutation(c.config, OpUpdateOne, withDictionaryEntry(de))
+	return &DictionaryEntryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// UpdateOneID returns an update builder for the given id.
+func (c *DictionaryEntryClient) UpdateOneID(id int) *DictionaryEntryUpdateOne {
+	mutation := newDictionaryEntryMutation(c.config, OpUpdateOne, withDictionaryEntryID(id))
+	return &DictionaryEntryUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// Delete returns a delete builder for DictionaryEntry.
+func (c *DictionaryEntryClient) Delete() *DictionaryEntryDelete {
+	mutation := newDictionaryEntryMutation(c.config, OpDelete)
+	return &DictionaryEntryDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+}
+
+// DeleteOne returns a delete builder for the given entity.
+func (c *DictionaryEntryClient) DeleteOne(de *DictionaryEntry) *DictionaryEntryDeleteOne {
+	return c.DeleteOneID(de.ID)
+}
+
+// DeleteOneID returns a delete builder for the given id.
+func (c *DictionaryEntryClient) DeleteOneID(id int) *DictionaryEntryDeleteOne {
+	builder := c.Delete().Where(dictionaryentry.ID(id))
+	builder.mutation.id = &id
+	builder.mutation.op = OpDeleteOne
+	return &DictionaryEntryDeleteOne{builder}
+}
+
+// Query returns a query builder for DictionaryEntry.
+func (c *DictionaryEntryClient) Query() *DictionaryEntryQuery {
+	return &DictionaryEntryQuery{config: c.config}
+}
+
+// Get returns a DictionaryEntry entity by its id.
+func (c *DictionaryEntryClient) Get(ctx context.Context, id int) (*DictionaryEntry, error) {
+	return c.Query().Where(dictionaryentry.ID(id)).Only(ctx)
+}
+
+// GetX is like Get, but panics if an error occurs.
+func (c *DictionaryEntryClient) GetX(ctx context.Context, id int) *DictionaryEntry {
+	obj, err := c.Get(ctx, id)
+	if err != nil {
+		panic(err)
+	}
+	return obj
+}
+
+// QueryDictionary queries the dictionary edge of a DictionaryEntry.
+func (c *DictionaryEntryClient) QueryDictionary(de *DictionaryEntry) *DictionaryQuery {
+	query := &DictionaryQuery{config: c.config}
+	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
+		id := de.ID
+		step := sqlgraph.NewStep(
+			sqlgraph.From(dictionaryentry.Table, dictionaryentry.FieldID, id),
+			sqlgraph.To(dictionary.Table, dictionary.FieldID),
+			sqlgraph.Edge(sqlgraph.M2O, true, dictionaryentry.DictionaryTable, dictionaryentry.DictionaryColumn),
+		)
+		fromV = sqlgraph.Neighbors(de.driver.Dialect(), step)
+		return fromV, nil
+	}
+	return query
+}
+
+// Hooks returns the client hooks.
+func (c *DictionaryEntryClient) Hooks() []Hook {
+	return c.hooks.DictionaryEntry
 }
 
 // IndicatorClient is a client for the Indicator schema.

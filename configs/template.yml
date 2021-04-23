@@ -27,3 +27,5 @@ data:
   presets:
     scalePresetsPath: "./data/presets/scales.json"
     indicatorPresetsPath: "./data/presets/indicators.json"
+    dictionaryPresetsPath: "./data/presets/dictionaries.json"
+    dictionaryEntryPresetsPath: "./data/presets/dictionary_entries.json"

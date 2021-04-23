@@ -20,3 +20,19 @@ func (s *Scale) JSONString() string {
 	}
 	return string(jsonBytes)
 }
+
+func (d *Dictionary) JSONString() string {
+	jsonBytes, err := json.Marshal(d)
+	if err != nil {
+		return fmt.Sprintf(`{"error":"%s"}`, err)
+	}
+	return string(jsonBytes)
+}
+
+func (e *DictionaryEntry) JSONString() string {
+	jsonBytes, err := json.Marshal(e)
+	if err != nil {
+		return fmt.Sprintf(`{"error":"%s"}`, err)
+	}
+	return string(jsonBytes)
+}

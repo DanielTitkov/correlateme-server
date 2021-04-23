@@ -21,15 +21,15 @@ type (
 		Code         string             `json:"code"` // unique code for external systems
 		Title        string             `json:"title"`
 		Description  string             `json:"description"`
-		Active       bool               `json:"active"`   // FIXME move to dataset?
-		BuiltIn      bool               `json:"built_in"` // if Indicator is created by the service
-		External     bool               `json:"extrnal"`  // if Indicator is populated by the user or external system
+		Active       bool               `json:"active"`  // FIXME move to dataset?
+		BuiltIn      bool               `json:"builtIn"` // if Indicator is created by the service
+		External     bool               `json:"extrnal"` // if Indicator is populated by the user or external system
 		Scale        *Scale             `json:"scale"`
 		Author       *User              `json:"author"`
-		UserDataset  *Dataset           `json:"user_dataset"` // dataset for a specific user
-		ValueMapping map[float64]string `json:"-"`            // aliases for nomial and ordinal scales
-		CreateTime   time.Time          `json:"create_time"`
-		UpdateTime   time.Time          `json:"update_time"`
+		UserDataset  *Dataset           `json:"userDataset"` // dataset for a specific user
+		ValueMapping map[float64]string `json:"-"`           // aliases for nomial and ordinal scales
+		CreateTime   time.Time          `json:"createTime"`
+		UpdateTime   time.Time          `json:"updateTime"`
 	}
 	// Scale is a type of a scale for an Indicator
 	Scale struct {
@@ -116,5 +116,18 @@ type (
 		Datasets     int `json:"datasets,omitempty"`
 		Observations int `json:"observations,omitempty"`
 		Correlations int `json:"correlations,omitempty"`
+	}
+	// Dictionary holds dictionaries
+	Dictionary struct {
+		ID          int    `json:"id"`
+		Code        string `json:"code"`
+		Description string `json:"description"`
+	}
+	// DictionaryEntry holds entry of dictionary
+	DictionaryEntry struct {
+		DictionaryID int    `json:"dictionaryId"`
+		ID           int    `json:"id"`
+		Code         string `json:"code"`
+		Description  string `json:"description"`
 	}
 )

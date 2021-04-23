@@ -12,6 +12,8 @@ import (
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/correlation"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dataset"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/datasetparams"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dictionary"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dictionaryentry"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicatorvaluealias"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/observation"
@@ -35,6 +37,8 @@ const (
 	TypeCorrelation         = "Correlation"
 	TypeDataset             = "Dataset"
 	TypeDatasetParams       = "DatasetParams"
+	TypeDictionary          = "Dictionary"
+	TypeDictionaryEntry     = "DictionaryEntry"
 	TypeIndicator           = "Indicator"
 	TypeIndicatorValueAlias = "IndicatorValueAlias"
 	TypeObservation         = "Observation"
@@ -2196,6 +2200,905 @@ func (m *DatasetParamsMutation) ResetEdge(name string) error {
 		return nil
 	}
 	return fmt.Errorf("unknown DatasetParams edge %s", name)
+}
+
+// DictionaryMutation represents an operation that mutates the Dictionary nodes in the graph.
+type DictionaryMutation struct {
+	config
+	op             Op
+	typ            string
+	id             *int
+	code           *string
+	description    *string
+	clearedFields  map[string]struct{}
+	entries        map[int]struct{}
+	removedentries map[int]struct{}
+	clearedentries bool
+	done           bool
+	oldValue       func(context.Context) (*Dictionary, error)
+	predicates     []predicate.Dictionary
+}
+
+var _ ent.Mutation = (*DictionaryMutation)(nil)
+
+// dictionaryOption allows management of the mutation configuration using functional options.
+type dictionaryOption func(*DictionaryMutation)
+
+// newDictionaryMutation creates new mutation for the Dictionary entity.
+func newDictionaryMutation(c config, op Op, opts ...dictionaryOption) *DictionaryMutation {
+	m := &DictionaryMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeDictionary,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withDictionaryID sets the ID field of the mutation.
+func withDictionaryID(id int) dictionaryOption {
+	return func(m *DictionaryMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *Dictionary
+		)
+		m.oldValue = func(ctx context.Context) (*Dictionary, error) {
+			once.Do(func() {
+				if m.done {
+					err = fmt.Errorf("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().Dictionary.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withDictionary sets the old Dictionary of the mutation.
+func withDictionary(node *Dictionary) dictionaryOption {
+	return func(m *DictionaryMutation) {
+		m.oldValue = func(context.Context) (*Dictionary, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m DictionaryMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m DictionaryMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of Dictionary entities.
+func (m *DictionaryMutation) SetID(id int) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID
+// is only available if it was provided to the builder.
+func (m *DictionaryMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// SetCode sets the "code" field.
+func (m *DictionaryMutation) SetCode(s string) {
+	m.code = &s
+}
+
+// Code returns the value of the "code" field in the mutation.
+func (m *DictionaryMutation) Code() (r string, exists bool) {
+	v := m.code
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCode returns the old "code" field's value of the Dictionary entity.
+// If the Dictionary object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DictionaryMutation) OldCode(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldCode is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldCode requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCode: %w", err)
+	}
+	return oldValue.Code, nil
+}
+
+// ResetCode resets all changes to the "code" field.
+func (m *DictionaryMutation) ResetCode() {
+	m.code = nil
+}
+
+// SetDescription sets the "description" field.
+func (m *DictionaryMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *DictionaryMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the Dictionary entity.
+// If the Dictionary object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DictionaryMutation) OldDescription(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ClearDescription clears the value of the "description" field.
+func (m *DictionaryMutation) ClearDescription() {
+	m.description = nil
+	m.clearedFields[dictionary.FieldDescription] = struct{}{}
+}
+
+// DescriptionCleared returns if the "description" field was cleared in this mutation.
+func (m *DictionaryMutation) DescriptionCleared() bool {
+	_, ok := m.clearedFields[dictionary.FieldDescription]
+	return ok
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *DictionaryMutation) ResetDescription() {
+	m.description = nil
+	delete(m.clearedFields, dictionary.FieldDescription)
+}
+
+// AddEntryIDs adds the "entries" edge to the DictionaryEntry entity by ids.
+func (m *DictionaryMutation) AddEntryIDs(ids ...int) {
+	if m.entries == nil {
+		m.entries = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.entries[ids[i]] = struct{}{}
+	}
+}
+
+// ClearEntries clears the "entries" edge to the DictionaryEntry entity.
+func (m *DictionaryMutation) ClearEntries() {
+	m.clearedentries = true
+}
+
+// EntriesCleared returns if the "entries" edge to the DictionaryEntry entity was cleared.
+func (m *DictionaryMutation) EntriesCleared() bool {
+	return m.clearedentries
+}
+
+// RemoveEntryIDs removes the "entries" edge to the DictionaryEntry entity by IDs.
+func (m *DictionaryMutation) RemoveEntryIDs(ids ...int) {
+	if m.removedentries == nil {
+		m.removedentries = make(map[int]struct{})
+	}
+	for i := range ids {
+		m.removedentries[ids[i]] = struct{}{}
+	}
+}
+
+// RemovedEntries returns the removed IDs of the "entries" edge to the DictionaryEntry entity.
+func (m *DictionaryMutation) RemovedEntriesIDs() (ids []int) {
+	for id := range m.removedentries {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// EntriesIDs returns the "entries" edge IDs in the mutation.
+func (m *DictionaryMutation) EntriesIDs() (ids []int) {
+	for id := range m.entries {
+		ids = append(ids, id)
+	}
+	return
+}
+
+// ResetEntries resets all changes to the "entries" edge.
+func (m *DictionaryMutation) ResetEntries() {
+	m.entries = nil
+	m.clearedentries = false
+	m.removedentries = nil
+}
+
+// Op returns the operation name.
+func (m *DictionaryMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (Dictionary).
+func (m *DictionaryMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *DictionaryMutation) Fields() []string {
+	fields := make([]string, 0, 2)
+	if m.code != nil {
+		fields = append(fields, dictionary.FieldCode)
+	}
+	if m.description != nil {
+		fields = append(fields, dictionary.FieldDescription)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *DictionaryMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case dictionary.FieldCode:
+		return m.Code()
+	case dictionary.FieldDescription:
+		return m.Description()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *DictionaryMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case dictionary.FieldCode:
+		return m.OldCode(ctx)
+	case dictionary.FieldDescription:
+		return m.OldDescription(ctx)
+	}
+	return nil, fmt.Errorf("unknown Dictionary field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *DictionaryMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case dictionary.FieldCode:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCode(v)
+		return nil
+	case dictionary.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	}
+	return fmt.Errorf("unknown Dictionary field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *DictionaryMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *DictionaryMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *DictionaryMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Dictionary numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *DictionaryMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(dictionary.FieldDescription) {
+		fields = append(fields, dictionary.FieldDescription)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *DictionaryMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *DictionaryMutation) ClearField(name string) error {
+	switch name {
+	case dictionary.FieldDescription:
+		m.ClearDescription()
+		return nil
+	}
+	return fmt.Errorf("unknown Dictionary nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *DictionaryMutation) ResetField(name string) error {
+	switch name {
+	case dictionary.FieldCode:
+		m.ResetCode()
+		return nil
+	case dictionary.FieldDescription:
+		m.ResetDescription()
+		return nil
+	}
+	return fmt.Errorf("unknown Dictionary field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *DictionaryMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.entries != nil {
+		edges = append(edges, dictionary.EdgeEntries)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *DictionaryMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case dictionary.EdgeEntries:
+		ids := make([]ent.Value, 0, len(m.entries))
+		for id := range m.entries {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *DictionaryMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.removedentries != nil {
+		edges = append(edges, dictionary.EdgeEntries)
+	}
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *DictionaryMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	case dictionary.EdgeEntries:
+		ids := make([]ent.Value, 0, len(m.removedentries))
+		for id := range m.removedentries {
+			ids = append(ids, id)
+		}
+		return ids
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *DictionaryMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.clearedentries {
+		edges = append(edges, dictionary.EdgeEntries)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *DictionaryMutation) EdgeCleared(name string) bool {
+	switch name {
+	case dictionary.EdgeEntries:
+		return m.clearedentries
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *DictionaryMutation) ClearEdge(name string) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown Dictionary unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *DictionaryMutation) ResetEdge(name string) error {
+	switch name {
+	case dictionary.EdgeEntries:
+		m.ResetEntries()
+		return nil
+	}
+	return fmt.Errorf("unknown Dictionary edge %s", name)
+}
+
+// DictionaryEntryMutation represents an operation that mutates the DictionaryEntry nodes in the graph.
+type DictionaryEntryMutation struct {
+	config
+	op                Op
+	typ               string
+	id                *int
+	code              *string
+	description       *string
+	clearedFields     map[string]struct{}
+	dictionary        *int
+	cleareddictionary bool
+	done              bool
+	oldValue          func(context.Context) (*DictionaryEntry, error)
+	predicates        []predicate.DictionaryEntry
+}
+
+var _ ent.Mutation = (*DictionaryEntryMutation)(nil)
+
+// dictionaryentryOption allows management of the mutation configuration using functional options.
+type dictionaryentryOption func(*DictionaryEntryMutation)
+
+// newDictionaryEntryMutation creates new mutation for the DictionaryEntry entity.
+func newDictionaryEntryMutation(c config, op Op, opts ...dictionaryentryOption) *DictionaryEntryMutation {
+	m := &DictionaryEntryMutation{
+		config:        c,
+		op:            op,
+		typ:           TypeDictionaryEntry,
+		clearedFields: make(map[string]struct{}),
+	}
+	for _, opt := range opts {
+		opt(m)
+	}
+	return m
+}
+
+// withDictionaryEntryID sets the ID field of the mutation.
+func withDictionaryEntryID(id int) dictionaryentryOption {
+	return func(m *DictionaryEntryMutation) {
+		var (
+			err   error
+			once  sync.Once
+			value *DictionaryEntry
+		)
+		m.oldValue = func(ctx context.Context) (*DictionaryEntry, error) {
+			once.Do(func() {
+				if m.done {
+					err = fmt.Errorf("querying old values post mutation is not allowed")
+				} else {
+					value, err = m.Client().DictionaryEntry.Get(ctx, id)
+				}
+			})
+			return value, err
+		}
+		m.id = &id
+	}
+}
+
+// withDictionaryEntry sets the old DictionaryEntry of the mutation.
+func withDictionaryEntry(node *DictionaryEntry) dictionaryentryOption {
+	return func(m *DictionaryEntryMutation) {
+		m.oldValue = func(context.Context) (*DictionaryEntry, error) {
+			return node, nil
+		}
+		m.id = &node.ID
+	}
+}
+
+// Client returns a new `ent.Client` from the mutation. If the mutation was
+// executed in a transaction (ent.Tx), a transactional client is returned.
+func (m DictionaryEntryMutation) Client() *Client {
+	client := &Client{config: m.config}
+	client.init()
+	return client
+}
+
+// Tx returns an `ent.Tx` for mutations that were executed in transactions;
+// it returns an error otherwise.
+func (m DictionaryEntryMutation) Tx() (*Tx, error) {
+	if _, ok := m.driver.(*txDriver); !ok {
+		return nil, fmt.Errorf("ent: mutation is not running in a transaction")
+	}
+	tx := &Tx{config: m.config}
+	tx.init()
+	return tx, nil
+}
+
+// SetID sets the value of the id field. Note that this
+// operation is only accepted on creation of DictionaryEntry entities.
+func (m *DictionaryEntryMutation) SetID(id int) {
+	m.id = &id
+}
+
+// ID returns the ID value in the mutation. Note that the ID
+// is only available if it was provided to the builder.
+func (m *DictionaryEntryMutation) ID() (id int, exists bool) {
+	if m.id == nil {
+		return
+	}
+	return *m.id, true
+}
+
+// SetCode sets the "code" field.
+func (m *DictionaryEntryMutation) SetCode(s string) {
+	m.code = &s
+}
+
+// Code returns the value of the "code" field in the mutation.
+func (m *DictionaryEntryMutation) Code() (r string, exists bool) {
+	v := m.code
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldCode returns the old "code" field's value of the DictionaryEntry entity.
+// If the DictionaryEntry object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DictionaryEntryMutation) OldCode(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldCode is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldCode requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldCode: %w", err)
+	}
+	return oldValue.Code, nil
+}
+
+// ResetCode resets all changes to the "code" field.
+func (m *DictionaryEntryMutation) ResetCode() {
+	m.code = nil
+}
+
+// SetDescription sets the "description" field.
+func (m *DictionaryEntryMutation) SetDescription(s string) {
+	m.description = &s
+}
+
+// Description returns the value of the "description" field in the mutation.
+func (m *DictionaryEntryMutation) Description() (r string, exists bool) {
+	v := m.description
+	if v == nil {
+		return
+	}
+	return *v, true
+}
+
+// OldDescription returns the old "description" field's value of the DictionaryEntry entity.
+// If the DictionaryEntry object wasn't provided to the builder, the object is fetched from the database.
+// An error is returned if the mutation operation is not UpdateOne, or the database query fails.
+func (m *DictionaryEntryMutation) OldDescription(ctx context.Context) (v string, err error) {
+	if !m.op.Is(OpUpdateOne) {
+		return v, fmt.Errorf("OldDescription is only allowed on UpdateOne operations")
+	}
+	if m.id == nil || m.oldValue == nil {
+		return v, fmt.Errorf("OldDescription requires an ID field in the mutation")
+	}
+	oldValue, err := m.oldValue(ctx)
+	if err != nil {
+		return v, fmt.Errorf("querying old value for OldDescription: %w", err)
+	}
+	return oldValue.Description, nil
+}
+
+// ClearDescription clears the value of the "description" field.
+func (m *DictionaryEntryMutation) ClearDescription() {
+	m.description = nil
+	m.clearedFields[dictionaryentry.FieldDescription] = struct{}{}
+}
+
+// DescriptionCleared returns if the "description" field was cleared in this mutation.
+func (m *DictionaryEntryMutation) DescriptionCleared() bool {
+	_, ok := m.clearedFields[dictionaryentry.FieldDescription]
+	return ok
+}
+
+// ResetDescription resets all changes to the "description" field.
+func (m *DictionaryEntryMutation) ResetDescription() {
+	m.description = nil
+	delete(m.clearedFields, dictionaryentry.FieldDescription)
+}
+
+// SetDictionaryID sets the "dictionary" edge to the Dictionary entity by id.
+func (m *DictionaryEntryMutation) SetDictionaryID(id int) {
+	m.dictionary = &id
+}
+
+// ClearDictionary clears the "dictionary" edge to the Dictionary entity.
+func (m *DictionaryEntryMutation) ClearDictionary() {
+	m.cleareddictionary = true
+}
+
+// DictionaryCleared returns if the "dictionary" edge to the Dictionary entity was cleared.
+func (m *DictionaryEntryMutation) DictionaryCleared() bool {
+	return m.cleareddictionary
+}
+
+// DictionaryID returns the "dictionary" edge ID in the mutation.
+func (m *DictionaryEntryMutation) DictionaryID() (id int, exists bool) {
+	if m.dictionary != nil {
+		return *m.dictionary, true
+	}
+	return
+}
+
+// DictionaryIDs returns the "dictionary" edge IDs in the mutation.
+// Note that IDs always returns len(IDs) <= 1 for unique edges, and you should use
+// DictionaryID instead. It exists only for internal usage by the builders.
+func (m *DictionaryEntryMutation) DictionaryIDs() (ids []int) {
+	if id := m.dictionary; id != nil {
+		ids = append(ids, *id)
+	}
+	return
+}
+
+// ResetDictionary resets all changes to the "dictionary" edge.
+func (m *DictionaryEntryMutation) ResetDictionary() {
+	m.dictionary = nil
+	m.cleareddictionary = false
+}
+
+// Op returns the operation name.
+func (m *DictionaryEntryMutation) Op() Op {
+	return m.op
+}
+
+// Type returns the node type of this mutation (DictionaryEntry).
+func (m *DictionaryEntryMutation) Type() string {
+	return m.typ
+}
+
+// Fields returns all fields that were changed during this mutation. Note that in
+// order to get all numeric fields that were incremented/decremented, call
+// AddedFields().
+func (m *DictionaryEntryMutation) Fields() []string {
+	fields := make([]string, 0, 2)
+	if m.code != nil {
+		fields = append(fields, dictionaryentry.FieldCode)
+	}
+	if m.description != nil {
+		fields = append(fields, dictionaryentry.FieldDescription)
+	}
+	return fields
+}
+
+// Field returns the value of a field with the given name. The second boolean
+// return value indicates that this field was not set, or was not defined in the
+// schema.
+func (m *DictionaryEntryMutation) Field(name string) (ent.Value, bool) {
+	switch name {
+	case dictionaryentry.FieldCode:
+		return m.Code()
+	case dictionaryentry.FieldDescription:
+		return m.Description()
+	}
+	return nil, false
+}
+
+// OldField returns the old value of the field from the database. An error is
+// returned if the mutation operation is not UpdateOne, or the query to the
+// database failed.
+func (m *DictionaryEntryMutation) OldField(ctx context.Context, name string) (ent.Value, error) {
+	switch name {
+	case dictionaryentry.FieldCode:
+		return m.OldCode(ctx)
+	case dictionaryentry.FieldDescription:
+		return m.OldDescription(ctx)
+	}
+	return nil, fmt.Errorf("unknown DictionaryEntry field %s", name)
+}
+
+// SetField sets the value of a field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *DictionaryEntryMutation) SetField(name string, value ent.Value) error {
+	switch name {
+	case dictionaryentry.FieldCode:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetCode(v)
+		return nil
+	case dictionaryentry.FieldDescription:
+		v, ok := value.(string)
+		if !ok {
+			return fmt.Errorf("unexpected type %T for field %s", value, name)
+		}
+		m.SetDescription(v)
+		return nil
+	}
+	return fmt.Errorf("unknown DictionaryEntry field %s", name)
+}
+
+// AddedFields returns all numeric fields that were incremented/decremented during
+// this mutation.
+func (m *DictionaryEntryMutation) AddedFields() []string {
+	return nil
+}
+
+// AddedField returns the numeric value that was incremented/decremented on a field
+// with the given name. The second boolean return value indicates that this field
+// was not set, or was not defined in the schema.
+func (m *DictionaryEntryMutation) AddedField(name string) (ent.Value, bool) {
+	return nil, false
+}
+
+// AddField adds the value to the field with the given name. It returns an error if
+// the field is not defined in the schema, or if the type mismatched the field
+// type.
+func (m *DictionaryEntryMutation) AddField(name string, value ent.Value) error {
+	switch name {
+	}
+	return fmt.Errorf("unknown DictionaryEntry numeric field %s", name)
+}
+
+// ClearedFields returns all nullable fields that were cleared during this
+// mutation.
+func (m *DictionaryEntryMutation) ClearedFields() []string {
+	var fields []string
+	if m.FieldCleared(dictionaryentry.FieldDescription) {
+		fields = append(fields, dictionaryentry.FieldDescription)
+	}
+	return fields
+}
+
+// FieldCleared returns a boolean indicating if a field with the given name was
+// cleared in this mutation.
+func (m *DictionaryEntryMutation) FieldCleared(name string) bool {
+	_, ok := m.clearedFields[name]
+	return ok
+}
+
+// ClearField clears the value of the field with the given name. It returns an
+// error if the field is not defined in the schema.
+func (m *DictionaryEntryMutation) ClearField(name string) error {
+	switch name {
+	case dictionaryentry.FieldDescription:
+		m.ClearDescription()
+		return nil
+	}
+	return fmt.Errorf("unknown DictionaryEntry nullable field %s", name)
+}
+
+// ResetField resets all changes in the mutation for the field with the given name.
+// It returns an error if the field is not defined in the schema.
+func (m *DictionaryEntryMutation) ResetField(name string) error {
+	switch name {
+	case dictionaryentry.FieldCode:
+		m.ResetCode()
+		return nil
+	case dictionaryentry.FieldDescription:
+		m.ResetDescription()
+		return nil
+	}
+	return fmt.Errorf("unknown DictionaryEntry field %s", name)
+}
+
+// AddedEdges returns all edge names that were set/added in this mutation.
+func (m *DictionaryEntryMutation) AddedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.dictionary != nil {
+		edges = append(edges, dictionaryentry.EdgeDictionary)
+	}
+	return edges
+}
+
+// AddedIDs returns all IDs (to other nodes) that were added for the given edge
+// name in this mutation.
+func (m *DictionaryEntryMutation) AddedIDs(name string) []ent.Value {
+	switch name {
+	case dictionaryentry.EdgeDictionary:
+		if id := m.dictionary; id != nil {
+			return []ent.Value{*id}
+		}
+	}
+	return nil
+}
+
+// RemovedEdges returns all edge names that were removed in this mutation.
+func (m *DictionaryEntryMutation) RemovedEdges() []string {
+	edges := make([]string, 0, 1)
+	return edges
+}
+
+// RemovedIDs returns all IDs (to other nodes) that were removed for the edge with
+// the given name in this mutation.
+func (m *DictionaryEntryMutation) RemovedIDs(name string) []ent.Value {
+	switch name {
+	}
+	return nil
+}
+
+// ClearedEdges returns all edge names that were cleared in this mutation.
+func (m *DictionaryEntryMutation) ClearedEdges() []string {
+	edges := make([]string, 0, 1)
+	if m.cleareddictionary {
+		edges = append(edges, dictionaryentry.EdgeDictionary)
+	}
+	return edges
+}
+
+// EdgeCleared returns a boolean which indicates if the edge with the given name
+// was cleared in this mutation.
+func (m *DictionaryEntryMutation) EdgeCleared(name string) bool {
+	switch name {
+	case dictionaryentry.EdgeDictionary:
+		return m.cleareddictionary
+	}
+	return false
+}
+
+// ClearEdge clears the value of the edge with the given name. It returns an error
+// if that edge is not defined in the schema.
+func (m *DictionaryEntryMutation) ClearEdge(name string) error {
+	switch name {
+	case dictionaryentry.EdgeDictionary:
+		m.ClearDictionary()
+		return nil
+	}
+	return fmt.Errorf("unknown DictionaryEntry unique edge %s", name)
+}
+
+// ResetEdge resets all changes to the edge with the given name in this mutation.
+// It returns an error if the edge is not defined in the schema.
+func (m *DictionaryEntryMutation) ResetEdge(name string) error {
+	switch name {
+	case dictionaryentry.EdgeDictionary:
+		m.ResetDictionary()
+		return nil
+	}
+	return fmt.Errorf("unknown DictionaryEntry edge %s", name)
 }
 
 // IndicatorMutation represents an operation that mutates the Indicator nodes in the graph.

@@ -71,6 +71,13 @@ type (
 		CreateOrUpdateCorrelation(*domain.Correlation) (*domain.Correlation, error)
 		GetUserCorrelations(userID int, granularity string) ([]*domain.Correlation, error)
 		GetCorrelation(domain.GetCorrelationArgs) (*domain.Correlation, error)
+
+		// dictionary
+		CreateDictionaty(*domain.Dictionary) error
+		GetDictionaryByCode(code string) (*domain.Dictionary, error)
+		GetDictionaryByID(id int) (*domain.Dictionary, error)
+		CreateDictionatyEntry(*domain.DictionaryEntry) error
+		GetDictionaryEntryByID(id int) (*domain.DictionaryEntry, error)
 	}
 )
 
@@ -91,6 +98,10 @@ func NewApp(
 
 	// TODO: maybe move it out from the constructor
 	err := app.initScales()
+	if err != nil {
+		return nil, err
+	}
+	err = app.initDictionaries()
 	if err != nil {
 		return nil, err
 	}
