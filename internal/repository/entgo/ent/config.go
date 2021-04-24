@@ -24,17 +24,17 @@ type config struct {
 
 // hooks per client, for fast access.
 type hooks struct {
-	Correlation         []ent.Hook
-	Dataset             []ent.Hook
-	DatasetParams       []ent.Hook
-	Dictionary          []ent.Hook
-	DictionaryEntry     []ent.Hook
-	Indicator           []ent.Hook
-	IndicatorValueAlias []ent.Hook
-	Observation         []ent.Hook
-	Scale               []ent.Hook
-	User                []ent.Hook
-	UserSettings        []ent.Hook
+	Correlation     []ent.Hook
+	Dataset         []ent.Hook
+	DatasetParams   []ent.Hook
+	Dictionary      []ent.Hook
+	DictionaryEntry []ent.Hook
+	Indicator       []ent.Hook
+	IndicatorParams []ent.Hook
+	Observation     []ent.Hook
+	Scale           []ent.Hook
+	User            []ent.Hook
+	UserSettings    []ent.Hook
 }
 
 // Options applies the options on the config object.

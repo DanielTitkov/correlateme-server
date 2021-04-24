@@ -87,15 +87,15 @@ func (f IndicatorFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, e
 	return f(ctx, mv)
 }
 
-// The IndicatorValueAliasFunc type is an adapter to allow the use of ordinary
-// function as IndicatorValueAlias mutator.
-type IndicatorValueAliasFunc func(context.Context, *ent.IndicatorValueAliasMutation) (ent.Value, error)
+// The IndicatorParamsFunc type is an adapter to allow the use of ordinary
+// function as IndicatorParams mutator.
+type IndicatorParamsFunc func(context.Context, *ent.IndicatorParamsMutation) (ent.Value, error)
 
 // Mutate calls f(ctx, m).
-func (f IndicatorValueAliasFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
-	mv, ok := m.(*ent.IndicatorValueAliasMutation)
+func (f IndicatorParamsFunc) Mutate(ctx context.Context, m ent.Mutation) (ent.Value, error) {
+	mv, ok := m.(*ent.IndicatorParamsMutation)
 	if !ok {
-		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.IndicatorValueAliasMutation", m)
+		return nil, fmt.Errorf("unexpected mutation type %T. expect *ent.IndicatorParamsMutation", m)
 	}
 	return f(ctx, mv)
 }

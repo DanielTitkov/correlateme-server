@@ -201,21 +201,22 @@ var (
 			},
 		},
 	}
-	// IndicatorValueAliasColumns holds the columns for the "indicator_value_alias" table.
-	IndicatorValueAliasColumns = []*schema.Column{
+	// IndicatorParamsColumns holds the columns for the "indicator_params" table.
+	IndicatorParamsColumns = []*schema.Column{
 		{Name: "id", Type: field.TypeInt, Increment: true},
 		{Name: "value_mapping", Type: field.TypeJSON, Nullable: true},
-		{Name: "indicator_indicator_value_alias", Type: field.TypeInt, Unique: true, Nullable: true},
+		{Name: "value_params", Type: field.TypeJSON},
+		{Name: "indicator_indicator_params", Type: field.TypeInt, Unique: true, Nullable: true},
 	}
-	// IndicatorValueAliasTable holds the schema information for the "indicator_value_alias" table.
-	IndicatorValueAliasTable = &schema.Table{
-		Name:       "indicator_value_alias",
-		Columns:    IndicatorValueAliasColumns,
-		PrimaryKey: []*schema.Column{IndicatorValueAliasColumns[0]},
+	// IndicatorParamsTable holds the schema information for the "indicator_params" table.
+	IndicatorParamsTable = &schema.Table{
+		Name:       "indicator_params",
+		Columns:    IndicatorParamsColumns,
+		PrimaryKey: []*schema.Column{IndicatorParamsColumns[0]},
 		ForeignKeys: []*schema.ForeignKey{
 			{
-				Symbol:  "indicator_value_alias_indicators_indicator_value_alias",
-				Columns: []*schema.Column{IndicatorValueAliasColumns[2]},
+				Symbol:  "indicator_params_indicators_indicator_params",
+				Columns: []*schema.Column{IndicatorParamsColumns[3]},
 
 				RefColumns: []*schema.Column{IndicatorsColumns[0]},
 				OnDelete:   schema.SetNull,
@@ -313,7 +314,7 @@ var (
 		DictionariesTable,
 		DictionaryEntriesTable,
 		IndicatorsTable,
-		IndicatorValueAliasTable,
+		IndicatorParamsTable,
 		ObservationsTable,
 		ScalesTable,
 		UsersTable,
@@ -330,7 +331,7 @@ func init() {
 	DictionaryEntriesTable.ForeignKeys[0].RefTable = DictionariesTable
 	IndicatorsTable.ForeignKeys[0].RefTable = ScalesTable
 	IndicatorsTable.ForeignKeys[1].RefTable = UsersTable
-	IndicatorValueAliasTable.ForeignKeys[0].RefTable = IndicatorsTable
+	IndicatorParamsTable.ForeignKeys[0].RefTable = IndicatorsTable
 	ObservationsTable.ForeignKeys[0].RefTable = DatasetsTable
 	UserSettingsTable.ForeignKeys[0].RefTable = UsersTable
 }

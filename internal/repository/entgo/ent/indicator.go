@@ -9,7 +9,7 @@ import (
 
 	"entgo.io/ent/dialect/sql"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
-	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicatorvaluealias"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicatorparams"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/scale"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/user"
 )
@@ -46,8 +46,8 @@ type Indicator struct {
 type IndicatorEdges struct {
 	// Datasets holds the value of the datasets edge.
 	Datasets []*Dataset `json:"datasets,omitempty"`
-	// IndicatorValueAlias holds the value of the indicator_value_alias edge.
-	IndicatorValueAlias *IndicatorValueAlias `json:"indicator_value_alias,omitempty"`
+	// IndicatorParams holds the value of the indicator_params edge.
+	IndicatorParams *IndicatorParams `json:"indicator_params,omitempty"`
 	// Author holds the value of the author edge.
 	Author *User `json:"author,omitempty"`
 	// Scale holds the value of the scale edge.
@@ -66,18 +66,18 @@ func (e IndicatorEdges) DatasetsOrErr() ([]*Dataset, error) {
 	return nil, &NotLoadedError{edge: "datasets"}
 }
 
-// IndicatorValueAliasOrErr returns the IndicatorValueAlias value or an error if the edge
+// IndicatorParamsOrErr returns the IndicatorParams value or an error if the edge
 // was not loaded in eager-loading, or loaded but was not found.
-func (e IndicatorEdges) IndicatorValueAliasOrErr() (*IndicatorValueAlias, error) {
+func (e IndicatorEdges) IndicatorParamsOrErr() (*IndicatorParams, error) {
 	if e.loadedTypes[1] {
-		if e.IndicatorValueAlias == nil {
-			// The edge indicator_value_alias was loaded in eager-loading,
+		if e.IndicatorParams == nil {
+			// The edge indicator_params was loaded in eager-loading,
 			// but was not found.
-			return nil, &NotFoundError{label: indicatorvaluealias.Label}
+			return nil, &NotFoundError{label: indicatorparams.Label}
 		}
-		return e.IndicatorValueAlias, nil
+		return e.IndicatorParams, nil
 	}
-	return nil, &NotLoadedError{edge: "indicator_value_alias"}
+	return nil, &NotLoadedError{edge: "indicator_params"}
 }
 
 // AuthorOrErr returns the Author value or an error if the edge
@@ -218,9 +218,9 @@ func (i *Indicator) QueryDatasets() *DatasetQuery {
 	return (&IndicatorClient{config: i.config}).QueryDatasets(i)
 }
 
-// QueryIndicatorValueAlias queries the "indicator_value_alias" edge of the Indicator entity.
-func (i *Indicator) QueryIndicatorValueAlias() *IndicatorValueAliasQuery {
-	return (&IndicatorClient{config: i.config}).QueryIndicatorValueAlias(i)
+// QueryIndicatorParams queries the "indicator_params" edge of the Indicator entity.
+func (i *Indicator) QueryIndicatorParams() *IndicatorParamsQuery {
+	return (&IndicatorClient{config: i.config}).QueryIndicatorParams(i)
 }
 
 // QueryAuthor queries the "author" edge of the Indicator entity.

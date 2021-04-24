@@ -30,8 +30,8 @@ const (
 
 	// EdgeDatasets holds the string denoting the datasets edge name in mutations.
 	EdgeDatasets = "datasets"
-	// EdgeIndicatorValueAlias holds the string denoting the indicator_value_alias edge name in mutations.
-	EdgeIndicatorValueAlias = "indicator_value_alias"
+	// EdgeIndicatorParams holds the string denoting the indicator_params edge name in mutations.
+	EdgeIndicatorParams = "indicator_params"
 	// EdgeAuthor holds the string denoting the author edge name in mutations.
 	EdgeAuthor = "author"
 	// EdgeScale holds the string denoting the scale edge name in mutations.
@@ -46,13 +46,13 @@ const (
 	DatasetsInverseTable = "datasets"
 	// DatasetsColumn is the table column denoting the datasets relation/edge.
 	DatasetsColumn = "indicator_datasets"
-	// IndicatorValueAliasTable is the table the holds the indicator_value_alias relation/edge.
-	IndicatorValueAliasTable = "indicator_value_alias"
-	// IndicatorValueAliasInverseTable is the table name for the IndicatorValueAlias entity.
-	// It exists in this package in order to avoid circular dependency with the "indicatorvaluealias" package.
-	IndicatorValueAliasInverseTable = "indicator_value_alias"
-	// IndicatorValueAliasColumn is the table column denoting the indicator_value_alias relation/edge.
-	IndicatorValueAliasColumn = "indicator_indicator_value_alias"
+	// IndicatorParamsTable is the table the holds the indicator_params relation/edge.
+	IndicatorParamsTable = "indicator_params"
+	// IndicatorParamsInverseTable is the table name for the IndicatorParams entity.
+	// It exists in this package in order to avoid circular dependency with the "indicatorparams" package.
+	IndicatorParamsInverseTable = "indicator_params"
+	// IndicatorParamsColumn is the table column denoting the indicator_params relation/edge.
+	IndicatorParamsColumn = "indicator_indicator_params"
 	// AuthorTable is the table the holds the author relation/edge.
 	AuthorTable = "indicators"
 	// AuthorInverseTable is the table name for the User entity.

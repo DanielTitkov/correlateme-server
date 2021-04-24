@@ -6,10 +6,12 @@ type (
 	// Indicator
 
 	CreateIndicatorArgs struct {
-		Username    string // TODO: change to ID
-		Title       string
-		Description string
-		ScaleType   string
+		Username     string // TODO: change to ID
+		Title        string
+		Description  string
+		ScaleType    string
+		ValueMapping map[string]string
+		ValueParams  *IndicatorValueParams
 	}
 	UpdateIndicatorArgs struct {
 		ID             int // immutable, only for getting indicator
@@ -17,6 +19,8 @@ type (
 		Title          string
 		Description    string
 		Active         bool
+		ValueMapping   map[string]string
+		ValueParams    *IndicatorValueParams
 		UpdateBuiltins bool
 	}
 	GetIndicatorsArgs struct {

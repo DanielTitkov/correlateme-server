@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dataset"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
-	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicatorvaluealias"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicatorparams"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/predicate"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/scale"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/user"
@@ -100,23 +100,23 @@ func (iu *IndicatorUpdate) AddDatasets(d ...*Dataset) *IndicatorUpdate {
 	return iu.AddDatasetIDs(ids...)
 }
 
-// SetIndicatorValueAliasID sets the "indicator_value_alias" edge to the IndicatorValueAlias entity by ID.
-func (iu *IndicatorUpdate) SetIndicatorValueAliasID(id int) *IndicatorUpdate {
-	iu.mutation.SetIndicatorValueAliasID(id)
+// SetIndicatorParamsID sets the "indicator_params" edge to the IndicatorParams entity by ID.
+func (iu *IndicatorUpdate) SetIndicatorParamsID(id int) *IndicatorUpdate {
+	iu.mutation.SetIndicatorParamsID(id)
 	return iu
 }
 
-// SetNillableIndicatorValueAliasID sets the "indicator_value_alias" edge to the IndicatorValueAlias entity by ID if the given value is not nil.
-func (iu *IndicatorUpdate) SetNillableIndicatorValueAliasID(id *int) *IndicatorUpdate {
+// SetNillableIndicatorParamsID sets the "indicator_params" edge to the IndicatorParams entity by ID if the given value is not nil.
+func (iu *IndicatorUpdate) SetNillableIndicatorParamsID(id *int) *IndicatorUpdate {
 	if id != nil {
-		iu = iu.SetIndicatorValueAliasID(*id)
+		iu = iu.SetIndicatorParamsID(*id)
 	}
 	return iu
 }
 
-// SetIndicatorValueAlias sets the "indicator_value_alias" edge to the IndicatorValueAlias entity.
-func (iu *IndicatorUpdate) SetIndicatorValueAlias(i *IndicatorValueAlias) *IndicatorUpdate {
-	return iu.SetIndicatorValueAliasID(i.ID)
+// SetIndicatorParams sets the "indicator_params" edge to the IndicatorParams entity.
+func (iu *IndicatorUpdate) SetIndicatorParams(i *IndicatorParams) *IndicatorUpdate {
+	return iu.SetIndicatorParamsID(i.ID)
 }
 
 // SetAuthorID sets the "author" edge to the User entity by ID.
@@ -175,9 +175,9 @@ func (iu *IndicatorUpdate) RemoveDatasets(d ...*Dataset) *IndicatorUpdate {
 	return iu.RemoveDatasetIDs(ids...)
 }
 
-// ClearIndicatorValueAlias clears the "indicator_value_alias" edge to the IndicatorValueAlias entity.
-func (iu *IndicatorUpdate) ClearIndicatorValueAlias() *IndicatorUpdate {
-	iu.mutation.ClearIndicatorValueAlias()
+// ClearIndicatorParams clears the "indicator_params" edge to the IndicatorParams entity.
+func (iu *IndicatorUpdate) ClearIndicatorParams() *IndicatorUpdate {
+	iu.mutation.ClearIndicatorParams()
 	return iu
 }
 
@@ -385,33 +385,33 @@ func (iu *IndicatorUpdate) sqlSave(ctx context.Context) (n int, err error) {
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if iu.mutation.IndicatorValueAliasCleared() {
+	if iu.mutation.IndicatorParamsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   indicator.IndicatorValueAliasTable,
-			Columns: []string{indicator.IndicatorValueAliasColumn},
+			Table:   indicator.IndicatorParamsTable,
+			Columns: []string{indicator.IndicatorParamsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: indicatorvaluealias.FieldID,
+					Column: indicatorparams.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := iu.mutation.IndicatorValueAliasIDs(); len(nodes) > 0 {
+	if nodes := iu.mutation.IndicatorParamsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   indicator.IndicatorValueAliasTable,
-			Columns: []string{indicator.IndicatorValueAliasColumn},
+			Table:   indicator.IndicatorParamsTable,
+			Columns: []string{indicator.IndicatorParamsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: indicatorvaluealias.FieldID,
+					Column: indicatorparams.FieldID,
 				},
 			},
 		}
@@ -577,23 +577,23 @@ func (iuo *IndicatorUpdateOne) AddDatasets(d ...*Dataset) *IndicatorUpdateOne {
 	return iuo.AddDatasetIDs(ids...)
 }
 
-// SetIndicatorValueAliasID sets the "indicator_value_alias" edge to the IndicatorValueAlias entity by ID.
-func (iuo *IndicatorUpdateOne) SetIndicatorValueAliasID(id int) *IndicatorUpdateOne {
-	iuo.mutation.SetIndicatorValueAliasID(id)
+// SetIndicatorParamsID sets the "indicator_params" edge to the IndicatorParams entity by ID.
+func (iuo *IndicatorUpdateOne) SetIndicatorParamsID(id int) *IndicatorUpdateOne {
+	iuo.mutation.SetIndicatorParamsID(id)
 	return iuo
 }
 
-// SetNillableIndicatorValueAliasID sets the "indicator_value_alias" edge to the IndicatorValueAlias entity by ID if the given value is not nil.
-func (iuo *IndicatorUpdateOne) SetNillableIndicatorValueAliasID(id *int) *IndicatorUpdateOne {
+// SetNillableIndicatorParamsID sets the "indicator_params" edge to the IndicatorParams entity by ID if the given value is not nil.
+func (iuo *IndicatorUpdateOne) SetNillableIndicatorParamsID(id *int) *IndicatorUpdateOne {
 	if id != nil {
-		iuo = iuo.SetIndicatorValueAliasID(*id)
+		iuo = iuo.SetIndicatorParamsID(*id)
 	}
 	return iuo
 }
 
-// SetIndicatorValueAlias sets the "indicator_value_alias" edge to the IndicatorValueAlias entity.
-func (iuo *IndicatorUpdateOne) SetIndicatorValueAlias(i *IndicatorValueAlias) *IndicatorUpdateOne {
-	return iuo.SetIndicatorValueAliasID(i.ID)
+// SetIndicatorParams sets the "indicator_params" edge to the IndicatorParams entity.
+func (iuo *IndicatorUpdateOne) SetIndicatorParams(i *IndicatorParams) *IndicatorUpdateOne {
+	return iuo.SetIndicatorParamsID(i.ID)
 }
 
 // SetAuthorID sets the "author" edge to the User entity by ID.
@@ -652,9 +652,9 @@ func (iuo *IndicatorUpdateOne) RemoveDatasets(d ...*Dataset) *IndicatorUpdateOne
 	return iuo.RemoveDatasetIDs(ids...)
 }
 
-// ClearIndicatorValueAlias clears the "indicator_value_alias" edge to the IndicatorValueAlias entity.
-func (iuo *IndicatorUpdateOne) ClearIndicatorValueAlias() *IndicatorUpdateOne {
-	iuo.mutation.ClearIndicatorValueAlias()
+// ClearIndicatorParams clears the "indicator_params" edge to the IndicatorParams entity.
+func (iuo *IndicatorUpdateOne) ClearIndicatorParams() *IndicatorUpdateOne {
+	iuo.mutation.ClearIndicatorParams()
 	return iuo
 }
 
@@ -867,33 +867,33 @@ func (iuo *IndicatorUpdateOne) sqlSave(ctx context.Context) (_node *Indicator, e
 		}
 		_spec.Edges.Add = append(_spec.Edges.Add, edge)
 	}
-	if iuo.mutation.IndicatorValueAliasCleared() {
+	if iuo.mutation.IndicatorParamsCleared() {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   indicator.IndicatorValueAliasTable,
-			Columns: []string{indicator.IndicatorValueAliasColumn},
+			Table:   indicator.IndicatorParamsTable,
+			Columns: []string{indicator.IndicatorParamsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: indicatorvaluealias.FieldID,
+					Column: indicatorparams.FieldID,
 				},
 			},
 		}
 		_spec.Edges.Clear = append(_spec.Edges.Clear, edge)
 	}
-	if nodes := iuo.mutation.IndicatorValueAliasIDs(); len(nodes) > 0 {
+	if nodes := iuo.mutation.IndicatorParamsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   indicator.IndicatorValueAliasTable,
-			Columns: []string{indicator.IndicatorValueAliasColumn},
+			Table:   indicator.IndicatorParamsTable,
+			Columns: []string{indicator.IndicatorParamsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: indicatorvaluealias.FieldID,
+					Column: indicatorparams.FieldID,
 				},
 			},
 		}

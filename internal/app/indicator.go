@@ -24,12 +24,14 @@ func (a *App) CreateIndicator(args domain.CreateIndicatorArgs) error {
 	}
 
 	_, err = a.repo.CreateIndicator(&domain.Indicator{
-		Code:        makeIndicatorCode(args.Username, args.ScaleType, args.Title),
-		Title:       args.Title,
-		Description: args.Description,
-		Scale:       scale,
-		Author:      user,
-		Active:      true,
+		Code:         makeIndicatorCode(args.Username, args.ScaleType, args.Title),
+		Title:        args.Title,
+		Description:  args.Description,
+		Scale:        scale,
+		Author:       user,
+		Active:       true,
+		ValueMapping: args.ValueMapping,
+		ValueParams:  args.ValueParams,
 	})
 	if err != nil {
 		return err
@@ -58,10 +60,12 @@ func (a *App) UpdateIndicator(args domain.UpdateIndicatorArgs) error {
 
 	_, err = a.repo.UpdateIndicator(
 		&domain.Indicator{
-			ID:          indicator.ID,
-			Title:       args.Title,
-			Description: args.Description,
-			Active:      args.Active,
+			ID:           indicator.ID,
+			Title:        args.Title,
+			Description:  args.Description,
+			Active:       args.Active,
+			ValueMapping: args.ValueMapping,
+			ValueParams:  args.ValueParams,
 		})
 
 	return nil

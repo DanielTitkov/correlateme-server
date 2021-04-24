@@ -28,10 +28,12 @@ func (h *Handler) CreateIndicator(c echo.Context) error {
 	}
 
 	err = h.app.CreateIndicator(domain.CreateIndicatorArgs{
-		Username:    username,
-		ScaleType:   request.ScaleType,
-		Title:       request.Title,
-		Description: request.Description,
+		Username:     username,
+		ScaleType:    request.ScaleType,
+		Title:        request.Title,
+		Description:  request.Description,
+		ValueMapping: request.ValueMapping,
+		ValueParams:  request.ValueParams,
 	})
 	if err != nil {
 		return c.JSON(http.StatusInternalServerError, model.ErrorResponse{
@@ -66,6 +68,8 @@ func (h *Handler) UpdateIndicator(c echo.Context) error {
 		Active:         request.Active,
 		Title:          request.Title,
 		Description:    request.Description,
+		ValueMapping:   request.ValueMapping,
+		ValueParams:    request.ValueParams,
 		UpdateBuiltins: false,
 	})
 	if err != nil {

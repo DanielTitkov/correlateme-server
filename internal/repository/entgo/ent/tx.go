@@ -24,8 +24,8 @@ type Tx struct {
 	DictionaryEntry *DictionaryEntryClient
 	// Indicator is the client for interacting with the Indicator builders.
 	Indicator *IndicatorClient
-	// IndicatorValueAlias is the client for interacting with the IndicatorValueAlias builders.
-	IndicatorValueAlias *IndicatorValueAliasClient
+	// IndicatorParams is the client for interacting with the IndicatorParams builders.
+	IndicatorParams *IndicatorParamsClient
 	// Observation is the client for interacting with the Observation builders.
 	Observation *ObservationClient
 	// Scale is the client for interacting with the Scale builders.
@@ -175,7 +175,7 @@ func (tx *Tx) init() {
 	tx.Dictionary = NewDictionaryClient(tx.config)
 	tx.DictionaryEntry = NewDictionaryEntryClient(tx.config)
 	tx.Indicator = NewIndicatorClient(tx.config)
-	tx.IndicatorValueAlias = NewIndicatorValueAliasClient(tx.config)
+	tx.IndicatorParams = NewIndicatorParamsClient(tx.config)
 	tx.Observation = NewObservationClient(tx.config)
 	tx.Scale = NewScaleClient(tx.config)
 	tx.User = NewUserClient(tx.config)

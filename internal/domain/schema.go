@@ -17,19 +17,27 @@ type (
 	}
 	// Indicator is a set of user-created data
 	Indicator struct {
-		ID           int                `json:"id"`
-		Code         string             `json:"code"` // unique code for external systems
-		Title        string             `json:"title"`
-		Description  string             `json:"description"`
-		Active       bool               `json:"active"`  // FIXME move to dataset?
-		BuiltIn      bool               `json:"builtIn"` // if Indicator is created by the service
-		External     bool               `json:"extrnal"` // if Indicator is populated by the user or external system
-		Scale        *Scale             `json:"scale"`
-		Author       *User              `json:"author"`
-		UserDataset  *Dataset           `json:"userDataset"` // dataset for a specific user
-		ValueMapping map[float64]string `json:"-"`           // aliases for nomial and ordinal scales
-		CreateTime   time.Time          `json:"createTime"`
-		UpdateTime   time.Time          `json:"updateTime"`
+		ID           int                   `json:"id"`
+		Code         string                `json:"code"` // unique code for external systems
+		Title        string                `json:"title"`
+		Description  string                `json:"description"`
+		Active       bool                  `json:"active"`  // FIXME move to dataset?
+		BuiltIn      bool                  `json:"builtIn"` // if Indicator is created by the service
+		External     bool                  `json:"extrnal"` // if Indicator is populated by the user or external system
+		Scale        *Scale                `json:"scale"`
+		Author       *User                 `json:"author"`
+		UserDataset  *Dataset              `json:"userDataset"`  // dataset for a specific user
+		ValueMapping map[string]string     `json:"valueMapping"` // aliases for nomial and ordinal scales
+		ValueParams  *IndicatorValueParams `json:"valueParams"`
+		CreateTime   time.Time             `json:"createTime"`
+		UpdateTime   time.Time             `json:"updateTime"`
+	}
+	// IndicatorValueParams holds rules for indicator values
+	IndicatorValueParams struct {
+		Default float64 `json:"default"`
+		Min     float64 `json:"min"`
+		Max     float64 `json:"max"`
+		Step    float64 `json:"step"`
 	}
 	// Scale is a type of a scale for an Indicator
 	Scale struct {

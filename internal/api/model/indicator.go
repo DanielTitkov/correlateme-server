@@ -1,6 +1,10 @@
 package model
 
-import "time"
+import (
+	"time"
+
+	"github.com/DanielTitkov/correlateme-server/internal/domain"
+)
 
 type (
 	// Indicator is a common model to use in various methods
@@ -22,15 +26,19 @@ type (
 
 type (
 	CreateIndicatorRequest struct {
-		Title       string `json:"title" validate:"required"`
-		ScaleType   string `json:"scaleType" validate:"required"`
-		Description string `json:"description"`
+		Title        string                       `json:"title" validate:"required"`
+		ScaleType    string                       `json:"scaleType" validate:"required"`
+		Description  string                       `json:"description"`
+		ValueMapping map[string]string            `json:"valueMapping"`
+		ValueParams  *domain.IndicatorValueParams `json:"valueParams"`
 	}
 	UpdateIndicatorRequest struct {
-		ID          int    `json:"id"`
-		Title       string `json:"title"`
-		Description string `json:"description"`
-		Active      bool   `json:"active"`
+		ID           int                          `json:"id"`
+		Title        string                       `json:"title"`
+		Description  string                       `json:"description"`
+		Active       bool                         `json:"active"`
+		ValueMapping map[string]string            `json:"valueMapping"`
+		ValueParams  *domain.IndicatorValueParams `json:"valueParams"`
 	}
 	GetIndicatorsRequest struct {
 		WithDataset       bool                       `json:"withDataset"`

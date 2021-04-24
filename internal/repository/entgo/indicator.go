@@ -36,6 +36,20 @@ func (r *EntgoRepository) CreateIndicator(i *domain.Indicator) (*domain.Indicato
 		return nil, err
 	}
 
+	if i.ValueMapping != nil && i.ValueParams != nil {
+		params, err := r.client.IndicatorParams.
+			Create().
+			SetIndicator(ind).
+			SetValueMapping(i.ValueMapping).
+			SetValueParams(*i.ValueParams).
+			Save(context.TODO())
+		if err != nil {
+			return nil, err
+		}
+
+		ind.Edges.IndicatorParams = params
+	}
+
 	return entToDomainIndicator(ind), nil
 }
 
@@ -174,18 +188,27 @@ func entToDomainIndicator(ind *ent.Indicator) *domain.Indicator {
 		dataset = entToDomainDataset(ind.Edges.Datasets[0])
 	}
 
+	var valueParams *domain.IndicatorValueParams
+	var valueMapping map[string]string
+	if ind.Edges.IndicatorParams != nil {
+		valueParams = &ind.Edges.IndicatorParams.ValueParams
+		valueMapping = ind.Edges.IndicatorParams.ValueMapping
+	}
+
 	return &domain.Indicator{
-		ID:          ind.ID,
-		Code:        ind.Code,
-		Author:      author,
-		Scale:       scale,
-		Title:       ind.Title,
-		Description: ind.Description,
-		Active:      ind.Active,
-		BuiltIn:     ind.BuiltIn,
-		External:    ind.External,
-		UserDataset: dataset,
-		CreateTime:  ind.CreateTime,
-		UpdateTime:  ind.UpdateTime,
+		ID:           ind.ID,
+		Code:         ind.Code,
+		Author:       author,
+		Scale:        scale,
+		Title:        ind.Title,
+		Description:  ind.Description,
+		Active:       ind.Active,
+		BuiltIn:      ind.BuiltIn,
+		External:     ind.External,
+		UserDataset:  dataset,
+		ValueMapping: valueMapping,
+		ValueParams:  valueParams,
+		CreateTime:   ind.CreateTime,
+		UpdateTime:   ind.UpdateTime,
 	}
 }

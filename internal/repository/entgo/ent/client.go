@@ -15,7 +15,7 @@ import (
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dictionary"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dictionaryentry"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
-	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicatorvaluealias"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicatorparams"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/observation"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/scale"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/user"
@@ -43,8 +43,8 @@ type Client struct {
 	DictionaryEntry *DictionaryEntryClient
 	// Indicator is the client for interacting with the Indicator builders.
 	Indicator *IndicatorClient
-	// IndicatorValueAlias is the client for interacting with the IndicatorValueAlias builders.
-	IndicatorValueAlias *IndicatorValueAliasClient
+	// IndicatorParams is the client for interacting with the IndicatorParams builders.
+	IndicatorParams *IndicatorParamsClient
 	// Observation is the client for interacting with the Observation builders.
 	Observation *ObservationClient
 	// Scale is the client for interacting with the Scale builders.
@@ -72,7 +72,7 @@ func (c *Client) init() {
 	c.Dictionary = NewDictionaryClient(c.config)
 	c.DictionaryEntry = NewDictionaryEntryClient(c.config)
 	c.Indicator = NewIndicatorClient(c.config)
-	c.IndicatorValueAlias = NewIndicatorValueAliasClient(c.config)
+	c.IndicatorParams = NewIndicatorParamsClient(c.config)
 	c.Observation = NewObservationClient(c.config)
 	c.Scale = NewScaleClient(c.config)
 	c.User = NewUserClient(c.config)
@@ -108,19 +108,19 @@ func (c *Client) Tx(ctx context.Context) (*Tx, error) {
 	cfg := c.config
 	cfg.driver = tx
 	return &Tx{
-		ctx:                 ctx,
-		config:              cfg,
-		Correlation:         NewCorrelationClient(cfg),
-		Dataset:             NewDatasetClient(cfg),
-		DatasetParams:       NewDatasetParamsClient(cfg),
-		Dictionary:          NewDictionaryClient(cfg),
-		DictionaryEntry:     NewDictionaryEntryClient(cfg),
-		Indicator:           NewIndicatorClient(cfg),
-		IndicatorValueAlias: NewIndicatorValueAliasClient(cfg),
-		Observation:         NewObservationClient(cfg),
-		Scale:               NewScaleClient(cfg),
-		User:                NewUserClient(cfg),
-		UserSettings:        NewUserSettingsClient(cfg),
+		ctx:             ctx,
+		config:          cfg,
+		Correlation:     NewCorrelationClient(cfg),
+		Dataset:         NewDatasetClient(cfg),
+		DatasetParams:   NewDatasetParamsClient(cfg),
+		Dictionary:      NewDictionaryClient(cfg),
+		DictionaryEntry: NewDictionaryEntryClient(cfg),
+		Indicator:       NewIndicatorClient(cfg),
+		IndicatorParams: NewIndicatorParamsClient(cfg),
+		Observation:     NewObservationClient(cfg),
+		Scale:           NewScaleClient(cfg),
+		User:            NewUserClient(cfg),
+		UserSettings:    NewUserSettingsClient(cfg),
 	}, nil
 }
 
@@ -138,18 +138,18 @@ func (c *Client) BeginTx(ctx context.Context, opts *sql.TxOptions) (*Tx, error) 
 	cfg := c.config
 	cfg.driver = &txDriver{tx: tx, drv: c.driver}
 	return &Tx{
-		config:              cfg,
-		Correlation:         NewCorrelationClient(cfg),
-		Dataset:             NewDatasetClient(cfg),
-		DatasetParams:       NewDatasetParamsClient(cfg),
-		Dictionary:          NewDictionaryClient(cfg),
-		DictionaryEntry:     NewDictionaryEntryClient(cfg),
-		Indicator:           NewIndicatorClient(cfg),
-		IndicatorValueAlias: NewIndicatorValueAliasClient(cfg),
-		Observation:         NewObservationClient(cfg),
-		Scale:               NewScaleClient(cfg),
-		User:                NewUserClient(cfg),
-		UserSettings:        NewUserSettingsClient(cfg),
+		config:          cfg,
+		Correlation:     NewCorrelationClient(cfg),
+		Dataset:         NewDatasetClient(cfg),
+		DatasetParams:   NewDatasetParamsClient(cfg),
+		Dictionary:      NewDictionaryClient(cfg),
+		DictionaryEntry: NewDictionaryEntryClient(cfg),
+		Indicator:       NewIndicatorClient(cfg),
+		IndicatorParams: NewIndicatorParamsClient(cfg),
+		Observation:     NewObservationClient(cfg),
+		Scale:           NewScaleClient(cfg),
+		User:            NewUserClient(cfg),
+		UserSettings:    NewUserSettingsClient(cfg),
 	}, nil
 }
 
@@ -185,7 +185,7 @@ func (c *Client) Use(hooks ...Hook) {
 	c.Dictionary.Use(hooks...)
 	c.DictionaryEntry.Use(hooks...)
 	c.Indicator.Use(hooks...)
-	c.IndicatorValueAlias.Use(hooks...)
+	c.IndicatorParams.Use(hooks...)
 	c.Observation.Use(hooks...)
 	c.Scale.Use(hooks...)
 	c.User.Use(hooks...)
@@ -907,15 +907,15 @@ func (c *IndicatorClient) QueryDatasets(i *Indicator) *DatasetQuery {
 	return query
 }
 
-// QueryIndicatorValueAlias queries the indicator_value_alias edge of a Indicator.
-func (c *IndicatorClient) QueryIndicatorValueAlias(i *Indicator) *IndicatorValueAliasQuery {
-	query := &IndicatorValueAliasQuery{config: c.config}
+// QueryIndicatorParams queries the indicator_params edge of a Indicator.
+func (c *IndicatorClient) QueryIndicatorParams(i *Indicator) *IndicatorParamsQuery {
+	query := &IndicatorParamsQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
 		id := i.ID
 		step := sqlgraph.NewStep(
 			sqlgraph.From(indicator.Table, indicator.FieldID, id),
-			sqlgraph.To(indicatorvaluealias.Table, indicatorvaluealias.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, indicator.IndicatorValueAliasTable, indicator.IndicatorValueAliasColumn),
+			sqlgraph.To(indicatorparams.Table, indicatorparams.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, indicator.IndicatorParamsTable, indicator.IndicatorParamsColumn),
 		)
 		fromV = sqlgraph.Neighbors(i.driver.Dialect(), step)
 		return fromV, nil
@@ -960,82 +960,82 @@ func (c *IndicatorClient) Hooks() []Hook {
 	return c.hooks.Indicator
 }
 
-// IndicatorValueAliasClient is a client for the IndicatorValueAlias schema.
-type IndicatorValueAliasClient struct {
+// IndicatorParamsClient is a client for the IndicatorParams schema.
+type IndicatorParamsClient struct {
 	config
 }
 
-// NewIndicatorValueAliasClient returns a client for the IndicatorValueAlias from the given config.
-func NewIndicatorValueAliasClient(c config) *IndicatorValueAliasClient {
-	return &IndicatorValueAliasClient{config: c}
+// NewIndicatorParamsClient returns a client for the IndicatorParams from the given config.
+func NewIndicatorParamsClient(c config) *IndicatorParamsClient {
+	return &IndicatorParamsClient{config: c}
 }
 
 // Use adds a list of mutation hooks to the hooks stack.
-// A call to `Use(f, g, h)` equals to `indicatorvaluealias.Hooks(f(g(h())))`.
-func (c *IndicatorValueAliasClient) Use(hooks ...Hook) {
-	c.hooks.IndicatorValueAlias = append(c.hooks.IndicatorValueAlias, hooks...)
+// A call to `Use(f, g, h)` equals to `indicatorparams.Hooks(f(g(h())))`.
+func (c *IndicatorParamsClient) Use(hooks ...Hook) {
+	c.hooks.IndicatorParams = append(c.hooks.IndicatorParams, hooks...)
 }
 
-// Create returns a create builder for IndicatorValueAlias.
-func (c *IndicatorValueAliasClient) Create() *IndicatorValueAliasCreate {
-	mutation := newIndicatorValueAliasMutation(c.config, OpCreate)
-	return &IndicatorValueAliasCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Create returns a create builder for IndicatorParams.
+func (c *IndicatorParamsClient) Create() *IndicatorParamsCreate {
+	mutation := newIndicatorParamsMutation(c.config, OpCreate)
+	return &IndicatorParamsCreate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// CreateBulk returns a builder for creating a bulk of IndicatorValueAlias entities.
-func (c *IndicatorValueAliasClient) CreateBulk(builders ...*IndicatorValueAliasCreate) *IndicatorValueAliasCreateBulk {
-	return &IndicatorValueAliasCreateBulk{config: c.config, builders: builders}
+// CreateBulk returns a builder for creating a bulk of IndicatorParams entities.
+func (c *IndicatorParamsClient) CreateBulk(builders ...*IndicatorParamsCreate) *IndicatorParamsCreateBulk {
+	return &IndicatorParamsCreateBulk{config: c.config, builders: builders}
 }
 
-// Update returns an update builder for IndicatorValueAlias.
-func (c *IndicatorValueAliasClient) Update() *IndicatorValueAliasUpdate {
-	mutation := newIndicatorValueAliasMutation(c.config, OpUpdate)
-	return &IndicatorValueAliasUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Update returns an update builder for IndicatorParams.
+func (c *IndicatorParamsClient) Update() *IndicatorParamsUpdate {
+	mutation := newIndicatorParamsMutation(c.config, OpUpdate)
+	return &IndicatorParamsUpdate{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOne returns an update builder for the given entity.
-func (c *IndicatorValueAliasClient) UpdateOne(iva *IndicatorValueAlias) *IndicatorValueAliasUpdateOne {
-	mutation := newIndicatorValueAliasMutation(c.config, OpUpdateOne, withIndicatorValueAlias(iva))
-	return &IndicatorValueAliasUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *IndicatorParamsClient) UpdateOne(ip *IndicatorParams) *IndicatorParamsUpdateOne {
+	mutation := newIndicatorParamsMutation(c.config, OpUpdateOne, withIndicatorParams(ip))
+	return &IndicatorParamsUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // UpdateOneID returns an update builder for the given id.
-func (c *IndicatorValueAliasClient) UpdateOneID(id int) *IndicatorValueAliasUpdateOne {
-	mutation := newIndicatorValueAliasMutation(c.config, OpUpdateOne, withIndicatorValueAliasID(id))
-	return &IndicatorValueAliasUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
+func (c *IndicatorParamsClient) UpdateOneID(id int) *IndicatorParamsUpdateOne {
+	mutation := newIndicatorParamsMutation(c.config, OpUpdateOne, withIndicatorParamsID(id))
+	return &IndicatorParamsUpdateOne{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
-// Delete returns a delete builder for IndicatorValueAlias.
-func (c *IndicatorValueAliasClient) Delete() *IndicatorValueAliasDelete {
-	mutation := newIndicatorValueAliasMutation(c.config, OpDelete)
-	return &IndicatorValueAliasDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
+// Delete returns a delete builder for IndicatorParams.
+func (c *IndicatorParamsClient) Delete() *IndicatorParamsDelete {
+	mutation := newIndicatorParamsMutation(c.config, OpDelete)
+	return &IndicatorParamsDelete{config: c.config, hooks: c.Hooks(), mutation: mutation}
 }
 
 // DeleteOne returns a delete builder for the given entity.
-func (c *IndicatorValueAliasClient) DeleteOne(iva *IndicatorValueAlias) *IndicatorValueAliasDeleteOne {
-	return c.DeleteOneID(iva.ID)
+func (c *IndicatorParamsClient) DeleteOne(ip *IndicatorParams) *IndicatorParamsDeleteOne {
+	return c.DeleteOneID(ip.ID)
 }
 
 // DeleteOneID returns a delete builder for the given id.
-func (c *IndicatorValueAliasClient) DeleteOneID(id int) *IndicatorValueAliasDeleteOne {
-	builder := c.Delete().Where(indicatorvaluealias.ID(id))
+func (c *IndicatorParamsClient) DeleteOneID(id int) *IndicatorParamsDeleteOne {
+	builder := c.Delete().Where(indicatorparams.ID(id))
 	builder.mutation.id = &id
 	builder.mutation.op = OpDeleteOne
-	return &IndicatorValueAliasDeleteOne{builder}
+	return &IndicatorParamsDeleteOne{builder}
 }
 
-// Query returns a query builder for IndicatorValueAlias.
-func (c *IndicatorValueAliasClient) Query() *IndicatorValueAliasQuery {
-	return &IndicatorValueAliasQuery{config: c.config}
+// Query returns a query builder for IndicatorParams.
+func (c *IndicatorParamsClient) Query() *IndicatorParamsQuery {
+	return &IndicatorParamsQuery{config: c.config}
 }
 
-// Get returns a IndicatorValueAlias entity by its id.
-func (c *IndicatorValueAliasClient) Get(ctx context.Context, id int) (*IndicatorValueAlias, error) {
-	return c.Query().Where(indicatorvaluealias.ID(id)).Only(ctx)
+// Get returns a IndicatorParams entity by its id.
+func (c *IndicatorParamsClient) Get(ctx context.Context, id int) (*IndicatorParams, error) {
+	return c.Query().Where(indicatorparams.ID(id)).Only(ctx)
 }
 
 // GetX is like Get, but panics if an error occurs.
-func (c *IndicatorValueAliasClient) GetX(ctx context.Context, id int) *IndicatorValueAlias {
+func (c *IndicatorParamsClient) GetX(ctx context.Context, id int) *IndicatorParams {
 	obj, err := c.Get(ctx, id)
 	if err != nil {
 		panic(err)
@@ -1043,25 +1043,25 @@ func (c *IndicatorValueAliasClient) GetX(ctx context.Context, id int) *Indicator
 	return obj
 }
 
-// QueryIndicator queries the indicator edge of a IndicatorValueAlias.
-func (c *IndicatorValueAliasClient) QueryIndicator(iva *IndicatorValueAlias) *IndicatorQuery {
+// QueryIndicator queries the indicator edge of a IndicatorParams.
+func (c *IndicatorParamsClient) QueryIndicator(ip *IndicatorParams) *IndicatorQuery {
 	query := &IndicatorQuery{config: c.config}
 	query.path = func(ctx context.Context) (fromV *sql.Selector, _ error) {
-		id := iva.ID
+		id := ip.ID
 		step := sqlgraph.NewStep(
-			sqlgraph.From(indicatorvaluealias.Table, indicatorvaluealias.FieldID, id),
+			sqlgraph.From(indicatorparams.Table, indicatorparams.FieldID, id),
 			sqlgraph.To(indicator.Table, indicator.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, true, indicatorvaluealias.IndicatorTable, indicatorvaluealias.IndicatorColumn),
+			sqlgraph.Edge(sqlgraph.O2O, true, indicatorparams.IndicatorTable, indicatorparams.IndicatorColumn),
 		)
-		fromV = sqlgraph.Neighbors(iva.driver.Dialect(), step)
+		fromV = sqlgraph.Neighbors(ip.driver.Dialect(), step)
 		return fromV, nil
 	}
 	return query
 }
 
 // Hooks returns the client hooks.
-func (c *IndicatorValueAliasClient) Hooks() []Hook {
-	return c.hooks.IndicatorValueAlias
+func (c *IndicatorParamsClient) Hooks() []Hook {
+	return c.hooks.IndicatorParams
 }
 
 // ObservationClient is a client for the Observation schema.

@@ -14,7 +14,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dataset"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
-	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicatorvaluealias"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicatorparams"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/predicate"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/scale"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/user"
@@ -29,11 +29,11 @@ type IndicatorQuery struct {
 	fields     []string
 	predicates []predicate.Indicator
 	// eager-loading edges.
-	withDatasets            *DatasetQuery
-	withIndicatorValueAlias *IndicatorValueAliasQuery
-	withAuthor              *UserQuery
-	withScale               *ScaleQuery
-	withFKs                 bool
+	withDatasets        *DatasetQuery
+	withIndicatorParams *IndicatorParamsQuery
+	withAuthor          *UserQuery
+	withScale           *ScaleQuery
+	withFKs             bool
 	// intermediate query (i.e. traversal path).
 	sql  *sql.Selector
 	path func(context.Context) (*sql.Selector, error)
@@ -85,9 +85,9 @@ func (iq *IndicatorQuery) QueryDatasets() *DatasetQuery {
 	return query
 }
 
-// QueryIndicatorValueAlias chains the current query on the "indicator_value_alias" edge.
-func (iq *IndicatorQuery) QueryIndicatorValueAlias() *IndicatorValueAliasQuery {
-	query := &IndicatorValueAliasQuery{config: iq.config}
+// QueryIndicatorParams chains the current query on the "indicator_params" edge.
+func (iq *IndicatorQuery) QueryIndicatorParams() *IndicatorParamsQuery {
+	query := &IndicatorParamsQuery{config: iq.config}
 	query.path = func(ctx context.Context) (fromU *sql.Selector, err error) {
 		if err := iq.prepareQuery(ctx); err != nil {
 			return nil, err
@@ -98,8 +98,8 @@ func (iq *IndicatorQuery) QueryIndicatorValueAlias() *IndicatorValueAliasQuery {
 		}
 		step := sqlgraph.NewStep(
 			sqlgraph.From(indicator.Table, indicator.FieldID, selector),
-			sqlgraph.To(indicatorvaluealias.Table, indicatorvaluealias.FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, indicator.IndicatorValueAliasTable, indicator.IndicatorValueAliasColumn),
+			sqlgraph.To(indicatorparams.Table, indicatorparams.FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, indicator.IndicatorParamsTable, indicator.IndicatorParamsColumn),
 		)
 		fromU = sqlgraph.SetNeighbors(iq.driver.Dialect(), step)
 		return fromU, nil
@@ -327,15 +327,15 @@ func (iq *IndicatorQuery) Clone() *IndicatorQuery {
 		return nil
 	}
 	return &IndicatorQuery{
-		config:                  iq.config,
-		limit:                   iq.limit,
-		offset:                  iq.offset,
-		order:                   append([]OrderFunc{}, iq.order...),
-		predicates:              append([]predicate.Indicator{}, iq.predicates...),
-		withDatasets:            iq.withDatasets.Clone(),
-		withIndicatorValueAlias: iq.withIndicatorValueAlias.Clone(),
-		withAuthor:              iq.withAuthor.Clone(),
-		withScale:               iq.withScale.Clone(),
+		config:              iq.config,
+		limit:               iq.limit,
+		offset:              iq.offset,
+		order:               append([]OrderFunc{}, iq.order...),
+		predicates:          append([]predicate.Indicator{}, iq.predicates...),
+		withDatasets:        iq.withDatasets.Clone(),
+		withIndicatorParams: iq.withIndicatorParams.Clone(),
+		withAuthor:          iq.withAuthor.Clone(),
+		withScale:           iq.withScale.Clone(),
 		// clone intermediate query.
 		sql:  iq.sql.Clone(),
 		path: iq.path,
@@ -353,14 +353,14 @@ func (iq *IndicatorQuery) WithDatasets(opts ...func(*DatasetQuery)) *IndicatorQu
 	return iq
 }
 
-// WithIndicatorValueAlias tells the query-builder to eager-load the nodes that are connected to
-// the "indicator_value_alias" edge. The optional arguments are used to configure the query builder of the edge.
-func (iq *IndicatorQuery) WithIndicatorValueAlias(opts ...func(*IndicatorValueAliasQuery)) *IndicatorQuery {
-	query := &IndicatorValueAliasQuery{config: iq.config}
+// WithIndicatorParams tells the query-builder to eager-load the nodes that are connected to
+// the "indicator_params" edge. The optional arguments are used to configure the query builder of the edge.
+func (iq *IndicatorQuery) WithIndicatorParams(opts ...func(*IndicatorParamsQuery)) *IndicatorQuery {
+	query := &IndicatorParamsQuery{config: iq.config}
 	for _, opt := range opts {
 		opt(query)
 	}
-	iq.withIndicatorValueAlias = query
+	iq.withIndicatorParams = query
 	return iq
 }
 
@@ -454,7 +454,7 @@ func (iq *IndicatorQuery) sqlAll(ctx context.Context) ([]*Indicator, error) {
 		_spec       = iq.querySpec()
 		loadedTypes = [4]bool{
 			iq.withDatasets != nil,
-			iq.withIndicatorValueAlias != nil,
+			iq.withIndicatorParams != nil,
 			iq.withAuthor != nil,
 			iq.withScale != nil,
 		}
@@ -514,7 +514,7 @@ func (iq *IndicatorQuery) sqlAll(ctx context.Context) ([]*Indicator, error) {
 		}
 	}
 
-	if query := iq.withIndicatorValueAlias; query != nil {
+	if query := iq.withIndicatorParams; query != nil {
 		fks := make([]driver.Value, 0, len(nodes))
 		nodeids := make(map[int]*Indicator)
 		for i := range nodes {
@@ -522,23 +522,23 @@ func (iq *IndicatorQuery) sqlAll(ctx context.Context) ([]*Indicator, error) {
 			nodeids[nodes[i].ID] = nodes[i]
 		}
 		query.withFKs = true
-		query.Where(predicate.IndicatorValueAlias(func(s *sql.Selector) {
-			s.Where(sql.InValues(indicator.IndicatorValueAliasColumn, fks...))
+		query.Where(predicate.IndicatorParams(func(s *sql.Selector) {
+			s.Where(sql.InValues(indicator.IndicatorParamsColumn, fks...))
 		}))
 		neighbors, err := query.All(ctx)
 		if err != nil {
 			return nil, err
 		}
 		for _, n := range neighbors {
-			fk := n.indicator_indicator_value_alias
+			fk := n.indicator_indicator_params
 			if fk == nil {
-				return nil, fmt.Errorf(`foreign-key "indicator_indicator_value_alias" is nil for node %v`, n.ID)
+				return nil, fmt.Errorf(`foreign-key "indicator_indicator_params" is nil for node %v`, n.ID)
 			}
 			node, ok := nodeids[*fk]
 			if !ok {
-				return nil, fmt.Errorf(`unexpected foreign-key "indicator_indicator_value_alias" returned %v for node %v`, *fk, n.ID)
+				return nil, fmt.Errorf(`unexpected foreign-key "indicator_indicator_params" returned %v for node %v`, *fk, n.ID)
 			}
-			node.Edges.IndicatorValueAlias = n
+			node.Edges.IndicatorParams = n
 		}
 	}
 

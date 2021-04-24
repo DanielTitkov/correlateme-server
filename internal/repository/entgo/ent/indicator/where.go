@@ -718,25 +718,25 @@ func HasDatasetsWith(preds ...predicate.Dataset) predicate.Indicator {
 	})
 }
 
-// HasIndicatorValueAlias applies the HasEdge predicate on the "indicator_value_alias" edge.
-func HasIndicatorValueAlias() predicate.Indicator {
+// HasIndicatorParams applies the HasEdge predicate on the "indicator_params" edge.
+func HasIndicatorParams() predicate.Indicator {
 	return predicate.Indicator(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(IndicatorValueAliasTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, IndicatorValueAliasTable, IndicatorValueAliasColumn),
+			sqlgraph.To(IndicatorParamsTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, IndicatorParamsTable, IndicatorParamsColumn),
 		)
 		sqlgraph.HasNeighbors(s, step)
 	})
 }
 
-// HasIndicatorValueAliasWith applies the HasEdge predicate on the "indicator_value_alias" edge with a given conditions (other predicates).
-func HasIndicatorValueAliasWith(preds ...predicate.IndicatorValueAlias) predicate.Indicator {
+// HasIndicatorParamsWith applies the HasEdge predicate on the "indicator_params" edge with a given conditions (other predicates).
+func HasIndicatorParamsWith(preds ...predicate.IndicatorParams) predicate.Indicator {
 	return predicate.Indicator(func(s *sql.Selector) {
 		step := sqlgraph.NewStep(
 			sqlgraph.From(Table, FieldID),
-			sqlgraph.To(IndicatorValueAliasInverseTable, FieldID),
-			sqlgraph.Edge(sqlgraph.O2O, false, IndicatorValueAliasTable, IndicatorValueAliasColumn),
+			sqlgraph.To(IndicatorParamsInverseTable, FieldID),
+			sqlgraph.Edge(sqlgraph.O2O, false, IndicatorParamsTable, IndicatorParamsColumn),
 		)
 		sqlgraph.HasNeighborsWith(s, step, func(s *sql.Selector) {
 			for _, p := range preds {

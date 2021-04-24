@@ -12,7 +12,7 @@ import (
 	"entgo.io/ent/schema/field"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/dataset"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicator"
-	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicatorvaluealias"
+	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/indicatorparams"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/scale"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent/user"
 )
@@ -135,23 +135,23 @@ func (ic *IndicatorCreate) AddDatasets(d ...*Dataset) *IndicatorCreate {
 	return ic.AddDatasetIDs(ids...)
 }
 
-// SetIndicatorValueAliasID sets the "indicator_value_alias" edge to the IndicatorValueAlias entity by ID.
-func (ic *IndicatorCreate) SetIndicatorValueAliasID(id int) *IndicatorCreate {
-	ic.mutation.SetIndicatorValueAliasID(id)
+// SetIndicatorParamsID sets the "indicator_params" edge to the IndicatorParams entity by ID.
+func (ic *IndicatorCreate) SetIndicatorParamsID(id int) *IndicatorCreate {
+	ic.mutation.SetIndicatorParamsID(id)
 	return ic
 }
 
-// SetNillableIndicatorValueAliasID sets the "indicator_value_alias" edge to the IndicatorValueAlias entity by ID if the given value is not nil.
-func (ic *IndicatorCreate) SetNillableIndicatorValueAliasID(id *int) *IndicatorCreate {
+// SetNillableIndicatorParamsID sets the "indicator_params" edge to the IndicatorParams entity by ID if the given value is not nil.
+func (ic *IndicatorCreate) SetNillableIndicatorParamsID(id *int) *IndicatorCreate {
 	if id != nil {
-		ic = ic.SetIndicatorValueAliasID(*id)
+		ic = ic.SetIndicatorParamsID(*id)
 	}
 	return ic
 }
 
-// SetIndicatorValueAlias sets the "indicator_value_alias" edge to the IndicatorValueAlias entity.
-func (ic *IndicatorCreate) SetIndicatorValueAlias(i *IndicatorValueAlias) *IndicatorCreate {
-	return ic.SetIndicatorValueAliasID(i.ID)
+// SetIndicatorParams sets the "indicator_params" edge to the IndicatorParams entity.
+func (ic *IndicatorCreate) SetIndicatorParams(i *IndicatorParams) *IndicatorCreate {
+	return ic.SetIndicatorParamsID(i.ID)
 }
 
 // SetAuthorID sets the "author" edge to the User entity by ID.
@@ -404,17 +404,17 @@ func (ic *IndicatorCreate) createSpec() (*Indicator, *sqlgraph.CreateSpec) {
 		}
 		_spec.Edges = append(_spec.Edges, edge)
 	}
-	if nodes := ic.mutation.IndicatorValueAliasIDs(); len(nodes) > 0 {
+	if nodes := ic.mutation.IndicatorParamsIDs(); len(nodes) > 0 {
 		edge := &sqlgraph.EdgeSpec{
 			Rel:     sqlgraph.O2O,
 			Inverse: false,
-			Table:   indicator.IndicatorValueAliasTable,
-			Columns: []string{indicator.IndicatorValueAliasColumn},
+			Table:   indicator.IndicatorParamsTable,
+			Columns: []string{indicator.IndicatorParamsColumn},
 			Bidi:    false,
 			Target: &sqlgraph.EdgeTarget{
 				IDSpec: &sqlgraph.FieldSpec{
 					Type:   field.TypeInt,
-					Column: indicatorvaluealias.FieldID,
+					Column: indicatorparams.FieldID,
 				},
 			},
 		}
