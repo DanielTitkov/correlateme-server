@@ -52,13 +52,13 @@ test:
 .PHONY: substitute_config_vars
 substitute_config_vars:
 	$(call sedi," \
-		s/{{db_password}}/${DB_PASSWORD}/g; \
-		s/{{db_name}}/${DB_NAME}/g;         \
-		s/{{db_host}}/${DB_HOST}/g;         \
-		s/{{db_port}}/${DB_PORT}/g;         \
-		s/{{db_user}}/${DB_USER}/g;         \
-		s/{{secret_key}}/${SECRET_KEY}/g;   \
-		s/{{telegram_to}}/${TELEGRAM_TO}/g;   \
+		s/{{db_password}}/${DB_PASSWORD}/g;         \
+		s/{{db_name}}/${DB_NAME}/g;                 \
+		s/{{db_host}}/${DB_HOST}/g;                 \
+		s/{{db_port}}/${DB_PORT}/g;                 \
+		s/{{db_user}}/${DB_USER}/g;                 \
+		s/{{secret_key}}/${SECRET_KEY}/g;           \
+		s/{{telegram_to}}/${TELEGRAM_TO}/g;         \
 		s/{{telegram_token}}/${TELEGRAM_TOKEN}/g;   \
 		" ${CONFIG_TEMPLATE_PATH})
 	cat ${CONFIG_PATH}

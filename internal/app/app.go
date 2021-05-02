@@ -155,17 +155,3 @@ func (a *App) makeChannels() (*Channels, error) {
 		UpdateDatasetAggregationsChan: updateAggregationsChan,
 	}, nil
 }
-
-func (a *App) loadPresets() error {
-	err := a.initScales()
-	if err != nil {
-		return err
-	}
-
-	err = a.initBuiltinIndicators()
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
