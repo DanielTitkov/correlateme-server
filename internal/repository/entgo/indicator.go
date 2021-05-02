@@ -2,6 +2,7 @@ package entgo
 
 import (
 	"context"
+	"fmt"
 
 	"github.com/DanielTitkov/correlateme-server/internal/domain"
 	"github.com/DanielTitkov/correlateme-server/internal/repository/entgo/ent"
@@ -17,7 +18,12 @@ func (r *EntgoRepository) IndicatorCount() (int, error) {
 }
 
 func (r *EntgoRepository) CreateIndicator(i *domain.Indicator) (*domain.Indicator, error) {
-	query := r.client.Indicator.
+	tx, err := r.client.Tx(context.TODO())
+	if err != nil {
+		return nil, fmt.Errorf("starting a transaction: %w", err)
+	}
+
+	query := tx.Indicator.
 		Create().
 		SetCode(i.Code).
 		SetScaleID(i.Scale.ID).
@@ -33,35 +39,66 @@ func (r *EntgoRepository) CreateIndicator(i *domain.Indicator) (*domain.Indicato
 
 	ind, err := query.Save(context.TODO())
 	if err != nil {
-		return nil, err
+		return nil, rollback(tx, err)
 	}
 
-	if i.ValueMapping != nil && i.ValueParams != nil {
-		params, err := r.client.IndicatorParams.
+	if i.ValueMapping != nil || i.ValueParams != nil {
+		params, err := tx.IndicatorParams.
 			Create().
 			SetIndicator(ind).
 			SetValueMapping(i.ValueMapping).
 			SetValueParams(*i.ValueParams).
 			Save(context.TODO())
 		if err != nil {
-			return nil, err
+			return nil, rollback(tx, err)
 		}
 
 		ind.Edges.IndicatorParams = params
 	}
 
-	return entToDomainIndicator(ind), nil
+	return entToDomainIndicator(ind), tx.Commit()
 }
 
 func (r *EntgoRepository) UpdateIndicator(i *domain.Indicator) (*domain.Indicator, error) {
-	ind, err := r.client.Indicator.
+	tx, err := r.client.Tx(context.TODO())
+	if err != nil {
+		return nil, fmt.Errorf("starting a transaction: %w", err)
+	}
+
+	ind, err := tx.Indicator.
 		Query().
 		WithAuthor().
 		WithScale().
+		WithIndicatorParams().
 		Where(indicator.IDEQ(i.ID)).
 		Only(context.TODO())
 	if err != nil {
-		return nil, err
+		return nil, rollback(tx, err)
+	}
+
+	var params *ent.IndicatorParams
+	if i.ValueMapping != nil || i.ValueParams != nil {
+		if ind.Edges.IndicatorParams == nil {
+			params, err = tx.IndicatorParams.
+				Create().
+				SetIndicator(ind).
+				SetValueMapping(i.ValueMapping).
+				SetValueParams(*i.ValueParams).
+				Save(context.TODO())
+			if err != nil {
+				return nil, rollback(tx, err)
+			}
+		} else {
+			// TODO is this bound to transaction?
+			params, err = ind.Edges.IndicatorParams.Update().
+				SetValueMapping(i.ValueMapping).
+				SetValueParams(*i.ValueParams).
+				Save(context.TODO())
+			if err != nil {
+				return nil, rollback(tx, err)
+			}
+
+		}
 	}
 
 	ind, err = ind.Update().
@@ -72,10 +109,11 @@ func (r *EntgoRepository) UpdateIndicator(i *domain.Indicator) (*domain.Indicato
 		SetTitle(i.Title).
 		Save(context.TODO())
 	if err != nil {
-		return nil, err
+		return nil, rollback(tx, err)
 	}
 
-	return entToDomainIndicator(ind), nil
+	ind.Edges.IndicatorParams = params
+	return entToDomainIndicator(ind), tx.Commit()
 }
 
 func (r *EntgoRepository) GetIndicatorByID(id int) (*domain.Indicator, error) {
@@ -83,6 +121,7 @@ func (r *EntgoRepository) GetIndicatorByID(id int) (*domain.Indicator, error) {
 		Query().
 		WithAuthor().
 		WithScale().
+		WithIndicatorParams().
 		Where(indicator.IDEQ(id)).
 		Only(context.TODO())
 	if err != nil {
@@ -97,6 +136,7 @@ func (r *EntgoRepository) GetIndicatorByCode(code string) (*domain.Indicator, er
 		Query().
 		WithAuthor().
 		WithScale().
+		WithIndicatorParams().
 		Where(indicator.CodeEQ(code)).
 		Only(context.TODO())
 	if err != nil {
@@ -107,7 +147,7 @@ func (r *EntgoRepository) GetIndicatorByCode(code string) (*domain.Indicator, er
 }
 
 func (r *EntgoRepository) GetIndicators(args domain.GetIndicatorsArgs) ([]*domain.Indicator, error) {
-	query := r.client.Indicator.Query().WithAuthor().WithScale()
+	query := r.client.Indicator.Query().WithAuthor().WithScale().WithIndicatorParams()
 
 	filter := args.Filter
 	if filter.ID != nil {

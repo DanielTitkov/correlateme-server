@@ -67,6 +67,9 @@ func (a *App) UpdateIndicator(args domain.UpdateIndicatorArgs) error {
 			ValueMapping: args.ValueMapping,
 			ValueParams:  args.ValueParams,
 		})
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
