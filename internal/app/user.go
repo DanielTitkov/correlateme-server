@@ -31,6 +31,7 @@ func (a *App) GetUser(u *domain.User) (*domain.User, error) {
 	}
 
 	return &domain.User{
+		ID:       user.ID,
 		Username: user.Username,
 		Email:    user.Email,
 	}, nil
