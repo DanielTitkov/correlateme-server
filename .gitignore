@@ -19,6 +19,5 @@ configs/*
 !configs/default.*
 !configs/template.*
 
-
 # binaries
 bin/*
