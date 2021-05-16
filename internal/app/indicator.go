@@ -63,15 +63,18 @@ func (a *App) UpdateIndicator(args domain.UpdateIndicatorArgs) error {
 		}
 	}
 
-	_, err = a.repo.UpdateIndicator(
-		&domain.Indicator{
-			ID:           indicator.ID,
-			Title:        args.Title,
-			Description:  args.Description,
-			Active:       args.Active,
-			ValueMapping: args.ValueMapping,
-			ValueParams:  args.ValueParams,
-		})
+	ind := &domain.Indicator{
+		ID:           indicator.ID,
+		Title:        args.Title,
+		Description:  args.Description,
+		Active:       args.Active,
+		ValueMapping: args.ValueMapping,
+		ValueParams:  args.ValueParams,
+	}
+	if err := ind.Validate(); err != nil {
+		return err
+	}
+	_, err = a.repo.UpdateIndicator(ind)
 	if err != nil {
 		return err
 	}

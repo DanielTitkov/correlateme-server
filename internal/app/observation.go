@@ -2,6 +2,8 @@ package app
 
 import (
 	"errors"
+	"fmt"
+	"math"
 	"sort"
 	"time"
 
@@ -28,12 +30,18 @@ func (a *App) CreateOrUpdateObservation(args domain.CreateOrUpdateObservationArg
 		return err
 	}
 
-	_, err = a.repo.CreateOrUpdateObservation(&domain.Observation{
+	obs := &domain.Observation{
 		Value:       args.Value,
 		Dataset:     dataset,
 		Date:        args.Date,
 		Granularity: domain.GranularityDay, // only daily observations can be created by user
-	})
+	}
+
+	if err := a.validateObservation(indicator, obs); err != nil {
+		return err
+	}
+
+	_, err = a.repo.CreateOrUpdateObservation(obs)
 	if err != nil {
 		return err
 	}
@@ -97,6 +105,35 @@ func (a *App) UpdateAggregations(args domain.UpdateAggregationsArgs) error {
 		if err != nil {
 			return err // TODO: maybe save error, not exit right now
 		}
+	}
+
+	return nil
+}
+
+func (a *App) validateObservation(ind *domain.Indicator, obs *domain.Observation) error {
+	if ind.ValueParams == nil {
+		return nil
+	}
+
+	if obs.Value > ind.ValueParams.Max {
+		return fmt.Errorf(
+			"value must be not greater than indicator maximum: got %f while max = %f",
+			obs.Value, ind.ValueParams.Max,
+		)
+	}
+
+	if obs.Value < ind.ValueParams.Min {
+		return fmt.Errorf(
+			"value must be greater than indicator minimum: got %f while min = %f",
+			obs.Value, ind.ValueParams.Min,
+		)
+	}
+
+	if ind.ValueParams.Step != 0 && math.Mod(obs.Value, ind.ValueParams.Step) != 0 {
+		return fmt.Errorf(
+			"value must be multiple of indicator step: step = %f",
+			ind.ValueParams.Step,
+		)
 	}
 
 	return nil
