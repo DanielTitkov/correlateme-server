@@ -23,7 +23,7 @@ func (a *App) CreateIndicator(args domain.CreateIndicatorArgs) error {
 		return err
 	}
 
-	_, err = a.repo.CreateIndicator(&domain.Indicator{
+	ind := &domain.Indicator{
 		Code:         makeIndicatorCode(args.Username, args.ScaleType, args.Title),
 		Title:        args.Title,
 		Description:  args.Description,
@@ -32,7 +32,12 @@ func (a *App) CreateIndicator(args domain.CreateIndicatorArgs) error {
 		Active:       true,
 		ValueMapping: args.ValueMapping,
 		ValueParams:  args.ValueParams,
-	})
+	}
+	if err := ind.Validate(); err != nil {
+		return err
+	}
+
+	_, err = a.repo.CreateIndicator(ind)
 	if err != nil {
 		return err
 	}
