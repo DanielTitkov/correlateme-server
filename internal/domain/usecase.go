@@ -5,14 +5,6 @@ import (
 	"fmt"
 )
 
-func (i *Indicator) JSONString() string {
-	jsonBytes, err := json.Marshal(i)
-	if err != nil {
-		return fmt.Sprintf(`{"error":"%s"}`, err)
-	}
-	return string(jsonBytes)
-}
-
 func (i *Indicator) Validate() error {
 	if err := i.checkParamsConsistency(); err != nil {
 		return err
@@ -42,6 +34,14 @@ func (i *Indicator) checkParamsConsistency() error {
 	}
 
 	return nil
+}
+
+func (i *Indicator) JSONString() string {
+	jsonBytes, err := json.Marshal(i)
+	if err != nil {
+		return fmt.Sprintf(`{"error":"%s"}`, err)
+	}
+	return string(jsonBytes)
 }
 
 func (s *Scale) JSONString() string {
